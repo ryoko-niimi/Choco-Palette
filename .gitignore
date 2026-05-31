@@ -1,2 +1,3 @@
 media/
-ssssss
+db.sqlite3
+__pycache__/
