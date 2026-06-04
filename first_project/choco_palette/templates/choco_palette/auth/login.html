@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 中央に寄せるためのカードスタイル */
+    .login-card { 
+        background: white; padding: 40px; border-radius: 15px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; 
+        margin: 50px auto; /* 中央寄せ */
+    }
+    .form-group { text-align: left; margin-bottom: 20px; }
+    
+    /* Djangoの入力欄(input)にもデザインを適用するための設定 */
+    .form-group input { 
+        width: 100%; padding: 10px; border: 1px solid #ccc; 
+        border-radius: 5px; box-sizing: border-box; 
+    }
+    
+    .login-btn { 
+        background-color: #7ab8cc; color: white; border: none; 
+        padding: 12px 40px; border-radius: 5px; font-size: 16px; cursor: pointer; 
+        display: block; margin: 20px auto;
+    }
+    .links { font-size: 14px; margin-top: 20px; }
+    .links a { color: #6f4e37; text-decoration: underline; }
+</style>
+
+<div class="login-card">
+    <h2>ログイン</h2>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        
+        <button type="submit" class="login-btn">ログイン</button>
+
+        <div class="links">
+            <div><a href="{% url 'choco_palette:signup' %}">新規アカウント登録</a></div>
+            <div style="margin-top: 10px;">パスワードを忘れた方は<a href="#">こちら</a></div>
+        </div>
+    </form>
+</div>
+{% endblock %}

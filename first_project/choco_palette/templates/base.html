@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Choco-Palette</title>
+    <style>
+        /* 全体の共通スタイル */
+        body { margin: 0; background-color: #fdf6f0; font-family: sans-serif; }
+        
+        /* ヘッダーの設定 */
+        .header { 
+            background-color: #e3d5ca; 
+            padding: 20px; 
+            text-align: center; 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #4a2c2a; 
+            border-bottom: 3px solid #6f4e37;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Choco Palette</div>
+    
+    <div style="display: flex; justify-content: center; padding-top: 40px;">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

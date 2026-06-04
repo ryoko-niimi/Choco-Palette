@@ -1,0 +1,22 @@
+<div class="profile-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="avatar-edit">
+            <img src="{{ profile.image.url }}" alt="プロフィール画像" class="avatar">
+            {{ form.image }}
+        </div>
+
+        <h1>{{ profile.user.username }} のマイページ</h1>
+        <div class="nickname">
+            {{ form.username.label }}: {{ form.username }}
+        </div>
+        
+        <div class="bio">
+            {{ form.introduction.label }}:<br>
+            {{ form.introduction }}
+        </div>
+
+        <button type="submit">保存する</button>
+    </form>
+</div>

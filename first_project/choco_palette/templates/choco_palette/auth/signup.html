@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .signup-card { 
+        background: white; padding: 40px; border-radius: 15px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; 
+    }
+    .form-group { text-align: left; margin-bottom: 20px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    .signup-btn { 
+        background-color: #7ab8cc; color: white; border: none; 
+        padding: 12px 40px; border-radius: 5px; font-size: 16px; cursor: pointer; 
+        display: block; margin: 20px auto; 
+    }
+</style>
+
+<div class="signup-card">
+    <h2>新規アカウント登録</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>ユーザーネーム</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>メールアドレス</label>
+            <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label>パスワード</label>
+            <input type="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label>パスワード再入力</label>
+            <input type="password" name="password_confirm" required>
+        </div>
+        <div class="form-group">
+            <label>アイコン画像</label>
+            <input type="file" name="image">
+        </div>
+        
+        <button type="submit" class="signup-btn">登録する</button>
+    </form>
+</div>
+{% endblock %}
