@@ -1,46 +1,55 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<style>
-    .signup-card { 
-        background: white; padding: 40px; border-radius: 15px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; 
-    }
-    .form-group { text-align: left; margin-bottom: 20px; }
-    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-    .signup-btn { 
-        background-color: #7ab8cc; color: white; border: none; 
-        padding: 12px 40px; border-radius: 5px; font-size: 16px; cursor: pointer; 
-        display: block; margin: 20px auto; 
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 <div class="signup-card">
     <h2>新規アカウント登録</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="form-group">
-            <label>ユーザーネーム</label>
-            <input type="text" name="username" required>
-        </div>
-        <div class="form-group">
-            <label>メールアドレス</label>
-            <input type="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label>パスワード</label>
-            <input type="password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label>パスワード再入力</label>
-            <input type="password" name="password_confirm" required>
-        </div>
-        <div class="form-group">
-            <label>アイコン画像</label>
-            <input type="file" name="image">
-        </div>
         
-        <button type="submit" class="signup-btn">登録する</button>
+        {% if form.errors %}
+            <div style="color: red; font-size: 0.9em; margin-bottom: 15px;">
+                {% for field in form %}{% for error in field.errors %}{{ error }}<br>{% endfor %}{% endfor %}
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-group icon-upload">
+            <label for="id_image">
+                <img src="{% static 'images/default-avatar.png' %}" alt="アイコン" class="avatar-preview">
+                <span class="upload-link">画像をアップロード</span>
+            </label>
+            <input type="file" name="image" id="id_image" style="display: none;">
+        </div>
+
+        <div class="form-group">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <small class="password-hint">※半角英数字を含む6文字以上</small>
+        </div>
+        <div class="form-group">
+            {{ form.password_confirm.label_tag }}
+            {{ form.password_confirm }}
+        </div>
+
+        <button type="submit">登録</button>
+        
+        <div style="margin-top: 7px;">
+            <a href="{% url 'choco_palette:login' %}" class="upload-link" style="text-decoration: underline;">
+                ログイン画面へ戻る
+            </a>
+        </div>
     </form>
 </div>
 {% endblock %}
+    

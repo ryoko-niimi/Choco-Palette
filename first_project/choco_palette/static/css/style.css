@@ -1,0 +1,70 @@
+/* signup.html 新規アカウント登録画面 */
+
+/* カード全体のデザイン */
+.signup-card { 
+    background: white; 
+    padding: 40px; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    width: 350px; 
+    text-align: center; 
+    margin: auto;
+}
+
+/* フォームの各項目 */
+.form-group { 
+    text-align: left; 
+    margin-bottom: 20px; 
+}
+
+input { 
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    box-sizing: border-box; 
+}
+
+/* 登録ボタン */
+button { 
+    background-color: #7ab8cc; 
+    color: white; 
+    border: none; 
+    padding: 12px 40px; 
+    border-radius: 5px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    display: block; 
+    margin: 20px auto; 
+}
+
+/* パスワードの注釈 */
+.password-hint {
+    font-size: 0.8em;       /* フォントサイズを小さく */
+    color: #666;            /* 少しグレーにして控えめに */
+    display: block;         /* 改行させる */
+    margin-top: 5px;
+}
+
+/* 画像アップロード部分のリンク風デザイン */
+.icon-upload label {
+    cursor: pointer;        /* マウスを乗せたらポインターにする */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload-link {
+    color: #007bff;         /* 青文字 */
+    text-decoration: underline; /* 下線 */
+    margin-top: 5px;
+}
+
+/* アバター画像のサイズ */
+.avatar-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;     /* 丸いアイコンに */
+    object-fit: cover;
+    background-color: #eee;
+}

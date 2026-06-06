@@ -2,25 +2,42 @@
 
 {% block content %}
 <style>
-    /* 中央に寄せるためのカードスタイル */
+    /* 中央に寄せるためのカードスタイル（スマホ対応版） */
     .login-card { 
-        background: white; padding: 40px; border-radius: 15px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; 
-        margin: 50px auto; /* 中央寄せ */
+        background: white; 
+        padding: 20px; 
+        border-radius: 15px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        /* スマホ対応：画面幅の90%を使い、最大350pxまで広がる */
+        width: 90%; 
+        max-width: 350px; 
+        text-align: center; 
+        margin: 50px auto; 
     }
+
     .form-group { text-align: left; margin-bottom: 20px; }
     
-    /* Djangoの入力欄(input)にもデザインを適用するための設定 */
+    /* Djangoの入力欄(input)にもデザインを適用 */
     .form-group input { 
-        width: 100%; padding: 10px; border: 1px solid #ccc; 
-        border-radius: 5px; box-sizing: border-box; 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid #ccc; 
+        border-radius: 5px; 
+        box-sizing: border-box; /* paddingを含めて幅を計算する設定 */
     }
     
     .login-btn { 
-        background-color: #7ab8cc; color: white; border: none; 
-        padding: 12px 40px; border-radius: 5px; font-size: 16px; cursor: pointer; 
-        display: block; margin: 20px auto;
+        background-color: #7ab8cc; 
+        color: white; 
+        border: none; 
+        padding: 12px 40px; 
+        border-radius: 5px; 
+        font-size: 16px; 
+        cursor: pointer; 
+        display: block; 
+        margin: 20px auto;
     }
+
     .links { font-size: 14px; margin-top: 20px; }
     .links a { color: #6f4e37; text-decoration: underline; }
 </style>
@@ -31,14 +48,24 @@
         {% csrf_token %}
         
         <div class="form-group">
-            {{ form.as_p }}
+            <label for="id_username">メールアドレス</label>
+            <input type="text" name="username" id="id_username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="id_password">パスワード</label>
+            <input type="password" name="password" id="id_password" required>
         </div>
         
         <button type="submit" class="login-btn">ログイン</button>
-
+        
         <div class="links">
-            <div><a href="{% url 'choco_palette:signup' %}">新規アカウント登録</a></div>
-            <div style="margin-top: 10px;">パスワードを忘れた方は<a href="#">こちら</a></div>
+            <div>
+                <a href="{% url 'choco_palette:signup' %}">アカウント登録</a>
+            </div>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'choco_palette:password_reset' %}">パスワードを忘れた方はこちら</a>
+            </div>
         </div>
     </form>
 </div>
