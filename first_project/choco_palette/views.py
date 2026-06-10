@@ -4,7 +4,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile
 from .forms import ProfileForm, SignupForm
+from django.shortcuts import render
 
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib import messages
+from django.urls import reverse_lazy
 
 # --- マイページ用の処理 ---
 @login_required
@@ -61,9 +65,18 @@ def signup_view(request):
     
     return render(request, 'choco_palette/auth/signup.html', {'form': form})
 
-# --- パスワード再設定画面の表示 ---
-def password_reset_view(request):
-    """
-    パスワード再設定画面を表示する
-    """
-    return render(request, 'choco_palette/auth/password_reset.html')
+# --- 新パスワード設定トースト通知 ---
+class MyPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'choco_palette/auth/password_reset_confirm.html'
+    success_url = reverse_lazy('login')  # ログイン画面へ遷移
+
+    def form_valid(self, form):
+        # 成功時にトースト通知を追加
+        messages.success(self.request, "新しいパスワードを設定しました！")
+        return super().form_valid(form)
+    
+def test_design_view(request):
+    from django.contrib.auth.forms import SetPasswordForm
+    # 確認用
+    form = SetPasswordForm(user=None)
+    return render(request, 'choco_palette/auth/password_reset_confirm.html', {'form': form})

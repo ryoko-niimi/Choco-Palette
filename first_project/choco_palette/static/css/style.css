@@ -1,14 +1,30 @@
-/* signup.html 新規アカウント登録画面 */
+/* =========================================================
+【全体共通】レイアウト・ベースパーツ
+========================================================= */
+
+body{
+    background-color: #fdfaf6;
+    font-family: sans-serif;
+}
 
 /* カード全体のデザイン */
-.signup-card { 
+.card { 
     background: white; 
-    padding: 40px; 
-    border-radius: 15px; 
+    padding: 40px; /* 余白*/
+    border-radius: 15px; /* 角丸*/
     box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
     width: 350px; 
     text-align: center; 
     margin: auto;
+}
+
+/* 入力枠*/
+input{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* レイアウト崩れないように*/
 }
 
 /* フォームの各項目 */
@@ -17,15 +33,7 @@
     margin-bottom: 20px; 
 }
 
-input { 
-    width: 100%; 
-    padding: 10px; 
-    border: 1px solid #ccc; 
-    border-radius: 5px; 
-    box-sizing: border-box; 
-}
-
-/* 登録ボタン */
+/* 青ボタン（ログイン・登録・送信・再設定 */
 button { 
     background-color: #7ab8cc; 
     color: white; 
@@ -38,6 +46,10 @@ button {
     margin: 20px auto; 
 }
 
+/* =========================================================
+【ログイン前】認証管理エリア
+========================================================= */
+
 /* パスワードの注釈 */
 .password-hint {
     font-size: 0.8em;       /* フォントサイズを小さく */
@@ -45,6 +57,17 @@ button {
     display: block;         /* 改行させる */
     margin-top: 5px;
 }
+
+/* 認証画面のリンク */
+.upload-link {
+    color: #007bff;         /* 青文字 */
+    text-decoration: underline; /* 下線 */
+    margin-top: 5px;
+}
+
+/* =========================================================
+【共通】メインコンテンツ（未ログイン・ログイン後共通）
+========================================================= */
 
 /* 画像アップロード部分のリンク風デザイン */
 .icon-upload label {
@@ -54,12 +77,6 @@ button {
     align-items: center;
 }
 
-.upload-link {
-    color: #007bff;         /* 青文字 */
-    text-decoration: underline; /* 下線 */
-    margin-top: 5px;
-}
-
 /* アバター画像のサイズ */
 .avatar-preview {
     width: 80px;
@@ -67,4 +84,13 @@ button {
     border-radius: 50%;     /* 丸いアイコンに */
     object-fit: cover;
     background-color: #eee;
+
+
 }
+
+
+
+/* =========================================================
+【ログイン後】
+
+========================================================= */

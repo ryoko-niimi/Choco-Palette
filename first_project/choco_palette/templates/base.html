@@ -2,43 +2,82 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <!--スマートフォン想定--> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choco-Palette</title>
     <style>
-    /* 全体の共通スタイル */
-    body { margin: 0; background-color: #fdf6f0; font-family: sans-serif; }
-    
-    /* ヘッダーの設定 */
-    .header { 
-        background-color: #e3d5ca; 
-        padding: 20px; 
-        text-align: center; 
-        font-size: 24px; 
-        font-weight: bold; 
-        color: #4a2c2a; 
-        border-bottom: 3px solid #6f4e37;
-    }
+        /* 全体の共通スタイル */
+        body { margin: 0; background-color: #fdf6f0; font-family: sans-serif; }
+        
+        /* 共通のカードデザイン */
+        .card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        /* ヘッダーの設定 */
+        .header { 
+            background-color: #e3d5ca; 
+            padding: 20px; 
+            text-align: center; 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #4a2c2a; 
+            border-bottom: 3px solid #6f4e37;
+        }
 
-    /* ボタンの共通デザイン */
-    .btn {
-        padding: 10px 20px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-    .btn-primary { background-color: #3498db; color: white; }
-    .btn-primary:hover { background-color: #2980b9; }
-    .btn-secondary { background-color: #95a5a6; color: white; }
-    .btn-secondary:hover { background-color: #7f8c8d; }
-    .btn-danger { background-color: #e74c3c; color: white; }
-    .btn-danger:hover { background-color: #c0392b; }
-</style>
+        /* --- ボタン共通の土台（すべてのボタンに適用） --- */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        /* --- ボタンの色分け（用途別） --- */
+
+        /* 青：（ログイン, 登録, 送信, 再設定, 編集, 完了, 検索, 保存, 変更） */
+         .btn-primary { background-color: #3498db; color: white; }
+         .btn-primary:hover { background-color: #2980b9; }
+
+        /* 赤：（ログアウト, 削除） */
+        .btn-danger { background-color: #e74c3c; color: white; }
+        .btn-danger:hover { background-color: #c0392b; }
+
+        /* グレー：（キャンセル）*/
+         .btn-secondary { background-color: #95a5a6; color: white; }
+         .btn-secondary:hover { background-color: #7f8c8d; }
+
+     
+
+        /* トースト通知のCSS */
+        .messages { position: fixed; top: 20px; width: 100%; text-align: center; z-index: 1000; }
+        .toast-message { 
+            background-color: #2ecc71; color: white; padding: 15px; 
+            border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        
+
+    </style>
 </head>
 <body>
     <header class="header">Choco Palette</header>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="toast-message">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
     
     <div style="display: flex; justify-content: center; padding-top: 40px;">
         {% block content %}
