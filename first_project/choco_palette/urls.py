@@ -27,9 +27,22 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', 
          auth_views.PasswordResetConfirmView.as_view(template_name='choco_palette/auth/password_reset_confirm.html'), 
          name='password_reset_confirm'),
+ 
+ 
+    # 投稿・テイスティング記録
+    path('post/new/', views.post_create, name='post_create'),
+    path('post/<int:pk>/edit/', views.post_edit, name='post_edit'),
+    path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
+    path('post/', views.post_list, name='post_list'),
     
-    
+    # テスト用
     path('test_design/', views.test_design_view, name='test_design'),
+ 
+    #テイスティング投稿詳細画面
+    #テイスティング投稿詳細画面
+    path('post/<int:pk>/', views.post_detail, name='post_detail'),
     
 ]
-    
+   
+ 
+   

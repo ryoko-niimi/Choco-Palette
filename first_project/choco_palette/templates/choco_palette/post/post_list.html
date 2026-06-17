@@ -1,0 +1,45 @@
+<!--ホーム画面（一覧表示）-->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="width: 100%; max-width: 400px;">
+    
+    <a href="#" class="btn btn-secondary" style="display:block; margin-bottom:20px;">🔍 チョコを検索・絞り込み</a>
+    
+    <div class="post-list">
+        {% for post in page_obj %}
+            <div class="post-item {% if post.status == 2 %}is-private{% endif %}">
+                <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit;">
+                    <p><strong>{{ post.chocolate_name }}</strong></p>
+                    <p>{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
+                </a>
+            </div>
+        {% empty %}
+            <p>まだ投稿がありません。</p>
+        {% endfor %}
+    </div>
+
+    <div class="pagination" style="text-align: center; margin: 20px 0;">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">前へ</a>
+        {% endif %}
+        <span style="margin: 0 10px;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">次へ</a>
+        {% endif %}
+    </div>
+    
+    {% if user.is_authenticated %}
+        
+    {% else %}
+        <h2>ログインすると、もっと楽しめます</h2>
+        <div style="display: flex; justify-content: space-around; margin: 20px 0; font-size: 14px; color: #555;">
+            <div style="text-align: center; width: 30%;"><p>📝テイスティング<br>を記録できる</p></div>
+            <div style="text-align: center; width: 30%;"><p>📁お気に入りを<br>保存できる</p></div>
+            <div style="text-align: center; width: 30%;"><p>📊自分の好みを<br>分析できる</p></div>
+        </div>
+        <a href="{% url 'choco_palette:login' %}" class="btn btn-primary" style="display:block; margin-top: 20px;">ログイン</a>
+    {% endif %}
+
+</div>
+{% endblock %}

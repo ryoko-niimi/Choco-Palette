@@ -1,0 +1,12 @@
+{% extends "base.html" %}  # 共通のデザインを読み込む 
+
+{% block content%}
+<h2>テイスティング投稿</h2>
+
+# 画像を扱うときは必ず enctype を入れる
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">投稿する</button>
+</form>
+{% endblock %}

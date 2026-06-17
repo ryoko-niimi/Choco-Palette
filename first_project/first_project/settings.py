@@ -86,3 +86,15 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'test1@example.com'
 EMAIL_HOST_PASSWORD = 'xxxx xxxx xxxx xxxx'
+
+#ログイン後の遷移先
+LOGIN_REDIRECT_URL = 'choco_palette:post_list'
+#未ログイン時に促す遷移先はログイン画面
+LOGIN_URL = 'choco_palette:login'
+
+# 認証の設定 
+# ユーザー名ではなく「メールアドレス」でログインできるようにするカスタムバックエンド
+AUTHENTICATION_BACKENDS = [
+    'choco_palette.backends.EmailBackend', 
+    'django.contrib.auth.backends.ModelBackend',
+]

@@ -27,6 +27,10 @@
             font-weight: bold; 
             color: #4a2c2a; 
             border-bottom: 3px solid #6f4e37;
+            position: relative; /* ボタン配置のために追加 */
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
         }
 
         /* --- ボタン共通の土台（すべてのボタンに適用） --- */
@@ -36,15 +40,17 @@
             border: none;
             cursor: pointer;
             font-weight: bold;
+            font-size: 16px;
             transition: 0.3s;
             display: inline-block;
             text-align: center;
+            text-decoration: none;
         }
         
         /* --- ボタンの色分け（用途別） --- */
 
         /* 青：（ログイン, 登録, 送信, 再設定, 編集, 完了, 検索, 保存, 変更） */
-         .btn-primary { background-color: #3498db; color: white; }
+         .btn-primary { background-color: #7ab8cc; color: white; }
          .btn-primary:hover { background-color: #2980b9; }
 
         /* 赤：（ログアウト, 削除） */
@@ -55,8 +61,6 @@
          .btn-secondary { background-color: #95a5a6; color: white; }
          .btn-secondary:hover { background-color: #7f8c8d; }
 
-     
-
         /* トースト通知のCSS */
         .messages { position: fixed; top: 20px; width: 100%; text-align: center; z-index: 1000; }
         .toast-message { 
@@ -64,12 +68,62 @@
             border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        
+        /* --- フッターのスタイル--- */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #e3d5ca;
+            padding: 15px 0;
+            text-align: center;
+            border-top: 2px solid #6f4e37;
+        }
+        .footer nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #4a2c2a;
+            font-weight: bold;
+        }
+
+        /* --- 投稿アイテム（リスト用） --- */
+        .post-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .is-private {
+            background-color: #f0f0f0; /* 薄いグレー */
+            color: #888;
+
+
+         /* テイスティング詳細：味・香りタグのスタイル */
+         .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 5px;
+    }
+    .tag {
+        background-color: #fdf6f0;
+        border: 1px solid #d4c4b7;
+        color: #4a2c2a;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 14px;
+
+        }
 
     </style>
 </head>
 <body>
-    <header class="header">Choco Palette</header>
+    <header class="header">
+        <div id="header-left" style="position: absolute; left: 20px;">
+            {% block header_left %}{% endblock %}
+        </div>
+        Choco Palette
+    </header>
 
     {% if messages %}
         <div class="messages">
@@ -79,9 +133,20 @@
         </div>
     {% endif %}
     
-    <div style="display: flex; justify-content: center; padding-top: 40px;">
+    <div style="display: flex; justify-content: center; padding: 40px 0 80px 0;">
         {% block content %}
         {% endblock %}
     </div>
+
+    {% if user.is_authenticated %}
+    <footer class="footer">
+        <nav>
+            <a href="{% url 'choco_palette:post_list' %}">ホーム</a>
+            <a href="{% url 'choco_palette:post_create' %}">登録</a>
+            <a href="#">検索</a>
+            <a href="{% url 'choco_palette:mypage' %}">マイページ</a>
+        </nav>
+    </footer>
+    {% endif %}
 </body>
 </html>
