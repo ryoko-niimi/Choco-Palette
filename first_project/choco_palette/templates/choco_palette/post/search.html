@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block header_left %}
+<a href="{% url 'choco_palette:post_list' %}" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center; color: #4a2c2a;"></h2>
+    
+    <form method="GET" action="{% url 'choco_palette:post_list' %}">
+        
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold;">キーワード</label>
+            <input type="text" name="q" placeholder="商品名・ブランド名..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">表示範囲</label>
+            <label><input type="checkbox" name="status" value="public"> 公開</label>
+            <label style="margin-left: 10px;"><input type="checkbox" name="status" value="private"> 非公開</label>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold;">カカオ含有率 (%)</label>
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <input type="number" name="min_cacao" placeholder="最小" style="width: 45%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                <span>～</span>
+                <input type="number" name="max_cacao" placeholder="最大" style="width: 45%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">テイスティング日</label>
+            <input type="date" name="start_date" style="width: 100%; margin-bottom: 5px; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+            <input type="date" name="end_date" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">お気に入り度</label>
+            {% for i in "12345"|make_list %}
+                <label><input type="checkbox" name="rate" value="{{ i }}"> {{ i }}⭐</label>
+            {% endfor %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold;">味</label>
+            <div class="tag-container" style="margin-bottom: 10px;">
+                {% for tag in taste_tags %}
+                    <label><input type="checkbox" name="taste" value="{{ tag.id }}"> {{ tag.name }}</label>
+                {% endfor %}
+            </div>
+            
+            <label style="font-weight: bold;">香り</label>
+            <div class="tag-container">
+                {% for tag in aroma_tags %}
+                    <label><input type="checkbox" name="aroma" value="{{ tag.id }}"> {{ tag.name }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">検索</button>
+    </form>
+</div>
+{% endblock %}

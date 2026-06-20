@@ -1,3 +1,4 @@
+<!--テイスティング詳細画面-->
 {% extends "base.html" %}
 
 {% block header_left %}
@@ -5,6 +6,28 @@
 {% endblock %}
 
 {% block content %}
+<style>
+    /* 画像表示をスマートにするCSS */
+    .carousel-container {
+        width: 100%;
+        max-width: 400px;
+        height: 300px; /* 高さを固定 */
+        overflow: hidden;
+        position: relative;
+        background-color: #eee;
+        border-radius: 8px;
+        margin: 0 auto;
+    }
+
+    .carousel-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 画像を枠に合わせてトリミング */
+        flex-shrink: 0;
+        scroll-snap-align: center;
+    }
+</style>
+
 <div class="card" style="margin: 20px auto; padding: 20px 0; max-width: 600px;">
     <div class="author-info" style="display: flex; align-items: center; padding: 0 20px 15px 20px;">
         {% with user_profile=post.user.profile %}
@@ -19,17 +42,22 @@
         {% endwith %}
     </div>
 
-    <div class="post-images" style="position: relative; width: 100%; overflow: hidden;">
-        <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
+    <div class="carousel-container">
+        <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 100%;">
             {% for photo in post.photos.all %}
-                <img src="{{ photo.image.url }}" style="width: 100%; flex-shrink: 0; scroll-snap-align: center; height: 250px; object-fit: cover;">
+                <img src="{{ photo.image.url }}" class="carousel-image">
             {% endfor %}
         </div>
-        <div style="display: flex; justify-content: flex-end; padding: 10px;">
-            <button type="button" id="like-btn" data-post-id="{{ post.pk }}" style="border:none; background:none; cursor:pointer; font-size: 24px;">
+    </div>
+    
+    <div style="display: flex; justify-content: flex-end; padding: 10px;">
+        <button type="button" id="like-btn" data-post-id="{{ post.pk }}" style="border:none; background:none; cursor:pointer; font-size: 24px;">
+            {% if is_liked %}
+                <span id="heart-icon" class="heart-red">❤️</span>
+            {% else %}
                 <span id="heart-icon">🤍</span>
-            </button>
-        </div>
+            {% endif %}
+        </button>
     </div>
 
     <div class="thumbnail-container" style="display: flex; flex-wrap: wrap; gap: 5px; padding: 10px 20px;">
@@ -37,7 +65,6 @@
             <img src="{{ photo.image.url }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
         {% endfor %}
     </div>
-    <span id="toast" style="display:none; color:red; margin: 5px; display: block; text-align: center;">お気に入りに保存しました！</span>
 
     <div style="padding: 0 20px;">
         <h2 style="margin-top: 20px;">{{ post.chocolate_name }}</h2>
@@ -93,19 +120,40 @@
 <script>
     document.getElementById('like-btn').addEventListener('click', function() {
         const postId = this.getAttribute('data-post-id');
+        const heartIcon = document.getElementById('heart-icon');
+
         fetch(`/post/${postId}/like/`, {
             method: 'POST',
-            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                document.getElementById('heart-icon').innerText = '❤';
-                const toast = document.getElementById('toast');
-                toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 2000);
+                heartIcon.classList.toggle('heart-red', data.is_liked);
+                heartIcon.innerText = data.is_liked ? '❤️' : '🤍';
+                
+                showToast(data.is_liked ? 'お気に入りに保存しました！' : 'お気に入りから解除しました！');
             }
         });
     });
+
+    function showToast(message) {
+        const parent = document.createElement('div');
+        parent.className = 'messages'; 
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.innerText = message;
+
+        parent.appendChild(toast);
+        document.body.appendChild(parent);
+
+        setTimeout(() => { 
+            parent.remove(); 
+        }, 2000);
+    }
 </script>
 {% endblock %}

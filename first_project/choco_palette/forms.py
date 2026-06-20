@@ -42,14 +42,27 @@ class SignupForm(forms.ModelForm):
         
         return cleaned_data
     
-# テイスティング投稿用フォーム
+# テイスティング投稿用フォーム 編集フォーム
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['chocolate_name','brand_name','cacao_percentage',
+        fields = ['chocolate_name', 'brand_name', 'cacao_percentage',
                   'tasting_date', 'favorite_rate', 'tasting_comment',
                   'private_memo', 'status', 'taste_tags', 'aroma_tags'
         ]
+        
+        widgets = {
+            'chocolate_name': forms.TextInput(attrs={'placeholder': '商品名を入力してください', 'class': 'form-control'}),
+            'brand_name': forms.TextInput(attrs={'placeholder': 'ブランド名を入力してください', 'class': 'form-control'}),
+            'cacao_percentage': forms.NumberInput(attrs={'placeholder': '例: 70', 'class': 'form-control'}),
+            'tasting_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), # カレンダー用
+            'tasting_comment': forms.Textarea(attrs={'placeholder': '1000文字まで', 'rows': 4, 'class': 'form-control'}),
+            'private_memo': forms.Textarea(attrs={'placeholder': '自分だけのメモ（非公開）', 'rows': 4, 'class': 'form-control'}),
+            'status': forms.RadioSelect(choices=[('public', '公開'), ('private', '非公開')]),
+            # ★追加：星評価用にお気に入り度を隠し入力欄に変更
+            'favorite_rate': forms.HiddenInput(),
+        }
+        
         labels = {
             'chocolate_name': '商品名',
             'brand_name': 'ブランド名',
@@ -62,6 +75,12 @@ class PostForm(forms.ModelForm):
             'taste_tags': '味タグ',
             'aroma_tags': '香りタグ',
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['tasting_date'].widget.attrs['readonly'] = True
+            self.fields['tasting_date'].widget.attrs['style'] = 'background-color: #f0f0f0; cursor: not-allowed;'
 
 # ログイン用フォーム
 class LoginForm(AuthenticationForm):

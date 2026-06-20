@@ -1,12 +1,208 @@
-{% extends "base.html" %}  # 共通のデザインを読み込む 
+<!--テイスティング登録画面-->
+{% extends "base.html" %}
 
-{% block content%}
-<h2>テイスティング投稿</h2>
+{% block header_left %}
+   <a href="{% url 'choco_palette:post_list' %}" id="back-button" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
+{% endblock %}
 
-# 画像を扱うときは必ず enctype を入れる
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">投稿する</button>
-</form>
+{% block content %}
+
+    <h2 style="text-align: center; margin-bottom: 20px;"></h2>
+
+    <form method="post" enctype="multipart/form-data" id="post-form">
+        {% csrf_token %}
+
+        <div class="form-group" style="margin: 20px 0;">
+            <label style="font-weight: bold; display: block; margin-bottom: 10px;">写真をアップロード (最大10枚)</label>
+            <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                {% for photo in post.photos.all %}
+                <div class="existing-image" style="position: relative; display: inline-block;">
+                    <img src="{{ photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                    <button type="button" class="remove-existing" data-id="{{ photo.id }}" style="position: absolute; top: -5px; right: -5px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
+                </div>
+                {% endfor %}
+            </div>
+            <input type="file" name="images" multiple accept="image/*" class="form-control">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.chocolate_name.label }}</label>
+            {{ form.chocolate_name }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.brand_name.label }}</label>
+            {{ form.brand_name }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.status.label }}</label>
+            <div style="display: flex; gap: 20px;">
+                {% for radio in form.status %}
+                    <label style="display: flex; align-items: center; gap: 5px;">{{ radio.tag }} {{ radio.choice_label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.cacao_percentage.label }}</label>
+            {{ form.cacao_percentage }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.tasting_date.label }}</label>
+            {{ form.tasting_date }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.favorite_rate.label }}</label>
+            <div id="star-rating" style="font-size: 24px; cursor: pointer;">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
+            {{ form.favorite_rate }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold;">味タグ</label>
+            <div>
+                {% for tag in all_taste_tags %}
+                    <label style="margin-right: 10px;">
+                        <input type="checkbox" name="taste_tags" value="{{ tag.id }}" {% if tag in post.taste_tags.all %}checked{% endif %}>
+                        {{ tag.name }}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold;">香りタグ</label>
+            <div>
+                {% for tag in all_aroma_tags %}
+                    <label style="margin-right: 10px;">
+                        <input type="checkbox" name="aroma_tags" value="{{ tag.id }}" {% if tag in post.aroma_tags.all %}checked{% endif %}>
+                        {{ tag.name }}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.tasting_comment.label }}</label>
+            {{ form.tasting_comment }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block;">{{ form.private_memo.label }}</label>
+            {{ form.private_memo }}
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+            {% if post %}更新する{% else %}登録する{% endif %}
+        </button>
+    </form>
+
+    <div id="leave-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <p style="margin-bottom: 20px;">入力内容をどうしますか？</p>
+            <button type="button" id="btn-cancel" class="btn btn-secondary">キャンセル</button>
+            <button type="button" id="btn-save" class="btn btn-success">下書き保存</button>
+            <button type="button" id="btn-delete" class="btn btn-danger">削除</button>
+        </div>
+    </div>
+
+<script>
+    // --- 離脱確認の処理 ---
+    let isChanged = false;
+    const form = document.getElementById('post-form');
+    const modal = document.getElementById('leave-modal');
+    form.addEventListener('input', () => { isChanged = true; });
+
+    const backButton = document.getElementById('back-button');
+    if (backButton) {
+        backButton.addEventListener('click', (e) => {
+            if (isChanged) { e.preventDefault(); modal.style.display = 'flex'; }
+        });
+    }
+
+    document.getElementById('btn-cancel').onclick = () => { modal.style.display = 'none'; };
+    document.getElementById('btn-delete').onclick = () => { window.location.href = "{% url 'choco_palette:home' %}"; };
+    document.getElementById('btn-save').onclick = () => {
+        const statusRadios = document.getElementsByName('status');
+        for (let r of statusRadios) { if (r.value === '2') r.checked = true; }
+        form.submit();
+    };
+
+    // --- お気に入り度☆の処理 ---
+    const stars = document.querySelectorAll('.star');
+    const rateInput = document.querySelector('input[name="favorite_rate"]');
+
+    function renderStars(value) {
+        stars.forEach((s, index) => {
+            s.textContent = index < value ? '★' : '☆';
+            s.style.color = index < value ? '#f1c40f' : '#ccc';
+        });
+    }
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            rateInput.value = value;
+            renderStars(value);
+        });
+    });
+
+    window.addEventListener('load', () => {
+        const initialRate = rateInput.value || {{ post.favorite_rate|default:0 }};
+        if (initialRate > 0) renderStars(initialRate);
+    });
+
+    // --- 写真プレビュー処理 ---
+    document.querySelector('input[name="images"]').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('image-preview');
+        Array.from(e.target.files).forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.innerHTML = `<img src="${e.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">`;
+                previewContainer.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // --- 投稿済み編集画面の画像削除処理 ---
+    document.querySelectorAll('.remove-existing').forEach(button => {
+    button.addEventListener('click', function() {
+        const photoId = this.getAttribute('data-id');
+        const wrapper = this.parentElement; // 写真を囲んでいるdiv
+
+        // Djangoに削除リクエストを送信
+        fetch(`/post/photo/${photoId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}', // DjangoのCSRF対策
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                wrapper.remove(); // 成功したら画面から消去
+            } else {
+                alert('削除に失敗しました。');
+            }
+        });
+    });
+});
+
+
+
+
+
+
+</script>
 {% endblock %}
