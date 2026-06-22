@@ -1,30 +1,60 @@
 /* =========================================================
 【全体共通】レイアウト・ベースパーツ
 ========================================================= */
+:root {
+    --primary-color: #6f4e37;    /* 濃い茶色 */
+    --accent-color: #e3d5ca;     /* 薄い茶色 */
+    --bg-color: #fdf6f0;        /* 背景色 */
+    --text-color: #4a2c2a;      /* 文字色 */
+    --btn-radius: 8px;          /* ボタンの角丸 */
+    --card-radius: 12px;        /* カードの角丸 */
+}
 
-body{
-    background-color: #fdfaf6;
-    font-family: sans-serif;
+body { 
+    margin: 0; 
+    background-color: var(--bg-color); 
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: var(--text-color); 
+    line-height: 1.6; 
 }
 
 /* カード全体のデザイン */
 .card { 
     background: white; 
-    padding: 40px; /* 余白*/
-    border-radius: 15px; /* 角丸*/
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-    width: 350px; 
+    padding: 30px; 
+    border-radius: var(--card-radius); 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    width: 90%; 
+    max-width: 400px; 
     text-align: center; 
-    margin: auto;
+    margin: 40px auto;
 }
 
-/* 入力枠*/
-input{
+/* カード内のラベル・フォームの配置調整 */
+.card .form-group label {
+    display: block;
+    text-align: left !important; /* 強制的に左寄せ */
+    margin-bottom:10px;
+    font-weight: bold;
+}
+
+/* 枠の中（div）にある選択肢用ラベルだけは例外（中央寄せに戻す） */
+.card .form-group div label {
+    display: inline-block;
+    text-align: center;
+    font-weight: normal; /* チェックボックスの文字は通常太さにする */
+    margin: 0 8px;       /* 選択肢同士の横の間隔を確保 */
+}
+
+/* 入力枠 */
+input[type="text"], input[type="number"], input[type="date"], textarea, select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
+    margin-top: 5px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box; /* レイアウト崩れないように*/
+    border-radius: var(--btn-radius);
+    box-sizing: border-box;
+    font-size: 16px;
 }
 
 /* フォームの各項目 */
@@ -33,64 +63,101 @@ input{
     margin-bottom: 20px; 
 }
 
-/* 青ボタン（ログイン・登録・送信・再設定 */
-button { 
-    background-color: #7ab8cc; 
-    color: white; 
-    border: none; 
-    padding: 12px 40px; 
-    border-radius: 5px; 
-    font-size: 16px; 
-    cursor: pointer; 
-    display: block; 
-    margin: 20px auto; 
+/* 必須ボタンのスタイル */
+.required-badge {
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-weight: normal;
 }
+
+/* ボタン共通 */
+.btn {
+    padding: 12px 24px;
+    border-radius: var(--btn-radius);
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+    margin: 20px auto;
+    text-align: center;
+    text-decoration: none;
+}
+.btn-primary { background-color: #7ab8cc; color: white; }
+.btn-danger { background-color: #e74c3c; color: white; }
+.btn-secondary { background-color: #95a5a6; color: white; }
 
 /* =========================================================
-【ログイン前】認証管理エリア
+【ヘッダー・フッター】
 ========================================================= */
-
-/* パスワードの注釈 */
-.password-hint {
-    font-size: 0.8em;       /* フォントサイズを小さく */
-    color: #666;            /* 少しグレーにして控えめに */
-    display: block;         /* 改行させる */
-    margin-top: 5px;
+.header { 
+    background-color: var(--accent-color); 
+    padding: 20px; 
+    text-align: center; 
+    font-weight: bold; 
+    color: var(--primary-color); 
+    border-bottom: 2px solid var(--primary-color);
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
 }
 
-/* 認証画面のリンク */
-.upload-link {
-    color: #007bff;         /* 青文字 */
-    text-decoration: underline; /* 下線 */
-    margin-top: 5px;
+/* フッター全体 */
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--accent-color);
+    padding: 10px 0;
+    text-align: center;
+    border-top: 2px solid var(--primary-color);
 }
 
-/* =========================================================
-【共通】メインコンテンツ（未ログイン・ログイン後共通）
-========================================================= */
-
-/* 画像アップロード部分のリンク風デザイン */
-.icon-upload label {
-    cursor: pointer;        /* マウスを乗せたらポインターにする */
+/* フッター ナビゲーションの並び */
+.footer nav {
     display: flex;
-    flex-direction: column;
+    justify-content: space-around;
     align-items: center;
 }
 
-/* アバター画像のサイズ */
-.avatar-preview {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;     /* 丸いアイコンに */
-    object-fit: cover;
-    background-color: #eee;
-
-
+/* フッター アイコン＋文字のスタイル */
+.footer nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 0.75rem;
 }
 
-
+/* フッター アイコンのサイズ */
+.footer-icon {
+    font-size: 1.2rem;       
+    margin-bottom: 2px;
+}
 
 /* =========================================================
-【ログイン後】
-
+【認証・投稿】共通エリア
 ========================================================= */
+.password-hint { font-size: 0.8em; color: #666; display: block; margin-top: 5px; }
+.upload-link { color: #007bff; text-decoration: underline; margin-top: 5px; }
+
+/* 投稿アイテム */
+.post-item { 
+    background-color: white; 
+    border: 1px solid #ddd; 
+    padding: 15px; 
+    margin: 15px auto;      /* 上下15px、左右自動で中央寄せ */
+    border-radius: var(--card-radius); 
+    width: 90%;             
+    max-width: 400px;       
+    text-align: left;       
+    display: block;         
+}

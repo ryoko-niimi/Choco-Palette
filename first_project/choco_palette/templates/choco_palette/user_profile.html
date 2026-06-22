@@ -1,0 +1,66 @@
+<!--ユーザープロフィール表示画面-->
+{% extends "base.html" %}
+
+{% block header_left %}
+<a href="{% url 'choco_palette:post_list' %}" id="back-button" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="profile-container" style="max-width: 600px; margin: 0 auto; padding: 10px;">
+        <div class="user-info" style="text-align: center; margin-bottom: 30px;">
+            {% if target_user.profile.image %}
+                <img src="{{ target_user.profile.image.url }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+            {% else %}
+                <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #ddd; margin: 0 auto;"></div>
+            {% endif %}
+            
+            <h2>{{ target_user.profile.nickname|default:target_user.username }}</h2>
+            
+            {% if request.user == target_user %}
+                <a href="{% url 'choco_palette:mypage' %}">プロフィールを編集</a>
+            {% endif %}
+            
+            <p style="margin-top: 15px; color: #555;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>
+            <p><a href="{{ target_user.profile.website|default:'#' }}">{{ target_user.profile.website }}</a></p>
+        </div>
+
+        <hr>
+
+        <h3>投稿記録</h3>
+        {% for post in page_obj %}
+            <div class="post-card" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; align-items: center;">
+                {% if post.photos.first %}
+                    <img src="{{ post.photos.first.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
+                {% endif %}
+                
+                <div>
+                    <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:black; font-weight:bold;">
+                        {{ post.chocolate_name }}
+                    </a>
+                    <p style="margin: 5px 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
+                    <div style="color: #f1c40f;">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>まだ投稿はありません。</p>
+        {% endfor %}
+
+        {% if page_obj %}
+        <div class="pagination" style="text-align: center; margin: 20px 0;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">前へ</a>
+            {% endif %}
+            <span style="margin: 0 10px; font-weight: bold;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">次へ</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

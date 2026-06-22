@@ -6,100 +6,75 @@
 {% endblock %}
 
 {% block content %}
-<style>
-    /* 画像表示をスマートにするCSS */
-    .carousel-container {
-        width: 100%;
-        max-width: 400px;
-        height: 300px; /* 高さを固定 */
-        overflow: hidden;
-        position: relative;
-        background-color: #eee;
-        border-radius: 8px;
-        margin: 0 auto;
-    }
-
-    .carousel-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* 画像を枠に合わせてトリミング */
-        flex-shrink: 0;
-        scroll-snap-align: center;
-    }
-</style>
-
-<div class="card" style="margin: 20px auto; padding: 20px 0; max-width: 600px;">
-    <div class="author-info" style="display: flex; align-items: center; padding: 0 20px 15px 20px;">
-        {% with user_profile=post.user.profile %}
-            <a href="{% url 'choco_palette:mypage' %}">
-                {% if user_profile.image %}
-                    <img src="{{ user_profile.image.url }}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
+<div class="card" style="text-align: left; max-width: 600px; margin: 20px auto;">
+    <div class="author-info" style="display: flex; align-items: center; margin-bottom: 15px;">
+        {% if post.user %}
+            <a href="{% url 'choco_palette:user_profile' post.user.id %}">
+                {% if post.user.profile.image %}
+                    <img src="{{ post.user.profile.image.url }}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
                 {% else %}
                     <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #ddd; margin-right: 10px;"></div>
                 {% endif %}
             </a>
-            <span style="font-weight: bold;">{{ user_profile.nickname|default:post.user.username }}</span>
-        {% endwith %}
+            <span style="font-weight: bold;">{{ post.user.profile.nickname|default:post.user.username }}</span>
+        {% else %}
+            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #eee; margin-right: 10px;"></div>
+            <span style="font-weight: bold;">ゲスト</span>
+        {% endif %}
     </div>
 
-    <div class="carousel-container">
+    <div style="width: 100%; max-width: 400px; height: 300px; overflow: hidden; margin: 0 auto 10px; background-color: #eee; border-radius: 8px;">
         <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 100%;">
             {% for photo in post.photos.all %}
-                <img src="{{ photo.image.url }}" class="carousel-image">
+                <img src="{{ photo.image.url }}" style="width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; scroll-snap-align: center;">
             {% endfor %}
         </div>
     </div>
     
-    <div style="display: flex; justify-content: flex-end; padding: 10px;">
+    <div style="display: flex; justify-content: flex-end; padding-bottom: 10px;">
         <button type="button" id="like-btn" data-post-id="{{ post.pk }}" style="border:none; background:none; cursor:pointer; font-size: 24px;">
-            {% if is_liked %}
-                <span id="heart-icon" class="heart-red">❤️</span>
-            {% else %}
-                <span id="heart-icon">🤍</span>
-            {% endif %}
+            <span id="heart-icon" class="{% if is_liked %}heart-red{% endif %}">{% if is_liked %}❤️{% else %}🤍{% endif %}</span>
         </button>
     </div>
 
-    <div class="thumbnail-container" style="display: flex; flex-wrap: wrap; gap: 5px; padding: 10px 20px;">
-        {% for photo in post.photos.all %}
-            <img src="{{ photo.image.url }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
-        {% endfor %}
-    </div>
+    <div style="line-height: 1.8;">
+        <h2 style="margin: 5px 0;">{{ post.chocolate_name }}</h2>
+        <p style="margin: 0;"><strong>ブランド:</strong> {{ post.brand_name }}</p>
+        <p style="margin: 0;"><strong>カカオ:</strong> {{ post.cacao_percentage }}%</p>
+        <p style="margin: 0;"><strong>日付:</strong> {{ post.created_at|date:"Y/m/d" }}</p>
 
-    <div style="padding: 0 20px;">
-        <h2 style="margin-top: 20px;">{{ post.chocolate_name }}</h2>
-        <p>{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
-        <p>日付: {{ post.created_at|date:"Y/m/d" }}</p>
-
-        <p style="margin-top: 10px;">
-            お気に入り度: 
-            {% if post.favorite_rate %}
-                <span style="color: #f1c40f;">
-                    {% for i in "12345"|make_list %}
-                        {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
-                    {% endfor %}
-                </span>
-            {% else %}未評価{% endif %}
+        <p style="margin: 10px 0;">
+            <strong>お気に入り度:</strong> 
+            <span style="color: #f1c40f;">
+                {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
+                {% endfor %}
+            </span>
         </p>
 
-        <p style="margin-bottom: 5px; font-weight: bold;">味</p>
+        <p style="margin: 10px 0 5px 0;"><strong>味</strong></p>
         <div class="tag-container">
             {% for tag in post.taste_tags.all %}<span class="tag">{{ tag.name }}</span>{% endfor %}
         </div>
 
-        <p style="margin-top: 15px; margin-bottom: 5px; font-weight: bold;">香り</p>
+        <p style="margin: 15px 0 5px 0;"><strong>香り</strong></p>
         <div class="tag-container">
             {% for tag in post.aroma_tags.all %}<span class="tag">{{ tag.name }}</span>{% endfor %}
         </div>
 
-        <p style="margin-top: 15px; font-weight: bold;">テイスティングコメント</p>
+        <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>
         <p style="background-color: #fdf6f0; padding: 10px; border-radius: 5px; border: 1px solid #e3d5ca;">{{ post.tasting_comment }}</p>
+        
+        {% if post.private_comment %}
+            <p style="margin: 15px 0 5px 0; font-weight: bold; color: #555;">非公開メモ</p>
+            <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777;">{{ post.private_comment }}</p>
+        {% endif %}
     </div>
 
     {% if user == post.user %}
     <div style="margin: 30px 0; display: flex; gap: 15px; justify-content: center;">
         <a href="{% url 'choco_palette:post_edit' post.pk %}" class="btn btn-secondary">編集</a>
-        <button type="button" onclick="document.getElementById('delete-modal').style.display='block'" class="btn btn-danger">削除</button>
+        <button type="button" onclick="openModal('delete-modal')" class="btn btn-danger">削除</button>
     </div>
     {% endif %}
 </div>
@@ -112,12 +87,13 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">削除する</button>
             </form>
-            <button type="button" onclick="document.getElementById('delete-modal').style.display='none'" class="btn btn-secondary">キャンセル</button>
+            <button type="button" onclick="closeModal('delete-modal')" class="btn btn-secondary">キャンセル</button>
         </div>
     </div>
 </div>
 
 <script>
+    // お気に入りボタン
     document.getElementById('like-btn').addEventListener('click', function() {
         const postId = this.getAttribute('data-post-id');
         const heartIcon = document.getElementById('heart-icon');
@@ -132,14 +108,17 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
+                // ハートアイコンの切り替え
                 heartIcon.classList.toggle('heart-red', data.is_liked);
                 heartIcon.innerText = data.is_liked ? '❤️' : '🤍';
                 
+                // トースト通知の表示
                 showToast(data.is_liked ? 'お気に入りに保存しました！' : 'お気に入りから解除しました！');
             }
         });
     });
 
+    // トースト通知を表示する関数
     function showToast(message) {
         const parent = document.createElement('div');
         parent.className = 'messages'; 
@@ -147,13 +126,14 @@
         const toast = document.createElement('div');
         toast.className = 'toast-message';
         toast.innerText = message;
-
+      
         parent.appendChild(toast);
         document.body.appendChild(parent);
 
         setTimeout(() => { 
             parent.remove(); 
-        }, 2000);
+        }, 3000);
     }
 </script>
+
 {% endblock %}

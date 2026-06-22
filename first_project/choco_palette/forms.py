@@ -50,37 +50,47 @@ class PostForm(forms.ModelForm):
                   'tasting_date', 'favorite_rate', 'tasting_comment',
                   'private_memo', 'status', 'taste_tags', 'aroma_tags'
         ]
-        
         widgets = {
             'chocolate_name': forms.TextInput(attrs={'placeholder': '商品名を入力してください', 'class': 'form-control'}),
             'brand_name': forms.TextInput(attrs={'placeholder': 'ブランド名を入力してください', 'class': 'form-control'}),
-            'cacao_percentage': forms.NumberInput(attrs={'placeholder': '例: 70', 'class': 'form-control'}),
-            'tasting_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), # カレンダー用
-            'tasting_comment': forms.Textarea(attrs={'placeholder': '1000文字まで', 'rows': 4, 'class': 'form-control'}),
-            'private_memo': forms.Textarea(attrs={'placeholder': '自分だけのメモ（非公開）', 'rows': 4, 'class': 'form-control'}),
+            'cacao_percentage': forms.NumberInput(attrs={'placeholder': '不明な場合は空欄OK', 'class': 'form-control'}),
+            'tasting_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'tasting_comment': forms.Textarea(attrs={'placeholder': '', 'rows': 4, 'class': 'form-control'}),
+            'private_memo': forms.Textarea(attrs={'placeholder': '自分用メモ（非公開）', 'rows': 4, 'class': 'form-control'}),
             'status': forms.RadioSelect(choices=[('public', '公開'), ('private', '非公開')]),
-            # ★追加：星評価用にお気に入り度を隠し入力欄に変更
             'favorite_rate': forms.HiddenInput(),
-        }
-        
-        labels = {
-            'chocolate_name': '商品名',
-            'brand_name': 'ブランド名',
-            'cacao_percentage': 'カカオ含有率',
-            'tasting_date': 'テイスティング日',
-            'favorite_rate': 'お気に入り度',
-            'tasting_comment': 'テイスティングコメント',
-            'private_memo': 'プライベートメモ',
-            'status': '公開範囲',
-            'taste_tags': '味タグ',
-            'aroma_tags': '香りタグ',
         }
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # 1. 必須バッジの定義
+        badge = '<span class="required-badge">必須</span>'
+        
+        # 2. ラベルにバッジを結合
+        self.fields['chocolate_name'].label = f'商品名{badge}'
+        self.fields['brand_name'].label = f'ブランド名{badge}'
+        self.fields['status'].label = f'公開範囲{badge}'
+        self.fields['cacao_percentage'].label = f'カカオ含有率{badge}'
+        self.fields['tasting_date'].label = f'テイスティング日{badge}'
+        
+        # 3. その他（バッジなしの項目）のラベルを日本語に設定
+        self.fields['favorite_rate'].label = 'お気に入り度'
+        self.fields['tasting_comment'].label = 'テイスティングコメント'
+        self.fields['private_memo'].label = 'プライベートメモ'
+        self.fields['taste_tags'].label = '味タグ'
+        self.fields['aroma_tags'].label = '香りタグ'
+        
+        # 4. カカオ含有率は必須入力をオフにする（バッジだけ表示）
+        self.fields['cacao_percentage'].required = False
+        
+        # 5. 編集時の日付読み取り専用設定
         if self.instance.pk:
             self.fields['tasting_date'].widget.attrs['readonly'] = True
             self.fields['tasting_date'].widget.attrs['style'] = 'background-color: #f0f0f0; cursor: not-allowed;'
+       
+
+
 
 # ログイン用フォーム
 class LoginForm(AuthenticationForm):
