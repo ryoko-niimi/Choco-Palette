@@ -3,7 +3,7 @@
 {% extends "base.html" %}
 
 {% block header_left %}
-<a href="{% url 'choco_palette:post_list' %}" id="back-button" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+<a href="{{ back_url|default:'/' }}" id="back-button" style="text-decoration:none; color:#4a2c2a;">🔙</a>
 {% endblock %}
 
 {% block content %}
@@ -18,27 +18,17 @@
         margin-left: 8px;
         vertical-align: middle;
     }
-    /* 日付グレーアウト用のスタイル */
-    .readonly-field {
-        background-color: #e9ecef;
-        border: 1px solid #ccc;
-        width: 100%;
-        padding: 8px;
-        border-radius: 4px;
-        color: #6c757d;
-        display: block;
-    }
 </style>
 
-<div class="card" style="width: 100%; max-width: 500px; margin: 0 auto; padding: 20px;">
-    
+<div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
+{% if not post %}
  <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px;">
     <a href="{% url 'choco_palette:draft_list' %}" 
-       class="btn btn-success" 
-       style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0;">
-       下書き一覧
+       class="btn btn-draft" style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0; background-color: #7db58a; color: white;">
+        下書き一覧
     </a>
 </div>
+{% endif %}
 
     <form method="post" enctype="multipart/form-data" id="post-form">
         {% csrf_token %}
@@ -82,12 +72,7 @@
 
         <div class="form-group" style="margin-bottom: 20px;">
             <label style="font-weight: bold; display: block;">{{ form.tasting_date.label|safe }}</label>
-            {% if post %}
-                <div class="readonly-field">{{ post.tasting_date|date:"Y/m/d" }}</div>
-                <input type="hidden" name="tasting_date" value="{{ post.tasting_date|date:'Y-m-d' }}">
-            {% else %}
-                {{ form.tasting_date }}
-            {% endif %}
+            {{ form.tasting_date }}
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
@@ -140,109 +125,51 @@
             {{ form.private_memo }}
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-            {% if post %}更新する{% else %}登録する{% endif %}
-        </button>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" name="action" value="save" class="btn btn-secondary" style="flex: 1;">
+                下書き保存
+            </button>
+            <button type="submit" name="action" value="publish" class="btn btn-primary" style="flex: 1;">
+                投稿する
+            </button>
+        </div>
     </form>
 </div>
 
-<div id="leave-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-    <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-        <p style="margin-bottom: 20px;">入力内容をどうしますか？</p>
-        <button type="button" id="btn-cancel" class="btn btn-secondary">キャンセル</button>
-        <button type="button" id="btn-save" class="btn btn-success">下書き保存</button>
-        <button type="button" id="btn-delete" class="btn btn-danger">削除</button>
-    </div>
-</div>
-
 <script>
-    // --- 離脱確認の処理 ---
-    let isChanged = false;
-    const form = document.getElementById('post-form');
-    const modal = document.getElementById('leave-modal');
-    form.addEventListener('input', () => { isChanged = true; });
-
-    const backButton = document.getElementById('back-button');
-    if (backButton) {
-        backButton.addEventListener('click', (e) => {
-            if (isChanged) { e.preventDefault(); modal.style.display = 'flex'; }
-        });
-    }
-
-    document.getElementById('btn-cancel').onclick = () => { modal.style.display = 'none'; };
-    document.getElementById('btn-delete').onclick = () => { window.location.href = "{% url 'choco_palette:post_list' %}"; };
-    document.getElementById('btn-save').onclick = () => {
-        const statusRadios = document.getElementsByName('status');
-        for (let r of statusRadios) { if (r.value === '2') r.checked = true; }
-        form.submit();
-    };
-
-    // --- お気に入り度☆の処理 ---
+document.addEventListener('DOMContentLoaded', function() {
+    // お気に入り度⭐
     const stars = document.querySelectorAll('.star');
     const rateInput = document.querySelector('input[name="favorite_rate"]');
-
-    function renderStars(value) {
-        stars.forEach((s, index) => {
-            s.textContent = index < value ? '★' : '☆';
-            s.style.color = index < value ? '#f1c40f' : '#ccc';
+    
+    function updateStars(val) {
+        stars.forEach(s => {
+            s.textContent = parseInt(s.getAttribute('data-value')) <= val ? '⭐' : '☆';
         });
     }
+    // ページ読み込み時に値があれば星を反映
+    if (rateInput && rateInput.value) updateStars(rateInput.value);
 
     stars.forEach(star => {
         star.addEventListener('click', function() {
-            const value = this.getAttribute('data-value');
-            rateInput.value = value;
-            renderStars(value);
+            const val = this.getAttribute('data-value');
+            rateInput.value = val;
+            updateStars(val);
         });
     });
 
-    window.addEventListener('load', () => {
-        const initialRate = rateInput.value || {{ post.favorite_rate|default:0 }};
-        if (initialRate > 0) renderStars(initialRate);
-    });
-
-    // --- 味タグ 香りタグ ---
+    // 2. 味・香りタグの処理
     document.querySelectorAll('.tag-label').forEach(label => {
-        if (label.querySelector('input').checked) {
-            label.style.backgroundColor = '#fdf6e3';
-        }
+        // 初期状態の色設定
+        const checkbox = label.querySelector('input[type="checkbox"]');
+        if (checkbox.checked) label.style.backgroundColor = '#e3d5ca';
+
         label.addEventListener('click', function() {
-            setTimeout(() => {
-                this.style.backgroundColor = this.querySelector('input').checked ? '#fdf6e3' : 'transparent';
-            }, 10);
+            const cb = this.querySelector('input[type="checkbox"]');
+            cb.checked = !cb.checked;
+            this.style.backgroundColor = cb.checked ? '#e3d5ca' : 'transparent';
         });
     });
-
-    // --- 写真プレビュー処理 ---
-    document.querySelector('input[name="images"]').addEventListener('change', function(e) {
-        const previewContainer = document.getElementById('image-preview');
-        Array.from(e.target.files).forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const wrapper = document.createElement('div');
-                wrapper.style.position = 'relative';
-                wrapper.innerHTML = `<img src="${e.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">`;
-                previewContainer.appendChild(wrapper);
-            };
-            reader.readAsDataURL(file);
-        });
-    });
-
-    // --- 投稿済み編集画面の画像削除処理 ---
-    document.querySelectorAll('.remove-existing').forEach(button => {
-        button.addEventListener('click', function() {
-            const photoId = this.getAttribute('data-id');
-            const wrapper = this.parentElement;
-            fetch(`/post/photo/${photoId}/delete/`, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') { wrapper.remove(); }
-                else { alert('削除に失敗しました。'); }
-            });
-        });
-    });
+});
 </script>
 {% endblock %}

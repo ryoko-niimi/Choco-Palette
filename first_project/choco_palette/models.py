@@ -14,7 +14,8 @@ class PasswordReset(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     introduction = models.TextField(blank=True, null=True)
     link = models.URLField(blank=True, null=True)
 

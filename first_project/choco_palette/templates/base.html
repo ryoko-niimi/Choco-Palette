@@ -9,7 +9,6 @@
 </head>
 <body>
     <header class="header">
-        
         <div class="header-left">{% block header_left %}{% endblock %}</div>
         <div class="header-title" style="font-weight:bold;">Choco Palette</div>
         <div class="header-right">
@@ -52,6 +51,14 @@
         </footer>
     {% endif %}
 
+    <div id="common-modal">
+        <div class="modal-content">
+            <p id="modal-message" style="margin-bottom: 20px;"></p>
+            <div id="modal-actions" style="display: flex; gap: 10px; justify-content: center;">
+            </div>
+        </div>
+    </div>
+
     <script>
         /* トースト通知があれば、3秒後に消す */
         document.addEventListener('DOMContentLoaded', function() {
@@ -64,9 +71,24 @@
             }
         });
 
-        /* 指定したIDのモーダルを表示・閉じる */
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        /* 【メモ】モーダル追加用のテンプレート
+           <button type="button" class="btn btn-danger" 
+            onclick="openCommonModal('メッセージ', 
+            '<button class=\'btn btn-danger\' onclick=\'処理\'>OK</button><button class=\'btn btn-secondary\' onclick=\'closeCommonModal()\'>キャンセル</button>')">
+            ボタン名
+           </button>
+        */
+        /* 共通モーダルを表示・閉じる */
+        function openCommonModal(message, confirmHtml) {
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-actions').innerHTML = confirmHtml;
+            document.getElementById('common-modal').style.display = 'block';
+        }
+        
+        function closeCommonModal() {
+            document.getElementById('common-modal').style.display = 'none';
+        }
     </script>
 </body>
 </html>

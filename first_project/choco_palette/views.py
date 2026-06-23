@@ -5,35 +5,21 @@ from django.urls import reverse_lazy
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+# --- Django標準ライブラリ ---
 from django.views.decorators.http import require_POST
-
-# --- Django認証関連 ---
-from django.contrib.auth import authenticate, login
+# --- 認証関連 ---
+from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.contrib.auth.models import User 
+from django.contrib.auth import update_session_auth_hash
+from .forms import MyPasswordChangeForm
 
 # --- 自作のモデルとフォーム ---
 from .models import Profile, Post, PostPhoto, TasteTag, AromaTag
-from .forms import ProfileForm, SignupForm, PostForm, LoginForm
-from django.core.paginator import Paginator
-
-# --- マイページ用の処理 ---
-@login_required
-def mypage_view(request):
-    try:
-        profile = Profile.objects.get(user=request.user)
-    except Profile.DoesNotExist:
-        profile = None
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-        return redirect('choco_palette:mypage')
-    else:
-        form = ProfileForm(instance=profile)
-    return render(request, 'choco_palette/auth/mypage.html', {'profile': profile, 'form': form})
+from django.contrib.auth.forms import UserChangeForm
+from .forms import ProfileForm, SignupForm, PostForm, LoginForm, EmailChangeForm  
 
 # --- ログイン用の処理 ---
 def login_view(request):
@@ -76,6 +62,9 @@ def test_design_view(request):
 
 # --- テイスティング投稿の処理 ---
 def post_create(request):
+    # ① back_url を取得（なければホームへ）
+    back_url = request.META.get('HTTP_REFERER', reverse_lazy('choco_palette:post_list'))
+    
     if request.method == 'POST':    
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
@@ -94,18 +83,20 @@ def post_create(request):
             return redirect('choco_palette:post_list')
     else:
         form = PostForm()
+    
+    # ② back_url を渡す
     return render(request, 'choco_palette/post/post_create.html', {
         'form': form,
+        'back_url': back_url,
         'all_taste_tags': TasteTag.objects.all(),
         'all_aroma_tags': AromaTag.objects.all(),
     })
 
 # --- ホーム画面（投稿一覧表示） ---
+# --- ホーム画面（投稿一覧表示） ---
 def post_list(request):
-    if request.user.is_authenticated: 
-        posts = Post.objects.filter(Q(status=1) | Q(user=request.user, status=2))
-    else:
-        posts = Post.objects.filter(status=1)
+    # 【修正箇所】ログインしていても、status=1（公開）のみを取得するように変更
+    posts = Post.objects.filter(status=1)
     
     query = request.GET.get('q')
     min_cacao = request.GET.get('min_cacao')
@@ -162,9 +153,14 @@ def post_detail(request, pk):
     is_liked = False
     if request.user.is_authenticated:
         is_liked = post.likes.filter(id=request.user.id).exists()
+    
+    # URLパラメータから遷移元を取得（デフォルトは 'home'）
+    back_url = request.GET.get('from', 'home')
+    
     return render(request, 'choco_palette/post/post_detail.html', {
         'post': post,
         'is_liked': is_liked,
+        'back_url': back_url, 
     })
 
 # --- お気に入り ---
@@ -187,27 +183,50 @@ def post_edit(request, pk):
     if post.user != request.user:
         messages.error(request, '他人の投稿は編集できません。')
         return redirect('choco_palette:post_list')
+
+    # ① back_url を取得
+    back_url = request.META.get('HTTP_REFERER', reverse_lazy('choco_palette:post_list'))
+   
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             updated_post = form.save(commit=False)
+            
+            # --- ボタンの種類を判定して処理を分岐 ---
+            action = request.POST.get('action')
+            if action == 'save':
+                updated_post.status = 2  
+                msg = '下書きを保存しました！'
+                redirect_url = 'choco_palette:draft_list'
+            else:
+                updated_post.status = 1 
+                msg = '投稿しました！'
+                redirect_url = 'choco_palette:post_list' 
+            # ------------------------------------------
+
             updated_post.tasting_date = post.tasting_date 
             updated_post.save()
             form.save_m2m()  
+            
+            # 写真追加処理
             images = request.FILES.getlist('images')
             for image in images:
                 PostPhoto.objects.create(post=updated_post, image=image)
-            messages.success(request, '投稿を更新しました！')
-            return redirect('choco_palette:post_detail', pk=post.pk)
+            
+            messages.success(request, msg)
+            return redirect(redirect_url)
     else:
         form = PostForm(instance=post)
+        
+    # ② back_url を渡す
     return render(request, 'choco_palette/post/post_create.html', {
         'form': form, 
         'post': post, 
+        'back_url': back_url,
         'all_taste_tags': TasteTag.objects.all(), 
         'all_aroma_tags': AromaTag.objects.all(),
     })
-
+    
 # --- 下書き一覧 ---
 @login_required
 def draft_list(request):
@@ -242,30 +261,119 @@ def draft_delete(request):
             messages.success(request, '削除しました！')
     return redirect('choco_palette:draft_list')
 
+# --- お気に入り投稿、❤の削除処理 ---
+@login_required
+@require_POST 
+def remove_favorites(request):
+    post_ids = request.POST.getlist('post_ids')
+    if post_ids:
+        posts = Post.objects.filter(id__in=post_ids)
+        for post in posts:
+            post.likes.remove(request.user)
+        messages.success(request, 'お気に入りから解除しました！')
+    
+    return redirect('choco_palette:favorites_list')
+
+
 # --- ユーザープロフィール表示画面 ---
 def user_profile(request, user_id):
     target_user = get_object_or_404(User, pk=user_id)
-    
-    #  投稿のフィルタリング（公開投稿を基本とする）
     all_posts = Post.objects.filter(user=target_user, status=1).order_by('-created_at')
-    
-    # 自分のプロフィールなら非公開も追加（フィルタリング後に結合）
     if request.user.is_authenticated and request.user == target_user:
         private_posts = Post.objects.filter(user=target_user, status=2)
         all_posts = (all_posts | private_posts).order_by('-created_at')
     
-    # 5件ずつ表示する設定（ページネーション）
     paginator = Paginator(all_posts, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    context = {
-        'target_user': target_user,
-        'page_obj': page_obj,  
-    }
-    
+    context = {'target_user': target_user, 'page_obj': page_obj}
     return render(request, 'choco_palette/user_profile.html', context)
 
-# --- マイページ画面---
+
+# --- マイページ関連の処理 ---
+@login_required
 def mypage(request):
-    return render(request, 'choco_palette/mypage.html')
+    profile = Profile.objects.filter(user=request.user).first()
+    return render(request, 'choco_palette/mypage/mypage.html', {'profile': profile})
+
+
+# --- マイページ→プロフィール編集画面---
+@login_required
+def profile_edit(request):
+    profile = request.user.profile
+    
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'プロフィールが更新されました')
+            return redirect('choco_palette:mypage')
+    else:
+        form = ProfileForm(instance=profile)
+    
+
+    return render(request, 'choco_palette/mypage/profile_edit.html', {
+        'form': form,
+        'profile': profile
+    })
+
+# --- マイページ→メールアドレス変更画面 ---
+@login_required
+def email_change(request):
+    # ログインユーザーを取得
+    user = request.user
+    
+    # メールアドレスがDB上で空なら、強制的に仮の値をセットして保存
+    if not user.email:
+        user.email = "example@example.com"  # 一時的な初期値
+        user.save(update_fields=['email'])  # メールアドレスだけを更新保存する
+        print("--- メールの空欄を修正しました ---")
+    
+    print("--- デバッグ: email_change 実行中 ---")
+    print(f"メールアドレス: '{user.email}'")
+    
+    if request.method == 'POST':
+        # POST時はフォームから入力された値を保存
+        form = EmailChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'メールアドレスを変更しました')
+            return redirect('choco_palette:mypage')
+    else:
+        # GET時は空のフォームを生成（新しいアドレス入力用）
+        form = EmailChangeForm()
+    
+    # 画面へ値を渡す
+    return render(request, 'choco_palette/mypage/email_change.html', {
+        'form': form,
+        'user_email': user.email  # ここで確実に値が渡る
+    })
+    
+
+# --- マイページ→パスワード変更画面---
+@login_required
+def password_change(request):
+    if request.method == 'POST':
+        form = MyPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user) # パスワード変更後にログアウトさせないおまじない
+            messages.success(request, 'パスワードを変更しました')
+            return redirect('choco_palette:mypage')
+    else:
+        form = MyPasswordChangeForm(request.user)
+    
+    return render(request, 'choco_palette/mypage/password_change.html', {'form': form})
+
+# --- マイページ→お気に入り一覧画面---
+@login_required
+def favorites_list(request):
+    fav_posts = Post.objects.filter(likes=request.user).order_by('-created_at')
+    return render(request, 'choco_palette/mypage/favorites.html', {'posts': fav_posts})
+
+# --- マイページ→ログアウト画面---
+@login_required
+def custom_logout(request):
+    logout(request)
+    return redirect('choco_palette:login')

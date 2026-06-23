@@ -11,7 +11,6 @@ urlpatterns = [
     # 認証関連
     path('login/', views.login_view, name='login'), 
     path('signup/', views.signup_view, name='signup'),
-    path('mypage/', views.mypage_view, name='mypage'),
     
     # パスワードの再設定画面
     path('password_reset/', 
@@ -51,6 +50,7 @@ urlpatterns = [
     #投稿済のテイスティング編集画面で画像削除処理
     path('post/photo/<int:photo_id>/delete/', views.delete_photo, name='delete_photo'),
     
+    
     #下書き一覧表示画面
     path('drafts/', views.draft_list, name='draft_list'),
     path('drafts/delete/', views.draft_delete, name='draft_delete'),
@@ -58,8 +58,21 @@ urlpatterns = [
     #ユーザープロフィール表示画面
     path('user_profile/<int:user_id>/', views.user_profile, name='user_profile'),
    
-   
    #マイページ画面
-   path('mypage/', views.mypage, name='mypage')
+   path('mypage/', views.mypage, name='mypage'),
+   #プロフィール編集画面
+   path('profile_edit/',views.profile_edit, name='profile_edit'),
+   #メールアドレス変更画面
+   path('email_change/', views.email_change, name='email_change'),
+   #パスワード変更画面
+   path('password_change/', views.password_change, name='password_change'),
+   #お気に入り一覧画面
+   path('favorites/', views.favorites_list, name='favorites_list'),
+   # お気に入り投稿削除
+   path('mypage/favorites/remove/', views.remove_favorites, name='favorites_list_remove'),
+   #ログアウト処理
+   path('logout/', views.custom_logout, name='logout'),
+   
+   
     
 ]

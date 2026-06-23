@@ -1,8 +1,7 @@
-<!--ホーム画面（一覧表示）-->
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="width: 90%; max-width: 400px; margin: 0 auto;"> 
+<div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
     
     {% if not user.is_authenticated %}
         <a href="{% url 'choco_palette:search' %}" class="btn btn-secondary" style="display:block; margin-bottom:20px; text-decoration:none;">
@@ -12,22 +11,25 @@
     
     <div class="post-list">
         {% for post in page_obj %}
-            <div class="card" style="margin-bottom: 20px; padding: 15px; display: flex; align-items: center; border-radius: 15px;">
-                {% if post.photos.first %}
-                    <img src="{{ post.photos.first.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 8px;">
-                {% else %}
-                    <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 8px; flex-shrink: 0;"></div>
-                {% endif %}
-                
-                <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; flex-grow: 1;">
-                    <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name }}</p>
-                    <p style="margin: 5px 0; font-size: 0.9em; color: #666;">{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
-                </a>
-                
-                {% if post.status == 2 %}
-                    <span style="font-size: 0.8em; color: #e67e22;">🔒</span>
-                {% endif %}
-            </div>
+        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; align-items: center;">
+            
+            {% if post.photos.first %}
+                <img src="{{ post.photos.first.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
+            {% else %}
+                <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
+            {% endif %}
+            
+            <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:black; flex-grow: 1;">
+                <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name }}</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">
+                    {{ post.brand_name }} / {{ post.cacao_percentage }}%
+                </p>
+            </a>
+            
+            {% if post.status == 2 %}
+                <span style="font-size: 1.2em; margin-left: 10px;">🔒</span>
+            {% endif %}
+        </div>
         {% empty %}
             <div style="text-align: center; margin-top: 50px; color: #7f8c8d;">
                 <div style="font-size: 48px; margin-bottom: 10px;">🔍</div>

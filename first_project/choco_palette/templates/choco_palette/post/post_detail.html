@@ -2,7 +2,11 @@
 {% extends "base.html" %}
 
 {% block header_left %}
-    <a href="{% url 'choco_palette:post_list' %}" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
+    {% if back_url == 'favorites' %}
+        <a href="{% url 'choco_palette:favorites_list' %}" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
+    {% else %}
+        <a href="{% url 'choco_palette:post_list' %}" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -73,27 +77,32 @@
 
     {% if user == post.user %}
     <div style="margin: 30px 0; display: flex; gap: 15px; justify-content: center;">
-        <a href="{% url 'choco_palette:post_edit' post.pk %}" class="btn btn-secondary">編集</a>
-        <button type="button" onclick="openModal('delete-modal')" class="btn btn-danger">削除</button>
+        <a href="{% url 'choco_palette:post_edit' post.pk %}" class="btn btn-primary">編集</a>
+        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">
+            削除
+        </button>
     </div>
     {% endif %}
+
+   
 </div>
 
-<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000;">
-    <div style="width: 80%; max-width: 300px; margin: 30% auto; background: white; padding: 20px; border-radius: 10px; text-align: center;">
-        <p style="margin-bottom: 20px;">本当に削除しますか？</p>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <form action="{% url 'choco_palette:post_delete' post.pk %}" method="POST">
+<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+    <div style="width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <p style="margin-bottom: 25px; font-weight: bold;">投稿を削除しますか？</p>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
+            <form action="{% url 'choco_palette:post_delete' post.pk %}" method="POST" style="margin:0;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">削除する</button>
+                <button type="submit" class="btn btn-danger" style="background-color: #e74c3c; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer;">削除</button>
             </form>
-            <button type="button" onclick="closeModal('delete-modal')" class="btn btn-secondary">キャンセル</button>
+            <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary" style="background-color: #bdc3c7; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer;">キャンセル</button>
         </div>
     </div>
 </div>
 
 <script>
-    // お気に入りボタン
+    // お気に入りボタン処理
     document.getElementById('like-btn').addEventListener('click', function() {
         const postId = this.getAttribute('data-post-id');
         const heartIcon = document.getElementById('heart-icon');
@@ -108,32 +117,31 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                // ハートアイコンの切り替え
                 heartIcon.classList.toggle('heart-red', data.is_liked);
                 heartIcon.innerText = data.is_liked ? '❤️' : '🤍';
-                
-                // トースト通知の表示
                 showToast(data.is_liked ? 'お気に入りに保存しました！' : 'お気に入りから解除しました！');
             }
         });
     });
 
-    // トースト通知を表示する関数
+    // モーダル制御
+    function openDeleteModal() {
+        document.getElementById('delete-modal').style.display = 'flex';
+    }
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').style.display = 'none';
+    }
+
+    // トースト通知処理
     function showToast(message) {
         const parent = document.createElement('div');
         parent.className = 'messages'; 
-        
         const toast = document.createElement('div');
         toast.className = 'toast-message';
         toast.innerText = message;
-      
         parent.appendChild(toast);
         document.body.appendChild(parent);
-
-        setTimeout(() => { 
-            parent.remove(); 
-        }, 3000);
+        setTimeout(() => { parent.remove(); }, 3000);
     }
 </script>
-
 {% endblock %}

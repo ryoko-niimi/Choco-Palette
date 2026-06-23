@@ -1,0 +1,46 @@
+<!--マイページ画面-->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
+    <div class="user-info" style="text-align: center; margin-bottom: 30px;">
+        {% if profile and profile.image %}
+            <img src="{{ profile.image.url }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+        {% else %}
+            <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #ddd; margin: 0 auto;"></div>
+        {% endif %}
+        <h2>{{ user.profile.nickname|default:user.username }}</h2>
+        <p>{{ user.profile.bio|default:"自己紹介がまだありません。" }}</p>
+    </div>
+    <div class="mypage-buttons" style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="{% url 'choco_palette:profile_edit' %}" class="btn btn-primary" style="width: 50%;">プロフィール編集</a>
+        <a href="{% url 'choco_palette:favorites_list' %}" class="btn btn-primary" style="width: 50%;">❤ お気に入り一覧</a>
+        <a href="{% url 'choco_palette:email_change' %}" class="btn btn-primary" style="width: 50%;">メールアドレス変更</a>
+        <a href="{% url 'choco_palette:password_change' %}" class="btn btn-primary" style="width: 50%;">パスワード変更</a>
+        
+        <button type="button" class="btn btn-danger" style="width: 60%;"
+            data-logout-url="{% url 'choco_palette:logout' %}" 
+            onclick="openLogoutConfirm(this)">
+            ログアウトする
+        </button>
+    </div>
+    </div>
+
+    
+
+<script>
+    function openLogoutConfirm(btn) {
+        // data属性からURLを取得
+        const logoutUrl = btn.getAttribute('data-logout-url');
+        
+        // モーダルのHTMLを組み立て
+        const confirmHtml = `
+            <a href="${logoutUrl}" class="btn btn-danger" style="text-decoration:none; color:white; padding:12px 24px; border-radius:8px;">ログアウト</a>
+            <button type="button" class="btn btn-secondary" onclick="closeCommonModal()">キャンセル</button>
+        `;
+        
+        // base.htmlにある関数を呼び出す
+        openCommonModal('ログアウトしますか？', confirmHtml);
+    }
+</script>
+{% endblock %}

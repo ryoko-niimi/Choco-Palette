@@ -3,6 +3,9 @@ from .models import Profile
 from django.contrib.auth.models import User
 from .models import Post
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
+
 
 # プロフィール設定と編集のフォーム
 class ProfileForm(forms.ModelForm):
@@ -81,13 +84,18 @@ class PostForm(forms.ModelForm):
         self.fields['taste_tags'].label = '味タグ'
         self.fields['aroma_tags'].label = '香りタグ'
         
-        # 4. カカオ含有率は必須入力をオフにする（バッジだけ表示）
-        self.fields['cacao_percentage'].required = False
+        # 必須にしたいフィールド
+        self.fields['chocolate_name'].required = True
+        self.fields['brand_name'].required = True
+        self.fields['status'].required = True
+        self.fields['tasting_date'].required = True
         
-        # 5. 編集時の日付読み取り専用設定
-        if self.instance.pk:
-            self.fields['tasting_date'].widget.attrs['readonly'] = True
-            self.fields['tasting_date'].widget.attrs['style'] = 'background-color: #f0f0f0; cursor: not-allowed;'
+        # 空欄OKにしたいフィールド
+        self.fields['cacao_percentage'].required = False
+        self.fields['tasting_comment'].required = False
+        self.fields['private_memo'].required = False
+        self.fields['favorite_rate'].required = False
+
        
 
 
@@ -95,3 +103,48 @@ class PostForm(forms.ModelForm):
 # ログイン用フォーム
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label='メールアドレス', widget=forms.TextInput(attrs={'autofocus': True}))
+    
+#マイページ→プロフィール設定編集画面
+class ProfileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # 全体に適用
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'custom-input'})
+            
+        # 自己紹介
+        self.fields['bio'].widget.attrs.update({'rows': 5}) 
+         # リンクを追加
+        self.fields['link'].widget.attrs.update({'style': 'height: 40px;'})
+        
+    class Meta:
+        model = Profile
+        fields = ['image', 'nickname', 'bio', 'link']
+        
+#マイページ→メールアドレス変更画面
+class EmailChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['email'] 
+        labels = {'email': '新しいメールアドレス'}
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'custom-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['email'].initial = ''
+        
+        
+#マイページ→パスワード変更画面
+class MyPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['old_password'].label = "現在のパスワード"
+        self.fields['new_password1'].label = "新しいパスワード"
+        self.fields['new_password2'].label = "新しいパスワード（確認用）"
+        
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'custom-input'})

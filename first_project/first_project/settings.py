@@ -4,7 +4,7 @@ from pathlib import Path
 # プロジェクトの基準となる場所（BASE_DIR）
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 開発用の設定
+# 開発用の設定 '*'
 SECRET_KEY = 'django-insecure-63rya_1s$3_+2k(lly=qw1qw5@bmnag5q)p(+7es$&fe3y3b&1'
 DEBUG = True
 ALLOWED_HOSTS = []
@@ -61,10 +61,11 @@ DATABASES = {
 # パスワードバリデーション
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator','OPTIONS': {'min_length': 8,}},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
+    ]
+
 
 # 国際化設定
 LANGUAGE_CODE = 'ja'
@@ -92,9 +93,4 @@ LOGIN_REDIRECT_URL = 'choco_palette:post_list'
 #未ログイン時に促す遷移先はログイン画面
 LOGIN_URL = 'choco_palette:login'
 
-# 認証の設定 
-# ユーザー名ではなく「メールアドレス」でログインできるようにするカスタムバックエンド
-AUTHENTICATION_BACKENDS = [
-    'choco_palette.backends.EmailBackend', 
-    'django.contrib.auth.backends.ModelBackend',
-]
+
