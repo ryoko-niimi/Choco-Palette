@@ -1,4 +1,5 @@
 <!--テイスティング詳細画面-->
+
 {% extends "base.html" %}
 
 {% block header_left %}
@@ -29,7 +30,7 @@
 
     <div style="width: 100%; max-width: 400px; height: 300px; overflow: hidden; margin: 0 auto 10px; background-color: #eee; border-radius: 8px;">
         <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 100%;">
-            {% for photo in post.photos.all %}
+            {% for photo in post.photos.all|dictsort:"sort_order" %}
                 <img src="{{ photo.image.url }}" style="width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; scroll-snap-align: center;">
             {% endfor %}
         </div>
@@ -69,39 +70,38 @@
         <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>
         <p style="background-color: #fdf6f0; padding: 10px; border-radius: 5px; border: 1px solid #e3d5ca;">{{ post.tasting_comment }}</p>
         
-        {% if post.private_comment %}
+        {% if post.private_memo %}
             <p style="margin: 15px 0 5px 0; font-weight: bold; color: #555;">非公開メモ</p>
-            <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777;">{{ post.private_comment }}</p>
+            <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777;">{{ post.private_memo }}</p>
         {% endif %}
     </div>
 
     {% if user == post.user %}
     <div style="margin: 30px 0; display: flex; gap: 15px; justify-content: center;">
         <a href="{% url 'choco_palette:post_edit' post.pk %}" class="btn btn-primary">編集</a>
-        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">
-            削除
-        </button>
+        <button type="button" class="btn btn-danger" 
+                data-delete-url="{% url 'choco_palette:post_delete' post.pk %}" 
+                onclick="openDeleteConfirm(this)">削除</button>
     </div>
     {% endif %}
-
-   
-</div>
-
-<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
-    <div style="width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <p style="margin-bottom: 25px; font-weight: bold;">投稿を削除しますか？</p>
-        
-        <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
-            <form action="{% url 'choco_palette:post_delete' post.pk %}" method="POST" style="margin:0;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" style="background-color: #e74c3c; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer;">削除</button>
-            </form>
-            <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary" style="background-color: #bdc3c7; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer;">キャンセル</button>
-        </div>
-    </div>
 </div>
 
 <script>
+     // 削除モーダル表示
+    function openDeleteConfirm(btn) {
+    const deleteUrl = btn.getAttribute('data-delete-url');
+    
+    const confirmHtml = `
+        <form action="${deleteUrl}" method="POST" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">削除する</button>
+        </form>
+        <button type="button" class="btn btn-secondary" onclick="closeCommonModal()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">キャンセル</button>
+    `;
+    
+    openCommonModal('投稿を削除しますか？', confirmHtml);
+}
+
     // お気に入りボタン処理
     document.getElementById('like-btn').addEventListener('click', function() {
         const postId = this.getAttribute('data-post-id');
@@ -123,14 +123,6 @@
             }
         });
     });
-
-    // モーダル制御
-    function openDeleteModal() {
-        document.getElementById('delete-modal').style.display = 'flex';
-    }
-    function closeDeleteModal() {
-        document.getElementById('delete-modal').style.display = 'none';
-    }
 
     // トースト通知処理
     function showToast(message) {

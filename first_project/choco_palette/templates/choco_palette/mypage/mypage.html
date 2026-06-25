@@ -1,7 +1,12 @@
 <!--マイページ画面-->
 {% extends "base.html" %}
 
+{% block header_left %}
+<a href="{% url 'choco_palette:post_list' %}" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+{% endblock %}
+
 {% block content %}
+
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
     <div class="user-info" style="text-align: center; margin-bottom: 30px;">
         {% if profile and profile.image %}
@@ -21,8 +26,7 @@
         <button type="button" class="btn btn-danger" style="width: 60%;"
             data-logout-url="{% url 'choco_palette:logout' %}" 
             onclick="openLogoutConfirm(this)">
-            ログアウトする
-        </button>
+            ログアウトする</button>
     </div>
     </div>
 

@@ -37,18 +37,22 @@
     </div>
 
     {% if user.is_authenticated %}
-        <footer class="footer">
-            <nav>
-                <a href="{% url 'choco_palette:post_list' %}">
-                    <span class = "footer-icon">🏠</span>ホーム</a>
-                <a href="{% url 'choco_palette:post_create' %}">
-                    <span class = "footer-icon">➕</span>登録</a>
-                <a href="{% url 'choco_palette:search' %}">
-                    <span class = "footer-icon">🔍</span>検索</a>
-                <a href="{% url 'choco_palette:mypage' %}">
-                    <span class = "footer-icon">👤</span>マイページ</a>
-            </nav>
-        </footer>
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="{% url 'choco_palette:post_list' %}" class="footer-link">
+                <span class="footer-icon">🏠</span>ホーム
+            </a>
+            <a href="{% url 'choco_palette:post_create' %}" class="footer-link">
+                <span class="footer-icon">➕</span>登録
+            </a>
+            <a href="{% url 'choco_palette:search' %}" class="footer-link">
+                <span class="footer-icon">🔍</span>検索
+            </a>
+            <a href="{% url 'choco_palette:mypage' %}" class="footer-link">
+                <span class="footer-icon">👤</span>マイページ
+            </a>
+        </nav>
+    </footer>
     {% endif %}
 
     <div id="common-modal">
@@ -71,7 +75,6 @@
             }
         });
 
-
         /* 【メモ】モーダル追加用のテンプレート
            <button type="button" class="btn btn-danger" 
             onclick="openCommonModal('メッセージ', 
@@ -79,6 +82,7 @@
             ボタン名
            </button>
         */
+
         /* 共通モーダルを表示・閉じる */
         function openCommonModal(message, confirmHtml) {
             document.getElementById('modal-message').innerText = message;

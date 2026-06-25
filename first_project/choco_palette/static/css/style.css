@@ -63,17 +63,8 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
     margin-bottom: 20px; 
 }
 
-/* 必須ボタンのスタイル */
-.required-badge {
-    background-color: #ff4d4d;
-    color: white;
-    font-size: 0.75rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 10px;
-    vertical-align: middle;
-    font-weight: normal;
-}
+
+
 
 /* ボタン共通 */
 .btn {
@@ -120,6 +111,7 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
 /* =========================================================
 【ヘッダー・フッター】
 ========================================================= */
+/* ヘッター全体 */
 .header { 
     background-color: var(--accent-color); 
     padding: 20px; 
@@ -131,6 +123,13 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
     justify-content: space-between;
     align-items: center;
     font-size: 24px;
+}
+
+
+/* フッター アイコンのサイズ */
+.header-icon {
+    font-size: 2rem;       
+    margin-bottom: 2px;
 }
 
 /* フッター全体 */
@@ -164,9 +163,10 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
 
 /* フッター アイコンのサイズ */
 .footer-icon {
-    font-size: 1.2rem;       
+    font-size: 1.5rem;       
     margin-bottom: 2px;
 }
+
 
 /* =========================================================
 【認証・投稿】共通エリア
@@ -184,8 +184,14 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
     width: 90%;             
     max-width: 400px;       
     text-align: left;       
-    display: block;         
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+
 }
+.status-public { background-color: #ffffff; }
+.status-private { background-color: #f0f0f0; }
+
 
 /* =========================================================
 【モーダル共通】
@@ -212,6 +218,34 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
     border-radius: var(--card-radius);
     text-align: center;
 }
+
+/*投稿画像のアップロード*/
+.photo-upload-label {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ccc; /* 破線の四角 */
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.photo-upload-label:hover {
+    border-color: #aaa;
+    background-color: #eee;
+}
+
+.plus-icon {
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+}
+
+
 
 
 /* =========================================================

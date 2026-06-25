@@ -1,3 +1,5 @@
+<!--ホーム画面（一覧表示）-->
+
 {% extends "base.html" %}
 
 {% block content %}
@@ -5,19 +7,22 @@
     
     {% if not user.is_authenticated %}
         <a href="{% url 'choco_palette:search' %}" class="btn btn-secondary" style="display:block; margin-bottom:20px; text-decoration:none;">
-            🔍 チョコを検索・絞り込み
+            🔍 投稿を検索・絞り込み
         </a>
     {% endif %}
     
     <div class="post-list">
         {% for post in page_obj %}
-        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; align-items: center;">
+        <div class="post-item {% if post.status == 2 %}status-private{% else %}status-public{% endif %}">
+        
             
-            {% if post.photos.first %}
-                <img src="{{ post.photos.first.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
-            {% else %}
-                <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
-            {% endif %}
+            {% with first_photo=post.photos.all|dictsort:"sort_order"|first %}
+                {% if first_photo %}
+                    <img src="{{ first_photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
+                {% else %}
+                    <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
+                {% endif %}
+            {% endwith %}
             
             <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:black; flex-grow: 1;">
                 <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name }}</p>

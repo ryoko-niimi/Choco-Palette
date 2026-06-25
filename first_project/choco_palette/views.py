@@ -16,21 +16,32 @@ from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from .forms import MyPasswordChangeForm
 
-# --- 自作のモデルとフォーム ---
+# --- 投稿 ---
 from .models import Profile, Post, PostPhoto, TasteTag, AromaTag
 from django.contrib.auth.forms import UserChangeForm
-from .forms import ProfileForm, SignupForm, PostForm, LoginForm, EmailChangeForm  
+from .forms import ProfileForm, SignupForm, PostForm, EmailLoginForm, EmailChangeForm  
+
+# --- 投稿画像並べ替え   ---
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from .models import PostPhoto
+
+
 
 # --- ログイン用の処理 ---
 def login_view(request):
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST) 
+        # 【修正】メールアドレスログイン用のフォーム（EmailLoginForm）を使用
+        form = EmailLoginForm(request, data=request.POST) 
         if form.is_valid():
             user = form.get_user()
             login(request, user)
             return redirect('choco_palette:post_list')
     else:
-        form = LoginForm() 
+        # 【修正】画面を開いた時も EmailLoginForm を表示
+        form = EmailLoginForm() 
     return render(request, 'choco_palette/auth/login.html', {'form': form})
 
 # --- 新規登録用の処理 ---
@@ -62,7 +73,7 @@ def test_design_view(request):
 
 # --- テイスティング投稿の処理 ---
 def post_create(request):
-    # ① back_url を取得（なければホームへ）
+    # back_url を取得（なければホームへ）
     back_url = request.META.get('HTTP_REFERER', reverse_lazy('choco_palette:post_list'))
     
     if request.method == 'POST':    
@@ -84,7 +95,7 @@ def post_create(request):
     else:
         form = PostForm()
     
-    # ② back_url を渡す
+    # back_url を渡す
     return render(request, 'choco_palette/post/post_create.html', {
         'form': form,
         'back_url': back_url,
@@ -92,10 +103,10 @@ def post_create(request):
         'all_aroma_tags': AromaTag.objects.all(),
     })
 
-# --- ホーム画面（投稿一覧表示） ---
+
 # --- ホーム画面（投稿一覧表示） ---
 def post_list(request):
-    # 【修正箇所】ログインしていても、status=1（公開）のみを取得するように変更
+    # 【修正箇所】ログインしていても、status=1（公開）のみを取得
     posts = Post.objects.filter(status=1)
     
     query = request.GET.get('q')
@@ -226,7 +237,8 @@ def post_edit(request, pk):
         'all_taste_tags': TasteTag.objects.all(), 
         'all_aroma_tags': AromaTag.objects.all(),
     })
-    
+
+
 # --- 下書き一覧 ---
 @login_required
 def draft_list(request):
@@ -249,6 +261,24 @@ def delete_photo(request, photo_id):
     photo = get_object_or_404(PostPhoto, id=photo_id, post__user=request.user)
     photo.delete()  
     return JsonResponse({'status': 'success'})
+
+# --- 投稿画像並べ替え処理 ---
+@login_required
+@require_POST  
+def reorder_photos(request):
+    import json
+    data = json.loads(request.body)
+    photo_ids = data.get('photo_ids', [])
+    
+    for index, photo_id in enumerate(photo_ids):
+       
+        photo = get_object_or_404(PostPhoto, id=photo_id, post__user=request.user)
+        photo.sort_order = index
+        photo.save()
+            
+    return JsonResponse({'status': 'success'})
+
+
 
 # --- 下書き投稿の削除処理 ---
 @login_required 

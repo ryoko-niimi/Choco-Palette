@@ -47,8 +47,12 @@ urlpatterns = [
     # 検索・絞り込み画面
     path('search/', views.search_view, name='search'),
     
-    #投稿済のテイスティング編集画面で画像削除処理
+    #投稿済・下書き一覧からのテイスティング編集画面で画像「削除」処理
     path('post/photo/<int:photo_id>/delete/', views.delete_photo, name='delete_photo'),
+    
+    #投稿済・下書き一覧からのテイスティング編集画面で画像「並べ替え」処理
+    path('post/images/reorder/', views.reorder_photos, name='reorder_photos'),
+    
     
     
     #下書き一覧表示画面

@@ -1,3 +1,4 @@
+<!--お気に入り一覧画面-->
 {% extends "base.html" %}
 
 {% block header_left %}
@@ -5,9 +6,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+<div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
     <h2>❤️ お気に入り一覧</h2>
-    
     
     <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
         <button type="button" id="toggle-select-btn" class="btn btn-success" style="margin: 0;">選択</button>
@@ -16,28 +16,37 @@
     <form id="delete-form" method="POST" action="{% url 'choco_palette:favorites_list_remove' %}">
         {% csrf_token %}
         <div class="post-list">
-    {% for post in posts %}
-    <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; align-items: center;">
-        <input type="checkbox" name="post_ids" value="{{ post.pk }}" class="select-checkbox" style="display: none; transform: scale(1.5); margin-right: 15px;">
-        
-        {% if post.photos.first %}
-            <img src="{{ post.photos.first.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
-        {% else %}
-            <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px;"></div>
-        {% endif %}
-        <a href="{% url 'choco_palette:post_detail' post.pk %}?from=favorites" style="text-decoration:none; color:black; flex-grow: 1;">
-            <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name|default:"無題" }}</p>
-            <p style="margin: 5px 0 0 0; font-size: 0.9em;">{{ post.brand_name }}</p>
-        </a>
-    </div>
-    {% empty %}
-    <p style="text-align: center; color: #999; margin-top: 20px;">お気に入りの投稿はまだありません。</p>
-    {% endfor %}
-</div>
+            {% for post in posts %}
+            <div class="post-item {% if post.status == 2 %}status-private{% else %}status-public{% endif %}">
+                
+                <input type="checkbox" name="post_ids" value="{{ post.pk }}" class="select-checkbox" style="display: none; transform: scale(1.5); margin-right: 15px;">
+                
+                {% with first_photo=post.photos.all|dictsort:"sort_order"|first %}
+                    {% if first_photo %}
+                        <img src="{{ first_photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px; flex-shrink: 0;">
+                    {% else %}
+                        <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
+                    {% endif %}
+                {% endwith %}
+
+                <a href="{% url 'choco_palette:post_detail' post.pk %}?from=favorites" style="text-decoration:none; color:black; flex-grow: 1;">
+                    <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name|default:"無題" }}</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">{{ post.brand_name }}</p>
+                </a>
+
+                {% if post.status == 2 %}
+                    <span style="font-size: 1.2em; margin-left: 10px;">🔒</span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #999; margin-top: 20px;">お気に入りの投稿はまだありません。</p>
+            {% endfor %}
+        </div>
     </form>
 </div>
 
 <div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+
     <div style="width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 15px; text-align: center;">
         <p style="margin-bottom: 20px; font-weight: bold;">お気に入りから解除しますか？</p>
         <div style="display: flex; gap: 10px; justify-content: center;">

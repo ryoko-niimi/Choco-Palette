@@ -98,11 +98,16 @@ class PostForm(forms.ModelForm):
 
        
 
-
-
 # ログイン用フォーム
-class LoginForm(AuthenticationForm):
-    username = forms.CharField(label='メールアドレス', widget=forms.TextInput(attrs={'autofocus': True}))
+class EmailLoginForm(AuthenticationForm):
+    
+    username = forms.EmailField(
+        label="メールアドレス",
+        widget=forms.EmailInput(attrs={'class': 'custom-input', 'placeholder': 'example@example.com', 'autocomplete': 'username'})
+    )
+
+
+
     
 #マイページ→プロフィール設定編集画面
 class ProfileForm(forms.ModelForm):

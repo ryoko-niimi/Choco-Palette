@@ -1,11 +1,15 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # プロジェクトの基準となる場所（BASE_DIR）
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#.envファイルを読み込む
+load_dotenv(BASE_DIR / '.env')
+
 # 開発用の設定 '*'
-SECRET_KEY = 'django-insecure-63rya_1s$3_+2k(lly=qw1qw5@bmnag5q)p(+7es$&fe3y3b&1'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-63rya_1s$3_+2k(lly=qw1qw5@bmnag5q)p(+7es$&fe3y3b&1')
 DEBUG = True
 ALLOWED_HOSTS = []
 
@@ -58,6 +62,12 @@ DATABASES = {
     }
 }
 
+# 認証バックエンドの設定（メールアドレスでログイン）
+AUTHENTICATION_BACKENDS = [
+    'choco_palette.backends.EmailAuthBackend',  
+    'django.contrib.auth.backends.ModelBackend', 
+]
+
 # パスワードバリデーション
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -85,8 +95,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'test1@example.com'
-EMAIL_HOST_PASSWORD = 'xxxx xxxx xxxx xxxx'
+EMAIL_HOST_USER = os.getenv('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 #ログイン後の遷移先
 LOGIN_REDIRECT_URL = 'choco_palette:post_list'

@@ -21,31 +21,38 @@
 </style>
 
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
-{% if not post %}
- <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px;">
-    <a href="{% url 'choco_palette:draft_list' %}" 
-       class="btn btn-draft" style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0; background-color: #7db58a; color: white;">
-        下書き一覧
-    </a>
-</div>
-{% endif %}
+    
+    {% if not post %}
+    <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px;">
+        <a href="{% url 'choco_palette:draft_list' %}" class="btn btn-draft" style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0; background-color: #7db58a; color: white;">
+            下書き一覧
+        </a>
+    </div>
+    {% endif %}
 
     <form method="post" enctype="multipart/form-data" id="post-form">
         {% csrf_token %}
-
+        
         <div class="form-group" style="margin: 20px 0;">
             <label style="font-weight: bold; display: block; margin-bottom: 10px;">写真をアップロード (最大10枚)</label>
-            <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            
+            <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for photo in post.photos.all %}
-                <div class="existing-image" style="position: relative; display: inline-block;">
-                    <img src="{{ photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
-                    <button type="button" class="remove-existing" data-id="{{ photo.id }}" style="position: absolute; top: -5px; right: -5px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
+                <div class="image-item existing-image" data-id="{{ photo.id }}" style="position: relative; width: 80px; height: 80px;">
+                    <img src="{{ photo.image.url }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                    <button type="button" class="remove-btn" onclick="deleteImage(this, {{ photo.id }})" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; border: none;">×</button>
                 </div>
                 {% endfor %}
+                
+                <label for="id_images" class="photo-upload-label" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80px; height: 80px; border: 2px dashed #ccc; border-radius: 5px; cursor: pointer; background: #f9f9f9;">
+                    <span style="font-size: 20px;">+</span>
+                    <span style="font-size: 10px;">写真を追加</span>
+                </label>
             </div>
-            <input type="file" name="images" multiple accept="image/*" class="form-control">
+            
+            <input type="file" id="id_images" name="images" multiple accept="image/*" style="display: none;">
         </div>
-
+        
         <div class="form-group" style="margin-bottom: 20px;">
             <label style="font-weight: bold; display: block;">{{ form.chocolate_name.label|safe }}</label>
             {{ form.chocolate_name }}
@@ -92,9 +99,7 @@
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for tag in all_taste_tags %}
                     <label class="tag-label" style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; cursor: pointer; transition: 0.3s;">
-                        <input type="checkbox" name="taste_tags" value="{{ tag.id }}" 
-                               {% if post and tag in post.taste_tags.all %}checked{% endif %} 
-                               style="display:none;">
+                        <input type="checkbox" name="taste_tags" value="{{ tag.id }}" {% if post and tag in post.taste_tags.all %}checked{% endif %} style="display:none;">
                         {{ tag.name }}
                     </label>
                 {% endfor %}
@@ -106,9 +111,7 @@
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for tag in all_aroma_tags %}
                     <label class="tag-label" style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; cursor: pointer; transition: 0.3s;">
-                        <input type="checkbox" name="aroma_tags" value="{{ tag.id }}" 
-                               {% if post and tag in post.aroma_tags.all %}checked{% endif %} 
-                               style="display:none;">
+                        <input type="checkbox" name="aroma_tags" value="{{ tag.id }}" {% if post and tag in post.aroma_tags.all %}checked{% endif %} style="display:none;">
                         {{ tag.name }}
                     </label>
                 {% endfor %}
@@ -136,40 +139,154 @@
     </form>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // お気に入り度⭐
-    const stars = document.querySelectorAll('.star');
-    const rateInput = document.querySelector('input[name="favorite_rate"]');
+    // ==========================================
+    // 1. 画像関連の処理（プレビュー追加・削除・上限チェック）
+    // ==========================================
+    const MAX_IMAGES = 10; // ★最大枚数を設定
+
+    // 画像の枚数をチェックして、追加ボタンの表示/非表示を切り替える関数
+    function checkImageLimit() {
+        const currentCount = document.querySelectorAll('.image-item').length;
+        const uploadLabel = document.querySelector('.photo-upload-label');
+        if (currentCount >= MAX_IMAGES) {
+            uploadLabel.style.display = 'none'; // 10枚以上なら隠す
+        } else {
+            uploadLabel.style.display = 'flex'; // 10枚未満なら表示する
+        }
+    }
+
+    document.getElementById('id_images').addEventListener('change', function(e) {
+        const preview = document.getElementById('image-preview');
+        let currentCount = document.querySelectorAll('.image-item').length; // 今ある枚数
+        
+        for (const file of e.target.files) {
+            
+            // 10枚を超えようとしたらストップ！
+    if (currentCount >= MAX_IMAGES) {
+         openCommonModal(
+        'アップロードできる写真は\n最大10枚までです!',
+        '<button type="button" class="btn btn-secondary" onclick="closeCommonModal()" style="margin: 0; padding: 8px 20px; font-size: 14px;">閉じる</button>'
+    );
+    break; 
+}
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const div = document.createElement('div');
+                div.className = 'image-item';
+                div.style = "position: relative; width: 80px; height: 80px; cursor: move;";
+                div.innerHTML = `
+                    <img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                    <button type="button" onclick="removeNewImage(this)" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%;">×</button>
+                `;
+                // 「写真を追加」ボタンの直前に追加する
+                preview.insertBefore(div, preview.lastElementChild);
+                checkImageLimit(); // 追加したあとに上限チェック
+            }
+            reader.readAsDataURL(file);
+            currentCount++; // カウントを増やす
+        }
+        e.target.value = ''; // 連続で同じファイルを選べるように入力をリセット
+    });
+
+    // 新しく選んだ画像（まだ保存してない）を画面上から消す
+    function removeNewImage(btn) {
+        btn.parentElement.remove();
+        checkImageLimit(); // 消したあとに上限チェック（10枚未満になったらボタン復活）
+    }
+
+    // ==========================================
+    // 2. 画面読み込み時の設定（星評価・タグ・並び替え）
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        checkImageLimit(); // ★画面を開いた時にも、すでに10枚あるかチェック！
+
+        // お気に入り度⭐のクリック処理
+        const stars = document.querySelectorAll('.star');
+        const rateInput = document.querySelector('input[name="favorite_rate"]');
+
+        function updateStars(val) {
+            stars.forEach(s => {
+                s.textContent = parseInt(s.getAttribute('data-value')) <= val ? '⭐' : '☆';
+            });
+        }
+
+        if (rateInput && rateInput.value) updateStars(rateInput.value);
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const val = this.getAttribute('data-value');
+                rateInput.value = val;
+                updateStars(val);
+            });
+        });
+
+        // 味・香りタグの色変更処理
+        document.querySelectorAll('.tag-label').forEach(label => {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            if (checkbox.checked) label.style.backgroundColor = '#e3d5ca';
+
+            label.addEventListener('click', function() {
+                const cb = this.querySelector('input[type="checkbox"]');
+                cb.checked = !cb.checked;
+                this.style.backgroundColor = cb.checked ? '#e3d5ca' : 'transparent';
+            });
+        });
+
+        // 画像の並び替え機能 (Sortable.js)
+        const el = document.getElementById('image-preview');
+        new Sortable(el, {
+            animation: 150,
+            onEnd: function () {
+                updateOrder();
+            }
+        });
+    });
+
+    // ==========================================
+    // 3. サーバー通信処理（並び替え・削除）
+    // ==========================================
     
-    function updateStars(val) {
-        stars.forEach(s => {
-            s.textContent = parseInt(s.getAttribute('data-value')) <= val ? '⭐' : '☆';
+    // 並び順をサーバーに送る関数
+    function updateOrder() {
+        const photoIds = Array.from(document.querySelectorAll('.existing-image'))
+                              .map(div => div.getAttribute('data-id'));
+
+        fetch('/post/images/reorder/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ photo_ids: photoIds }),
         });
     }
-    // ページ読み込み時に値があれば星を反映
-    if (rateInput && rateInput.value) updateStars(rateInput.value);
 
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const val = this.getAttribute('data-value');
-            rateInput.value = val;
-            updateStars(val);
+    // 投稿画像の削除
+    function deleteImage(btn, photoId) {
+        fetch(`/post/photo/${photoId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.parentElement.remove();
+                checkImageLimit(); // ★サーバーの画像を消した時もチェックしてボタン復活
+            } else {
+                alert('削除に失敗しました');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('通信エラーが発生しました');
         });
-    });
-
-    // 2. 味・香りタグの処理
-    document.querySelectorAll('.tag-label').forEach(label => {
-        // 初期状態の色設定
-        const checkbox = label.querySelector('input[type="checkbox"]');
-        if (checkbox.checked) label.style.backgroundColor = '#e3d5ca';
-
-        label.addEventListener('click', function() {
-            const cb = this.querySelector('input[type="checkbox"]');
-            cb.checked = !cb.checked;
-            this.style.backgroundColor = cb.checked ? '#e3d5ca' : 'transparent';
-        });
-    });
-});
+    }
 </script>
 {% endblock %}
