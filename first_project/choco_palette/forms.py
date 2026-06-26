@@ -5,6 +5,7 @@ from .models import Post
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import authenticate
 
 
 # プロフィール設定と編集のフォーム
@@ -98,13 +99,38 @@ class PostForm(forms.ModelForm):
 
        
 
+
 # ログイン用フォーム
 class EmailLoginForm(AuthenticationForm):
     
+    # ① ここでは「見た目」の定義だけをします！（エラーは起きません）
     username = forms.EmailField(
         label="メールアドレス",
         widget=forms.EmailInput(attrs={'class': 'custom-input', 'placeholder': 'example@example.com', 'autocomplete': 'username'})
     )
+
+    # ② ユーザーが入力し終わった「後」で、この部屋が呼び出されます
+    def clean(self):
+        # 画面に入力されたメールアドレスを、安全に「username」という箱から取り出す
+        username = self.cleaned_data.get('username') 
+        password = self.cleaned_data.get('password') 
+
+        if username and password:
+            # 💡 ここなら「username」という変数にメールアドレスが入っているので、安全に検索できます！
+            user = User.objects.filter(email=username).first()
+            
+            if user:
+                # Djangoの裏方に「メールアドレスじゃなくて、この人の本当のユーザー名だよ」と教えてあげる
+                self.user_cache = authenticate(self.request, username=user.username, password=password)
+            else:
+                self.user_cache = None
+
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 

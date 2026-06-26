@@ -88,7 +88,7 @@ STATIC_URL = 'static/'
 
 # メディアファイル設定
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # メール設定（SMTP）
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -104,3 +104,5 @@ LOGIN_REDIRECT_URL = 'choco_palette:post_list'
 LOGIN_URL = 'choco_palette:login'
 
 
+# settings.py の最後に追加626
+print(f"★保存先チェック: {MEDIA_ROOT}")
