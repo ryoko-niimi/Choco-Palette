@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.http import JsonResponse
 # --- Django標準ライブラリ ---
 from django.views.decorators.http import require_POST
 # --- 認証関連 ---
@@ -22,6 +21,7 @@ from django.contrib.auth.forms import UserChangeForm
 from .forms import ProfileForm, SignupForm, PostForm, EmailLoginForm, EmailChangeForm  
 
 # --- 投稿画像並べ替え    ---
+from django.http import JsonResponse
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -302,19 +302,22 @@ def delete_photo(request, photo_id):
 
 # --- 投稿画像並べ替え処理 ---
 @login_required
-@require_POST  
+@require_POST # POST通信のみ許可することで安全性を高める
 def reorder_photos(request):
     import json
-    data = json.loads(request.body)
-    photo_ids = data.get('photo_ids', [])
-    
-    for index, photo_id in enumerate(photo_ids):
-       
-        photo = get_object_or_404(PostPhoto, id=photo_id, post__user=request.user)
-        photo.sort_order = index
-        photo.save()
+    try:
+        data = json.loads(request.body)
+        photo_ids = data.get('photo_ids', [])
+        
+        for index, photo_id in enumerate(photo_ids):
+            # 自分の投稿の写真であるかを確認して取得する（これが最強のガード！）
+            photo = get_object_or_404(PostPhoto, id=photo_id, post__user=request.user)
+            photo.sort_order = index
+            photo.save()
             
-    return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
 

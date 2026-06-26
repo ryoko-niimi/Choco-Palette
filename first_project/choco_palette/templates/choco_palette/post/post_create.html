@@ -144,9 +144,6 @@
     // ==========================================
     // 1. 画像関連の処理
     // ==========================================
-    // ==========================================
-    // 1. 画像関連の処理
-    // ==========================================
     const MAX_IMAGES = 10;
     const fileInput = document.getElementById('id_images');
     const preview = document.getElementById('image-preview');
@@ -206,6 +203,27 @@
         fileInput.files = fileList.files;
         checkImageLimit();
     }
+
+    // 画像の並び替え順
+    // 【追加】保存ボタンを押した時に順番を確定させる
+        document.getElementById('post-form').addEventListener('submit', function(e) {
+    // 既存画像（.existing-image）の順番をIDで取得
+            const photoElements = document.querySelectorAll('.existing-image');
+            const photoIds = Array.from(photoElements).map(el => el.dataset.id);
+
+            if (photoIds.length > 0) {
+        // 並び替えの指示をサーバーに飛ばす
+                fetch("{% url 'choco_palette:reorder_photos' %}", {
+                method: 'POST',
+                headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}' 
+            },
+            body: JSON.stringify({ photo_ids: photoIds })
+        });
+    }
+});
+
    
 
     // ==========================================
@@ -264,6 +282,5 @@
     }
 </script>
 
-
-
 {% endblock %}
+

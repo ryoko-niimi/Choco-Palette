@@ -51,7 +51,8 @@ urlpatterns = [
     path('post/photo/<int:photo_id>/delete/', views.delete_photo, name='delete_photo'),
     
     #投稿済・下書き一覧からのテイスティング編集画面で画像「並べ替え」処理
-    path('post/images/reorder/', views.reorder_photos, name='reorder_photos'),
+    path('post/photo/reorder/', views.reorder_photos, name='reorder_photos'),
+   
     
     
     
