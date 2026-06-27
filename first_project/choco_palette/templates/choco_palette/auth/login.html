@@ -2,51 +2,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<style>
-    /* 中央に寄せるためのカードスタイル（スマホ対応版） */
-    .login-card { 
-        background: white; 
-        padding: 20px; 
-        border-radius: 15px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        /* スマホ対応：画面幅の90%、最大350pxまで */
-        width: 90%; 
-        max-width: 350px; 
-        text-align: center; 
-        margin: 50px auto; 
-    }
-
-    .form-group { text-align: left; margin-bottom: 20px; }
-    
-    /* form.as_p で生成される要素への装飾 */
-    .form-group p { margin: 5px 0; }
-    
-    /* Djangoの入力欄(input)にもデザインを適用 */
-    .form-group input { 
-        width: 100%; 
-        padding: 10px; 
-        border: 1px solid #ccc; 
-        border-radius: 5px; 
-        box-sizing: border-box; /* paddingを含めて幅を計算する設定 */
-    }
-    
-    .login-btn { 
-        background-color: #7ab8cc; 
-        color: white; 
-        border: none; 
-        padding: 12px 40px; 
-        border-radius: 5px; 
-        font-size: 16px; 
-        cursor: pointer; 
-        display: block; 
-        margin: 20px auto;
-    }
-
-    .links { font-size: 14px; margin-top: 20px; }
-    .links a { color: #6f4e37; text-decoration: underline; }
-</style>
-
-<div class="login-card">
+<div class="card">
     <h2>ログイン</h2>
     
     {% if form.errors %}
@@ -57,17 +13,23 @@
         {% csrf_token %}
         
         <div class="form-group">
-            {{ form.as_p }}
+            <label>{{ form.username.label }}</label>
+            {{ form.username }}
         </div>
         
-        <button type="submit" class="login-btn">ログイン</button>
+        <div class="form-group">
+            <label>{{ form.password.label }}</label>
+            {{ form.password }}
+        </div>
         
-        <div class="links">
+        <button type="submit" class="btn btn-primary" style="width: 100%;">ログイン</button>
+        
+        <div class="links" style="font-size: 14px; margin-top: 20px;">
             <div>
-                <a href="{% url 'choco_palette:signup' %}">アカウント登録</a>
+                <a href="{% url 'choco_palette:signup' %}" style="color: var(--primary-color);">アカウント登録</a>
             </div>
             <div style="margin-top: 15px;">
-                <a href="{% url 'choco_palette:password_reset' %}">パスワードを忘れた方はこちら</a>
+                <a href="{% url 'choco_palette:password_reset' %}" style="color: var(--primary-color);">パスワードを忘れた方はこちら</a>
             </div>
         </div>
     </form>

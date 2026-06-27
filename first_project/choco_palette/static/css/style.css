@@ -47,7 +47,9 @@ body {
 }
 
 /* 入力枠 */
-input[type="text"], input[type="number"], input[type="date"], textarea, select, .custom-input {
+.form-control, 
+input[type="text"], input[type="password"], input[type="email"],
+input[type="number"], input[type="date"], textarea, select, .custom-input {
     width: 100%;
     padding: 12px;
     margin-top: 5px;
@@ -56,6 +58,7 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
     box-sizing: border-box;
     font-size: 16px;
 }
+
 
 /* フォームの各項目 */
 .form-group { 
@@ -219,7 +222,7 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select, 
     text-align: center;
 }
 
-/*投稿画像のアップロード*/
+/*投稿画像アップロード*/
 .photo-upload-label {
     display: inline-block;
     width: 100px;

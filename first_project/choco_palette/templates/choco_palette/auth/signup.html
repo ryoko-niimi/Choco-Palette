@@ -4,49 +4,53 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-
 <div class="card">
-    <h2>新規アカウント登録</h2>
+    <h2 style="margin-bottom: 25px;">新規アカウント登録</h2>
+    
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         {% if form.errors %}
-            <div style="color: red; font-size: 0.9em; margin-bottom: 15px;">
+            <div style="color: red; font-size: 0.9em; margin-bottom: 15px; text-align: left;">
                 {% for field in form %}{% for error in field.errors %}{{ error }}<br>{% endfor %}{% endfor %}
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
-
-        <div class="form-group icon-upload">
-            <label for="id_image">
-                <img src="{% static 'images/default-avatar.png' %}" alt="アイコン" class="avatar-preview">
-                <span class="upload-link">画像をアップロード</span>
+   <img src="{% static 'images/default-avatar.png' %}" alt="アイコン" 
+                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #e3d5ca;">
+             
+        <div class="form-group" style="text-align: center;">
+            <label for="id_image" style="cursor: pointer; display: inline-block;">
+                <div class="upload-link" style="margin-top: 10px;">画像をアップロード</div>
             </label>
             <input type="file" name="image" id="id_image" style="display: none;">
         </div>
 
         <div class="form-group">
-            {{ form.username.label_tag }}
+            <label>{{ form.username.label }}</label>
             {{ form.username }}
         </div>
+
         <div class="form-group">
-            {{ form.email.label_tag }}
+            <label>{{ form.email.label }}</label>
             {{ form.email }}
         </div>
+
         <div class="form-group">
-            {{ form.password.label_tag }}
+            <label>{{ form.password.label }}</label>
             {{ form.password }}
-            <small class="password-hint">※半角英数字を含む6文字以上</small>
+            <small class="password-hint">※半角英数字を含む8文字以上</small>
         </div>
+
         <div class="form-group">
-            {{ form.password_confirm.label_tag }}
+            <label>{{ form.password_confirm.label }}</label>
             {{ form.password_confirm }}
         </div>
 
-        <button type="submit">登録</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin: 20px 0;">登録</button>
+
         
-        <div style="margin-top: 7px;">
+        <div style="margin-top: 20px;">
             <a href="{% url 'choco_palette:login' %}" class="upload-link" style="text-decoration: underline;">
                 ログイン画面へ戻る
             </a>
@@ -54,4 +58,4 @@
     </form>
 </div>
 {% endblock %}
-    
+

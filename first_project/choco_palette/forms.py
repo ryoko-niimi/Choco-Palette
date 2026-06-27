@@ -14,6 +14,8 @@ class ProfileForm(forms.ModelForm):
         model = Profile
         fields = ['nickname', 'image', 'introduction', 'link']
 
+
+
 # ユーザー情報（アカウント登録用）のフォーム
 class SignupForm(forms.ModelForm):
     # パスワード入力欄を明示的に定義
@@ -29,11 +31,16 @@ class SignupForm(forms.ModelForm):
             'username': 'ニックネーム',
             'email': 'メールアドレス',
         }
+        # widgetsはここで指定せず、__init__で統一的に指定します
+        widgets = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
-        # パスワード入力欄に属性を追加（セキュリティのため）
-        widgets = {
-            'password': forms.PasswordInput(),
-        }
+        # すべてのフィールドにクラスを追加し、PasswordInputを明示的に指定
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            # パスワード系には必要であればここでも明示可能ですが、今のままでもOKです
 
     # パスワードの一致チェック用メソッド（バリデーション）
     def clean(self):
@@ -45,6 +52,7 @@ class SignupForm(forms.ModelForm):
             raise forms.ValidationError("パスワードと再入力パスワードが一致していません。")
         
         return cleaned_data
+
     
 # テイスティング投稿用フォーム 編集フォーム
 class PostForm(forms.ModelForm):
@@ -103,24 +111,28 @@ class PostForm(forms.ModelForm):
 # ログイン用フォーム
 class EmailLoginForm(AuthenticationForm):
     
-    # ① ここでは「見た目」の定義だけをします！（エラーは起きません）
     username = forms.EmailField(
         label="メールアドレス",
-        widget=forms.EmailInput(attrs={'class': 'custom-input', 'placeholder': 'example@example.com', 'autocomplete': 'username'})
+        widget=forms.EmailInput(attrs={'class': 'custom-input',  'autocomplete': 'username'})
     )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
-    # ② ユーザーが入力し終わった「後」で、この部屋が呼び出されます
+
     def clean(self):
         # 画面に入力されたメールアドレスを、安全に「username」という箱から取り出す
         username = self.cleaned_data.get('username') 
         password = self.cleaned_data.get('password') 
 
         if username and password:
-            # 💡 ここなら「username」という変数にメールアドレスが入っているので、安全に検索できます！
             user = User.objects.filter(email=username).first()
             
             if user:
-                # Djangoの裏方に「メールアドレスじゃなくて、この人の本当のユーザー名だよ」と教えてあげる
+                
                 self.user_cache = authenticate(self.request, username=user.username, password=password)
             else:
                 self.user_cache = None
