@@ -49,12 +49,19 @@ class Post(models.Model):
     tasting_comment = models.TextField()
     private_memo = models.TextField(blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
-    status_choices =(
-        (1,"公開"),
-        (2,"非公開"),
-         )
-    status = models.IntegerField(choices=status_choices,default=1)
-         
+    
+    STATUS_DRAFT = 0
+    STATUS_PUBLIC = 1
+    STATUS_PRIVATE = 2
+
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, "下書き"),
+        (STATUS_PUBLIC, "公開"),
+        (STATUS_PRIVATE, "非公開"),
+    )
+
+    # ステータス設定
+    status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_DRAFT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     taste_tags = models.ManyToManyField(TasteTag, blank=True)

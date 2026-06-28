@@ -28,8 +28,20 @@ urlpatterns = [
     
     # 新パスワードの設定画面
     path('reset/<uidb64>/<token>/', 
-         auth_views.PasswordResetConfirmView.as_view(template_name='choco_palette/auth/password_reset_confirm.html'), 
+         auth_views.PasswordResetConfirmView.as_view(
+             template_name='choco_palette/auth/password_reset_confirm.html',
+             success_url='/reset/done/'  
+         ), 
          name='password_reset_confirm'),
+    
+    # 新パスワード変更完了画面
+    path('reset/done/', 
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='choco_palette/auth/password_reset_complete.html'
+         ), 
+         name='password_reset_complete'),
+    
+    
 
     # 投稿・テイスティング記録
     path('post/new/', views.post_create, name='post_create'),

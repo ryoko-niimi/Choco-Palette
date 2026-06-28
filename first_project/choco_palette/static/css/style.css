@@ -38,13 +38,11 @@ body {
     font-weight: bold;
 }
 
-/* 枠の中（div）にある選択肢用ラベルだけは例外（中央寄せに戻す） */
-.card .form-group div label {
-    display: inline-block;
-    text-align: center;
-    font-weight: normal; /* チェックボックスの文字は通常太さにする */
-    margin: 0 8px;      /* 選択肢同士の横の間隔を確保 */
-}
+/* 表示画面の枠 */
+.post-card { border: 1px solid #e3d5ca; padding: 15px; }/* 公開用：通常通り */
+.post-card.status-draft { border: 2px dashed #ccc; background-color: #f9f9f9; }/* 下書き用：破線で「作成中」感を出す */
+.post-card.status-private { border: 2px solid #a3958a; }/* 非公開用：実線 */
+
 
 /* 入力枠 */
 .form-control, 
@@ -58,6 +56,24 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     box-sizing: border-box;
     font-size: 16px;
 }
+
+/*アイコン画像*/
+.profile-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    margin: 0 auto 10px auto;
+    border: 2px solid #e3d5ca;
+    padding: 5px;
+    
+
+}
+
+
+
 
 
 /* フォームの各項目 */

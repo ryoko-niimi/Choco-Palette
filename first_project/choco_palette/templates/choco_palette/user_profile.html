@@ -18,7 +18,8 @@
             <h2>{{ target_user.profile.nickname|default:target_user.username }}</h2>
             
             {% if request.user == target_user %}
-                <a href="{% url 'choco_palette:profile_edit' %}">プロフィールを編集</a>
+                <a href="{% url 'choco_palette:profile_edit' %}" class="upload-link" style="text-decoration: underline;">プロフィールを編集</a>
+
             {% endif %}
             
             <p style="margin-top: 15px; color: #555;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>

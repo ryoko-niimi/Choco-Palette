@@ -1,21 +1,13 @@
 from django import forms
-from .models import Profile
+from .models import Profile, Post, TasteTag, AromaTag
 from django.contrib.auth.models import User
-from .models import Post
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.forms import UserChangeForm
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import authenticate
 
 
-# プロフィール設定と編集のフォーム
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['nickname', 'image', 'introduction', 'link']
 
 
-
+        
 # ユーザー情報（アカウント登録用）のフォーム
 class SignupForm(forms.ModelForm):
     # パスワード入力欄を明示的に定義
@@ -65,14 +57,16 @@ class PostForm(forms.ModelForm):
         widgets = {
             'chocolate_name': forms.TextInput(attrs={'placeholder': '商品名を入力してください', 'class': 'form-control'}),
             'brand_name': forms.TextInput(attrs={'placeholder': 'ブランド名を入力してください', 'class': 'form-control'}),
+            'status': forms.RadioSelect(choices=[
+                (Post.STATUS_PUBLIC, "公開"),
+                (Post.STATUS_PRIVATE, "非公開"),
+            ]),
             'cacao_percentage': forms.NumberInput(attrs={'placeholder': '不明な場合は空欄OK', 'class': 'form-control'}),
             'tasting_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'tasting_comment': forms.Textarea(attrs={'placeholder': '', 'rows': 4, 'class': 'form-control'}),
             'private_memo': forms.Textarea(attrs={'placeholder': '自分用メモ（非公開）', 'rows': 4, 'class': 'form-control'}),
-            'status': forms.RadioSelect(choices=[('public', '公開'), ('private', '非公開')]),
             'favorite_rate': forms.HiddenInput(),
         }
-        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -132,7 +126,6 @@ class EmailLoginForm(AuthenticationForm):
             user = User.objects.filter(email=username).first()
             
             if user:
-                
                 self.user_cache = authenticate(self.request, username=user.username, password=password)
             else:
                 self.user_cache = None
@@ -148,7 +141,14 @@ class EmailLoginForm(AuthenticationForm):
 
     
 #マイページ→プロフィール設定編集画面
+
+# プロフィール設定と編集のフォーム
 class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['image', 'nickname', 'bio', 'introduction', 'link']
+        
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -158,12 +158,11 @@ class ProfileForm(forms.ModelForm):
             
         # 自己紹介
         self.fields['bio'].widget.attrs.update({'rows': 5}) 
+        
          # リンクを追加
         self.fields['link'].widget.attrs.update({'style': 'height: 40px;'})
         
-    class Meta:
-        model = Profile
-        fields = ['image', 'nickname', 'bio', 'link']
+
         
 #マイページ→メールアドレス変更画面
 class EmailChangeForm(forms.ModelForm):

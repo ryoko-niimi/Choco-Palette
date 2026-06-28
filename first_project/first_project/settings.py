@@ -84,14 +84,17 @@ USE_I18N = True
 USE_TZ = True
 
 # 静的ファイル設定
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # メディアファイル設定
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# メール設定（SMTP）
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# パスワード再設定メール設定（console↔smtpに直す）
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

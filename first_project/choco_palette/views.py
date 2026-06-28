@@ -379,6 +379,8 @@ def profile_edit(request):
     profile = request.user.profile
     
     if request.method == 'POST':
+        print(request.FILES)
+
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
@@ -391,6 +393,7 @@ def profile_edit(request):
     return render(request, 'choco_palette/mypage/profile_edit.html', {
         'form': form,
         'profile': profile
+   
     })
 
 # --- マイページ→メールアドレス変更画面 ---
@@ -455,3 +458,4 @@ def favorites_list(request):
 def custom_logout(request):
     logout(request)
     return redirect('choco_palette:login')
+

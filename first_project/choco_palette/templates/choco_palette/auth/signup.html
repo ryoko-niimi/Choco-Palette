@@ -16,16 +16,20 @@
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
-   <img src="{% static 'images/default-avatar.png' %}" alt="アイコン" 
-                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #e3d5ca;">
-             
-        <div class="form-group" style="text-align: center;">
-            <label for="id_image" style="cursor: pointer; display: inline-block;">
-                <div class="upload-link" style="margin-top: 10px;">画像をアップロード</div>
-            </label>
-            <input type="file" name="image" id="id_image" style="display: none;">
-        </div>
 
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img id="profile-preview" class="profile-icon" src="{% static 'images/default-avatar.png' %}">
+    
+        </div>
+            
+            <div class="upload-link" style="text-decoration: underline;">
+                <label for="id_image" style="cursor: pointer;">
+                    <div style="margin-top: 20px;">画像をアップロード</div>
+                </label>
+                <input type="file" name="image" id="id_image" style="display: none;">
+            </div>
+           
+        
         <div class="form-group">
             <label>{{ form.username.label }}</label>
             {{ form.username }}
@@ -49,7 +53,6 @@
 
         <button type="submit" class="btn btn-primary" style="width: 100%; margin: 20px 0;">登録</button>
 
-        
         <div style="margin-top: 20px;">
             <a href="{% url 'choco_palette:login' %}" class="upload-link" style="text-decoration: underline;">
                 ログイン画面へ戻る
@@ -57,5 +60,21 @@
         </div>
     </form>
 </div>
-{% endblock %}
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('id_image');
+        const profilePreview = document.getElementById('profile-preview');
+
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+</script>
+{% endblock %}

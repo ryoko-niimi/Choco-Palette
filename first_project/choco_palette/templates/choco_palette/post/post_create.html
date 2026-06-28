@@ -66,7 +66,10 @@
             <label style="font-weight: bold; display: block;">{{ form.status.label|safe }}</label>
             <div style="display: flex; gap: 20px;">
                 {% for radio in form.status %}
+                    {% if radio.choice_label != "下書き" %}
                     <label style="display: flex; align-items: center; gap: 5px;">{{ radio.tag }} {{ radio.choice_label }}</label>
+                    {% endif %}
+                
                 {% endfor %}
             </div>
         </div>
