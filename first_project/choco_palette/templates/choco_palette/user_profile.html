@@ -19,7 +19,6 @@
             
             {% if request.user == target_user %}
                 <a href="{% url 'choco_palette:profile_edit' %}" class="upload-link" style="text-decoration: underline;">プロフィールを編集</a>
-
             {% endif %}
             
             <p style="margin-top: 15px; color: #555;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>
@@ -29,8 +28,14 @@
         <hr>
 
         <h3>投稿記録</h3>
+
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <button type="button" id="toggle-select-btn" class="btn btn-success" style="margin: 0;">選択</button>
+        </div>
+
+
         {% for post in page_obj %}
-            <div class="post-item {% if post.status == 2 %}status-private{% else %}status-public{% endif %}">
+            <div class="post-card {% if post.status == 2 %}status-private{% endif %}">
                 
                 {% with first_photo=post.photos.all|dictsort:"sort_order"|first %}
                     {% if first_photo %}
@@ -41,11 +46,11 @@
                 {% endwith %}
                 
                 <div style="flex-grow: 1;">
-                    <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:black; font-weight:bold;">
+                    <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; font-weight:bold;">
                         {{ post.chocolate_name }}
                     </a>
                     <p style="margin: 5px 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
-                    <div style="color: #f1c40f;">
+                    <div style="color: #f1c40f; font-size: 0.8em;">
                         {% for i in "12345"|make_list %}
                             {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
                         {% endfor %}
@@ -57,7 +62,7 @@
                 {% endif %}
             </div>
         {% empty %}
-            <p>まだ投稿はありません。</p>
+            <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">まだ投稿はありません。</p>
         {% endfor %}
 
         {% if page_obj %}
@@ -73,4 +78,34 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    const toggleBtn = document.getElementById('toggle-select-btn');
+    const checkboxes = document.querySelectorAll('.select-checkbox');
+    const deleteModal = document.getElementById('delete-modal');
+
+    toggleBtn.addEventListener('click', () => {
+        const isSelecting = checkboxes[0]?.style.display === 'block';
+        
+        if (!isSelecting) {
+            checkboxes.forEach(cb => cb.style.display = 'block');
+            toggleBtn.textContent = '解除を実行';
+            toggleBtn.classList.replace('btn-success', 'btn-danger');
+        } else {
+            const checked = document.querySelectorAll('.select-checkbox:checked');
+            if (checked.length > 0) {
+                deleteModal.style.display = 'flex';
+            } else {
+                checkboxes.forEach(cb => cb.style.display = 'none');
+                toggleBtn.textContent = '選択';
+                toggleBtn.classList.replace('btn-danger', 'btn-success');
+            }
+        }
+    });
+
+    document.getElementById('confirm-delete').addEventListener('click', () => {
+        document.getElementById('delete-form').submit();
+    });
+</script>
+
 {% endblock %}

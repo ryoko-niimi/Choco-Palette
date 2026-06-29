@@ -117,15 +117,21 @@ def post_create(request):
     })
     
     
-    
 
 # --- ホーム画面（投稿一覧表示） ---
 def post_list(request):
     
-    posts = Post.objects.filter(status=1).prefetch_related(
+    posts = Post.objects.exclude(status=0).prefetch_related(
         Prefetch('photos', queryset=PostPhoto.objects.order_by('sort_order'))
     )
     
+    if request.user.is_authenticated:
+        
+        posts = posts.filter(Q(status=1) | (Q(status=2) & Q(user=request.user)))
+    else:
+        
+        posts = posts.filter(status=1)
+
     query = request.GET.get('q')
     min_cacao = request.GET.get('min_cacao')
     max_cacao = request.GET.get('max_cacao')
@@ -150,6 +156,8 @@ def post_list(request):
         posts = posts.filter(tasting_date__gte=start_date)
     if end_date:
         posts = posts.filter(tasting_date__lte=end_date)
+    
+
     if status_filter:
         if 'public' in status_filter and 'private' in status_filter:
             pass 
@@ -157,6 +165,7 @@ def post_list(request):
             posts = posts.filter(status=1)
         elif 'private' in status_filter and request.user.is_authenticated:
             posts = posts.filter(status=2, user=request.user)
+            
     if favorite_rates:
         posts = posts.filter(favorite_rate__in=favorite_rates)
     
@@ -284,12 +293,12 @@ def draft_list(request):
 
 # --- 投稿削除処理 ---
 @login_required
-def post_delete(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    if request.user == post.user:
-        post.delete()
-        messages.success(request, '投稿を削除しました。')
-    return redirect('choco_palette:post_list')
+def post_delete(request): 
+    if request.method == 'POST':
+        post_ids = request.POST.getlist('post_ids')
+        if post_ids:
+            Post.objects.filter(pk__in=post_ids, user=request.user).delete()
+    return redirect(request.META.get('HTTP_REFERER', 'choco_palette:post_list'))
     
 # --- 投稿画像削除処理 ---
 @login_required
@@ -301,7 +310,7 @@ def delete_photo(request, photo_id):
 
 # --- 投稿画像並べ替え処理 ---
 @login_required
-@require_POST # POST通信のみ許可することで安全性を高める
+@require_POST 
 def reorder_photos(request):
     import json
     try:
@@ -309,7 +318,7 @@ def reorder_photos(request):
         photo_ids = data.get('photo_ids', [])
         
         for index, photo_id in enumerate(photo_ids):
-            # 自分の投稿の写真であるかを確認して取得する
+        
             photo = get_object_or_404(PostPhoto, id=photo_id, post__user=request.user)
             photo.sort_order = index
             photo.save()
@@ -412,14 +421,14 @@ def email_change(request):
     print(f"メールアドレス: '{user.email}'")
     
     if request.method == 'POST':
-        # POST時はフォームから入力された値を保存
+        
         form = EmailChangeForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
             messages.success(request, 'メールアドレスを変更しました')
             return redirect('choco_palette:mypage')
     else:
-        # GET時は空のフォームを生成（新しいアドレス入力用）
+        
         form = EmailChangeForm()
     
    

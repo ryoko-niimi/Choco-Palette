@@ -21,7 +21,7 @@
         {% csrf_token %}
         <div class="post-list">
             {% for post in drafts %}
-            <div class="post-item {% if post.status == 2 %}status-private{% else %}status-public{% endif %}">
+            <div class="post-card status-draft">
                 
                 <input type="checkbox" name="post_ids" value="{{ post.pk }}" class="select-checkbox" style="display: none; transform: scale(1.5); margin-right: 15px;">
                 
@@ -33,7 +33,7 @@
                     {% endif %}
                 {% endwith %}
                 
-                <a href="{% url 'choco_palette:post_edit' post.pk %}" style="text-decoration:none; color:black; flex-grow: 1;">
+                <a href="{% url 'choco_palette:post_edit' post.pk %}" style="text-decoration:none; color:inherit; flex-grow: 1;">
                     <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name|default:"無題" }}</p>
                     <p style="margin: 5px 0 0 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage|default:"-" }}%</p>
                     <div style="color: #f1c40f; font-size: 0.8em;">
@@ -42,10 +42,6 @@
                         {% endfor %}
                     </div>
                 </a>
-
-                {% if post.status == 2 %}
-                    <span style="font-size: 1.2em; margin-left: 10px;">🔒</span>
-                {% endif %}
             </div>
             {% empty %}
             <p style="text-align: center; color: #999; margin-top: 20px;">下書きはありません</p>

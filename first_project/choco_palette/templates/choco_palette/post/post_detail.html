@@ -86,10 +86,10 @@
         {% endif %}
     </div>
 
-    {% if user == post.user %}
-    <div style="margin: 30px 0; display: flex; gap: 15px; justify-content: center;">
-        <a href="{% url 'choco_palette:post_edit' post.pk %}" class="btn btn-primary">編集</a>
-        <button type="button" class="btn btn-danger" 
+    {% if user == post.user %}    
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <a href="{% url 'choco_palette:post_edit' post.pk %}" class="btn btn-primary" style="flex: 1;">編集</a>
+        <button type="button" class="btn btn-danger" style="flex: 1;"
                 data-delete-url="{% url 'choco_palette:post_delete' post.pk %}" 
                 onclick="openDeleteConfirm(this)">削除</button>
     </div>

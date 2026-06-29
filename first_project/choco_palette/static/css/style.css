@@ -38,11 +38,29 @@ body {
     font-weight: bold;
 }
 
-/* 表示画面の枠 */
-.post-card { border: 1px solid #e3d5ca; padding: 15px; }/* 公開用：通常通り */
-.post-card.status-draft { border: 2px dashed #ccc; background-color: #f9f9f9; }/* 下書き用：破線で「作成中」感を出す */
-.post-card.status-private { border: 2px solid #a3958a; }/* 非公開用：実線 */
+/* 基本の投稿枠（公開済み・デフォルト） */
+.post-card {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e3d5ca;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #ffffff; /* 白（公開済み） */
+}
 
+/* 下書き：グレー系で「未完成」を表現 */
+.post-card.status-draft {
+    background-color: #f9f9f9; 
+    border-color: #d1d1d1;
+    color: #888;
+}
+
+/* 非公開：少し温かみのある色で「隠されている」ことを表現 */
+.post-card.status-private {
+    background-color: #fdfaf6;
+    border-color: #c9b9ae;
+}
 
 /* 入力枠 */
 .form-control, 
@@ -132,6 +150,7 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 ========================================================= */
 /* ヘッター全体 */
 .header { 
+    
     background-color: var(--accent-color); 
     padding: 20px; 
     text-align: center; 
@@ -142,6 +161,13 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     justify-content: space-between;
     align-items: center;
     font-size: 24px;
+    position: fixed; /* 画面に固定 */
+    top: 0;          /* 上端に張り付ける */
+    left: 0;         /* 左端に張り付ける */
+    width: 100%;     /* 幅を画面いっぱいに */
+    z-index: 1000;   /* 他の要素より上に表示（必須） */
+    box-sizing: border-box; /* パディングを含めて幅を計算させる */
+    
 }
 
 
