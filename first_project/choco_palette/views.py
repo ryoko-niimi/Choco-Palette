@@ -54,8 +54,11 @@ def signup_view(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
+            
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
             return redirect('choco_palette:mypage')
+            
     else:
         form = SignupForm()
     return render(request, 'choco_palette/auth/signup.html', {'form': form})
@@ -80,7 +83,7 @@ def post_create(request):
     if request.method == 'POST':    
         form = PostForm(request.POST, request.FILES)
         
-        # --- 枚数制限チェック ---
+        # 枚数制限チェック
         files = request.FILES.getlist('images')
         if len(files) > 10:
             messages.error(request, '写真は最大10枚までです。')
@@ -89,12 +92,23 @@ def post_create(request):
                 'all_taste_tags': TasteTag.objects.all(),
                 'all_aroma_tags': AromaTag.objects.all(),
             })
-        # ------------------------
 
         if form.is_valid():
             post = form.save(commit=False)
             post.user = None if not request.user.is_authenticated else request.user
-            if not request.user.is_authenticated: post.status = 1
+            
+            # --- ここが一番大事！ボタンで処理を分ける ---
+            action = request.POST.get('action')
+            if action == 'save':
+                post.status = 0  
+                message = '下書きを保存しました！'
+                redirect_url = 'choco_palette:draft_list'
+            else:
+                post.status = 1  
+                message = '投稿完了しました！'
+                redirect_url = 'choco_palette:post_list'
+            # ----------------------------------------
+                
             post.save()
             form.save_m2m()
             
@@ -103,8 +117,8 @@ def post_create(request):
                 photo.image.save(f.name, f) 
                 photo.save()
             
-            messages.success(request, '投稿完了しました！')
-            return redirect('choco_palette:post_list')
+            messages.success(request, message)
+            return redirect(redirect_url)
         
     else:
         form = PostForm()
@@ -115,7 +129,6 @@ def post_create(request):
         'all_taste_tags': TasteTag.objects.all(),
         'all_aroma_tags': AromaTag.objects.all(),
     })
-    
     
 
 # --- ホーム画面（投稿一覧表示） ---
@@ -286,10 +299,16 @@ def post_edit(request, pk):
 @login_required
 def draft_list(request):
     
-    drafts = Post.objects.filter(user=request.user, status=2).prefetch_related(
-        Prefetch('photos', queryset=PostPhoto.objects.order_by('sort_order'), to_attr='ordered_photos')
+    posts = Post.objects.filter(user=request.user, status=0).prefetch_related(
+        Prefetch('photos', queryset=PostPhoto.objects.order_by('sort_order'))
     ).order_by('-created_at')
-    return render(request, 'choco_palette/post/draft_list.html', {'drafts': drafts})
+    
+
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'choco_palette/post/draft_list.html', {'page_obj': page_obj})
 
 # --- 投稿削除処理 ---
 @login_required
@@ -357,10 +376,19 @@ def remove_favorites(request):
 # --- ユーザープロフィール表示画面 ---
 def user_profile(request, user_id):
     target_user = get_object_or_404(User, pk=user_id)
+    if request.method == 'POST' and request.user == target_user:
+        post_ids = request.POST.getlist('post_ids')
+        if post_ids:
+            # 自分の投稿のみを対象に削除
+            Post.objects.filter(id__in=post_ids, user=target_user).delete()
+            messages.success(request, '削除しました！')
+        # 削除後にリダイレクトすることで、再送信（フォームの二重送信）を防ぐ
+        return redirect('choco_palette:user_profile', user_id=user_id)
+
+    # 2. 表示用データの取得
     condition = Q(user=target_user, status=1)
     if request.user.is_authenticated and request.user == target_user:
         condition |= Q(user=target_user, status=2)
-        
     
     all_posts = Post.objects.filter(condition).prefetch_related(
         Prefetch('photos', queryset=PostPhoto.objects.order_by('sort_order'), to_attr='ordered_photos')
@@ -386,6 +414,7 @@ def mypage(request):
 @login_required
 def profile_edit(request):
     profile = request.user.profile
+    profile, created = Profile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
         print(request.FILES)
@@ -456,11 +485,17 @@ def password_change(request):
 # --- マイページ→お気に入り一覧画面---
 @login_required
 def favorites_list(request):
-    
     fav_posts = Post.objects.filter(likes=request.user).prefetch_related(
-        Prefetch('photos', queryset=PostPhoto.objects.order_by('sort_order'), to_attr='ordered_photos')
+        Prefetch('photos', queryset=PostPhoto.objects.order_by('sort_order'))
     ).order_by('-created_at')
-    return render(request, 'choco_palette/mypage/favorites.html', {'posts': fav_posts})
+    
+    paginator = Paginator(fav_posts, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+
+    return render(request, 'choco_palette/mypage/favorites.html', {'page_obj': page_obj})
+
 
 # --- マイページ→ログアウト画面---
 @login_required

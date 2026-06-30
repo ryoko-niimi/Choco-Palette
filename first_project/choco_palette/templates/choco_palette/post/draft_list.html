@@ -20,7 +20,7 @@
     <form id="delete-form" method="POST" action="{% url 'choco_palette:draft_delete' %}">
         {% csrf_token %}
         <div class="post-list">
-            {% for post in drafts %}
+            {% for post in page_obj %}
             <div class="post-card status-draft">
                 
                 <input type="checkbox" name="post_ids" value="{{ post.pk }}" class="select-checkbox" style="display: none; transform: scale(1.5); margin-right: 15px;">
@@ -47,13 +47,27 @@
             <p style="text-align: center; color: #999; margin-top: 20px;">下書きはありません</p>
             {% endfor %}
         </div>
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="text-align: center; margin: 20px 0;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">前へ</a>
+            {% endif %}
+            
+            <span style="margin: 0 10px; font-weight: bold;">
+                {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">次へ</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </form>
-    
 </div>
 
 <div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
     <div style="width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 15px; text-align: center;">
-        <p style="margin-bottom: 20px; font-weight: bold;">選択した投稿を下書きから削除しますか？</p>
+        <p style="margin-bottom: 20px; font-weight: bold;">選択した投稿を<br>下書きから削除しますか？</p>
         <div style="display: flex; gap: 10px; justify-content: center;">
             <button type="button" class="btn btn-danger" id="confirm-delete">削除</button>
             <button type="button" class="btn btn-secondary" onclick="document.getElementById('delete-modal').style.display='none';">キャンセル</button>

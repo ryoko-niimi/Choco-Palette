@@ -23,47 +23,57 @@
             
             <p style="margin-top: 15px; color: #555;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>
             <p><a href="{{ target_user.profile.website|default:'#' }}">{{ target_user.profile.website }}</a></p>
+            {% if target_user.profile.link %}
+                <p><a href="{{ target_user.profile.link }}" target="_blank" style="color: #4a2c2a; text-decoration: underline;">{{ target_user.profile.link }}</a></p>
+            {% endif %}
         </div>
 
         <hr>
 
         <h3>投稿記録</h3>
 
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <button type="button" id="toggle-select-btn" class="btn btn-success" style="margin: 0;">選択</button>
-        </div>
+        
 
+        <form id="delete-form" method="POST" action="{% url 'choco_palette:user_profile' target_user.pk %}">
+            {% csrf_token %}
 
-        {% for post in page_obj %}
-            <div class="post-card {% if post.status == 2 %}status-private{% endif %}">
-                
-                {% with first_photo=post.photos.all|dictsort:"sort_order"|first %}
-                    {% if first_photo %}
-                        <img src="{{ first_photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px; flex-shrink: 0;">
-                    {% else %}
-                        <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
-                    {% endif %}
-                {% endwith %}
-                
-                <div style="flex-grow: 1;">
-                    <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; font-weight:bold;">
-                        {{ post.chocolate_name }}
-                    </a>
-                    <p style="margin: 5px 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
-                    <div style="color: #f1c40f; font-size: 0.8em;">
-                        {% for i in "12345"|make_list %}
-                            {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                {% if post.status == 2 %}
-                    <span style="font-size: 1.2em; margin-left: 10px;">🔒</span>
-                {% endif %}
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+                <button type="button" id="toggle-select-btn" class="btn btn-success" style="margin: 0;">選択</button>
             </div>
-        {% empty %}
-            <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">まだ投稿はありません。</p>
-        {% endfor %}
+
+            {% for post in page_obj %}
+                <div class="post-card {% if post.status == 2 %}status-private{% endif %}" style="display: flex; align-items: center; margin-bottom: 10px;">
+                    
+                    <input type="checkbox" name="post_ids" value="{{ post.pk }}" class="select-checkbox" style="display: none; transform: scale(1.5); margin-right: 15px;">
+
+                    {% with first_photo=post.photos.all|dictsort:"sort_order"|first %}
+                        {% if first_photo %}
+                            <img src="{{ first_photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px; flex-shrink: 0;">
+                        {% else %}
+                            <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div style="flex-grow: 1;">
+                        <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; font-weight:bold;">
+                            {{ post.chocolate_name }}
+                        </a>
+                        <p style="margin: 5px 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage }}%</p>
+                        <div style="color: #f1c40f; font-size: 0.8em;">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if post.status == 2 %}
+                        <span style="font-size: 1.2em; margin-left: 10px;">🔒</span>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">まだ投稿はありません。</p>
+            {% endfor %}
+        </form>
 
         {% if page_obj %}
         <div class="pagination" style="text-align: center; margin: 20px 0;">
@@ -79,6 +89,16 @@
     </div>
 </div>
 
+<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+    <div style="width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 15px; text-align: center;">
+        <p style="margin-bottom: 20px; font-weight: bold;">選択した投稿を削除しますか？</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" class="btn btn-danger" id="confirm-delete">削除</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('delete-modal').style.display='none';">キャンセル</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const toggleBtn = document.getElementById('toggle-select-btn');
     const checkboxes = document.querySelectorAll('.select-checkbox');
@@ -89,7 +109,7 @@
         
         if (!isSelecting) {
             checkboxes.forEach(cb => cb.style.display = 'block');
-            toggleBtn.textContent = '解除を実行';
+            toggleBtn.textContent = '削除を実行';
             toggleBtn.classList.replace('btn-success', 'btn-danger');
         } else {
             const checked = document.querySelectorAll('.select-checkbox:checked');

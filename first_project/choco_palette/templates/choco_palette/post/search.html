@@ -1,9 +1,10 @@
 <!--テイスティング投稿検索・絞り込み画面-->
 
 {% extends "base.html" %}
+{% load custom_filters %} 
 
 {% block header_left %}
-<a href="{% url 'choco_palette:post_list' %}" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+<a href="{% url 'choco_palette:post_list' %}?{{ request.GET.urlencode }}" style="text-decoration:none; color:#4a2c2a;">🔙</a>
 {% endblock %}
 
 {% block content %}
@@ -12,65 +13,77 @@
         
         <div class="form-group">
             <label>キーワード</label>
-            <input type="text" name="q" placeholder="商品名・ブランド名を入力してください">
+            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="商品名・ブランド名を入力してください">
         </div>
 
         {% if user.is_authenticated %}
         <div class="form-group">
             <label>表示範囲</label>
+            {% with status_list=request.GET|getlist:'status' %}
             <div>
-                <label style="display: inline-block;"><input type="checkbox" name="status" value="public"> 公開</label>
-                <label style="display: inline-block;"><input type="checkbox" name="status" value="private"> 非公開</label>
+                <label style="display: inline-block;"><input type="checkbox" name="status" value="public" {% if 'public' in status_list %}checked{% endif %}> 公開</label>
+                <label style="display: inline-block;"><input type="checkbox" name="status" value="private" {% if 'private' in status_list %}checked{% endif %}> 非公開</label>
             </div>
+            {% endwith %}
         </div>
         {% endif %}
 
         <div class="form-group">
             <label>カカオ含有率 (%)</label>
             <div style="display: flex; gap: 5px; align-items: center;">
-                <input type="number" name="min_cacao" placeholder="最小">
+                <input type="number" name="min_cacao" value="{{ request.GET.min_cacao|default:'' }}" placeholder="最小">
                 <span>～</span>
-                <input type="number" name="max_cacao" placeholder="最大">
+                <input type="number" name="max_cacao" value="{{ request.GET.max_cacao|default:'' }}" placeholder="最大">
             </div>
         </div>
 
         <div class="form-group">
             <label>テイスティング日</label>
-            <input type="date" name="start_date">
-            <input type="date" name="end_date">
+            <input type="date" name="start_date" value="{{ request.GET.start_date|default:'' }}">
+            <input type="date" name="end_date" value="{{ request.GET.end_date|default:'' }}">
         </div>
 
         <div class="form-group">
             <label>お気に入り度</label>
+            {% with rate_list=request.GET|getlist:'rate' %}
             <div>
                 {% for i in "12345"|make_list %}
-                    <label style="display: inline-block;"><input type="checkbox" name="rate" value="{{ i }}"> ⭐{{ i }}</label>
+                    <label style="display: inline-block;">
+                        <input type="checkbox" name="rate" value="{{ i }}" {% if i in rate_list %}checked{% endif %}> ⭐{{ i }}
+                    </label>
                 {% endfor %}
             </div>
+            {% endwith %}
         </div>
 
         <div class="form-group">
             <label>味</label>
+            {% with taste_list=request.GET|getlist:'taste' %}
             <div>
                 {% for tag in taste_tags %}
-                    <label style="display: inline-block;"><input type="checkbox" name="taste" value="{{ tag.id }}"> {{ tag.name }}</label>
+                    <label style="display: inline-block;">
+                        <input type="checkbox" name="taste" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in taste_list %}checked{% endif %}> {{ tag.name }}
+                    </label>
                 {% endfor %}
             </div>
+            {% endwith %}
         </div>
 
         <div class="form-group">
             <label>香り</label>
+            {% with aroma_list=request.GET|getlist:'aroma' %}
             <div>
                 {% for tag in aroma_tags %}
-                    <label style="display: inline-block;"><input type="checkbox" name="aroma" value="{{ tag.id }}"> {{ tag.name }}</label>
+                    <label style="display: inline-block;">
+                        <input type="checkbox" name="aroma" value="{{ tag.id }}" {% if tag.id|stringformat:"s" in aroma_list %}checked{% endif %}> {{ tag.name }}
+                    </label>
                 {% endfor %}
             </div>
+            {% endwith %}
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%;">検索</button>
     </form>
 </div>
-
-
 
 {% endblock %}

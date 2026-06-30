@@ -16,7 +16,13 @@
         {% endif %}
         <h2>{{ user.profile.nickname|default:user.username }}</h2>
         <p>{{ user.profile.bio|default:"自己紹介がまだありません。" }}</p>
+        {% if user.profile.link %}
+            <p><a href="{{ user.profile.link }}" target="_blank" style="color: #4a2c2a; text-decoration: underline;">{{ user.profile.link }}</a></p>
+        {% endif %}
+        
     </div>
+
+    
     <div class="mypage-buttons" style="display: flex; flex-direction: column; gap: 10px;">
         <a href="{% url 'choco_palette:profile_edit' %}" class="btn btn-primary" style="width: 50%;">プロフィール編集</a>
         <a href="{% url 'choco_palette:favorites_list' %}" class="btn btn-primary" style="width: 50%;">❤ お気に入り一覧</a>
@@ -34,16 +40,14 @@
 
 <script>
     function openLogoutConfirm(btn) {
-        // data属性からURLを取得
+        
         const logoutUrl = btn.getAttribute('data-logout-url');
         
-        // モーダルのHTMLを組み立て
         const confirmHtml = `
             <a href="${logoutUrl}" class="btn btn-danger" style="text-decoration:none; color:white; padding:12px 24px; border-radius:8px;">ログアウト</a>
             <button type="button" class="btn btn-secondary" onclick="closeCommonModal()">キャンセル</button>
         `;
         
-        // base.htmlにある関数を呼び出す
         openCommonModal('ログアウトしますか？', confirmHtml);
     }
 </script>

@@ -3,11 +3,7 @@
 {% extends "base.html" %}
 
 {% block header_left %}
-    {% if back_url == 'favorites' %}
-        <a href="{% url 'choco_palette:favorites_list' %}" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
-    {% else %}
-        <a href="{% url 'choco_palette:post_list' %}" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
-    {% endif %}
+    <a href="javascript:history.back()" style="text-decoration: none; font-size: 24px; color: #4a2c2a;">🔙</a>
 {% endblock %}
 
 {% block content %}
@@ -68,13 +64,21 @@
         </p>
 
         <p style="margin: 10px 0 5px 0;"><strong>味</strong></p>
-        <div class="tag-container">
-            {% for tag in post.taste_tags.all %}<span class="tag">{{ tag.name }}</span>{% endfor %}
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            {% for tag in post.taste_tags.all %}
+                <span style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; color: #5a4a3f; background-color: #fdfaf8;">
+                    {{ tag.name }}
+                </span>
+            {% endfor %}
         </div>
 
         <p style="margin: 15px 0 5px 0;"><strong>香り</strong></p>
-        <div class="tag-container">
-            {% for tag in post.aroma_tags.all %}<span class="tag">{{ tag.name }}</span>{% endfor %}
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            {% for tag in post.aroma_tags.all %}
+                <span style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; color: #5a4a3f; background-color: #fdfaf8;">
+                    {{ tag.name }}
+                </span>
+            {% endfor %}
         </div>
 
         <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>

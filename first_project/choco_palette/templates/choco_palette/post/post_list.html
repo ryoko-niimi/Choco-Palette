@@ -1,6 +1,13 @@
 <!--ホーム画面（一覧表示）-->
-
 {% extends "base.html" %}
+
+{% block header_left %}
+    {% if request.GET %}
+        <a href="{% url 'choco_palette:search' %}?{{ request.GET.urlencode }}" style="text-decoration:none; color:#4a2c2a; font-size: 1.2em;">
+            🔙
+        </a>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
@@ -10,6 +17,7 @@
             🔍 投稿を検索・絞り込み
         </a>
     {% endif %}
+    
     
     <div class="post-list">
         {% for post in page_obj %}
@@ -22,7 +30,7 @@
                 {% endif %}
                 
                 
-                <a href="{% url 'choco_palette:post_edit' post.pk %}" style="text-decoration:none; color:inherit; flex-grow: 1;">
+                <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; flex-grow: 1;">
                     <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name|default:"無題" }}</p>
                     <p style="margin: 5px 0 0 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage|default:"-" }}%</p>
                     <div style="color: #f1c40f; font-size: 0.8em;">

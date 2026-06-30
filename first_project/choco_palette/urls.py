@@ -75,6 +75,7 @@ urlpatterns = [
     #ユーザープロフィール表示画面
     path('user_profile/<int:user_id>/', views.user_profile, name='user_profile'),
     path('posts/delete/', views.post_delete, name='post_delete'),
+    
    
    #マイページ画面
    path('mypage/', views.mypage, name='mypage'),

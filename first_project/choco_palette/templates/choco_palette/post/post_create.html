@@ -2,8 +2,12 @@
 {% extends "base.html" %}
 
 {% block header_left %}
-<a href="{{ back_url|default:'/' }}" id="back-button" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+    {% if is_search_results %}
+        <a href="{% url 'choco_palette:search' %}" style="text-decoration:none; color:#4a2c2a; font-size: 24px;">🔙</a>
+    {% else %}
+        {% endif %}
 {% endblock %}
+
 
 {% block content %}
 <style>
