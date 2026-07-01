@@ -91,16 +91,11 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 }
 
 
-
-
-
 /* フォームの各項目 */
 .form-group { 
     text-align: left; 
     margin-bottom: 20px; 
 }
-
-
 
 
 /* ボタン共通 */

@@ -141,8 +141,6 @@ class EmailLoginForm(AuthenticationForm):
 
     
 #マイページ→プロフィール設定編集画面
-
-# プロフィール設定と編集のフォーム
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile

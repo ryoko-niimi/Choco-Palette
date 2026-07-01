@@ -46,22 +46,26 @@ def login_view(request):
         form = EmailLoginForm() 
     return render(request, 'choco_palette/auth/login.html', {'form': form})
 
+
 # --- 新規登録用の処理 ---
 def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
+            
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
+    
+            Profile.objects.create(user=user, nickname=user.username)
             
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
-            login(request, user)
             return redirect('choco_palette:login')
             
     else:
         form = SignupForm()
     return render(request, 'choco_palette/auth/signup.html', {'form': form})
+    
+
 
 # --- 新パスワード設定トースト通知 ---
 class MyPasswordResetConfirmView(PasswordResetConfirmView):
@@ -410,28 +414,31 @@ def mypage(request):
     return render(request, 'choco_palette/mypage/mypage.html', {'profile': profile})
 
 
-# --- マイページ→プロフィール編集画面---
+
+# --- マイページ→プロフィール編集画面 ---
 @login_required
 def profile_edit(request):
-
+    
     profile, created = Profile.objects.get_or_create(user=request.user)
     
-    if request.method == 'POST':
-        print(request.FILES)
+    
+    if not profile.nickname:
+        profile.nickname = request.user.username
+        profile.save()
 
+    if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
             messages.success(request, 'プロフィールが更新されました')
             return redirect('choco_palette:mypage')
     else:
+        
         form = ProfileForm(instance=profile)
     
-
     return render(request, 'choco_palette/mypage/profile_edit.html', {
         'form': form,
         'profile': profile
-   
     })
 
 # --- マイページ→メールアドレス変更画面 ---
