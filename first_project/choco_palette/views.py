@@ -57,7 +57,7 @@ def signup_view(request):
             
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
-            return redirect('choco_palette:mypage')
+            return redirect('choco_palette:login')
             
     else:
         form = SignupForm()
