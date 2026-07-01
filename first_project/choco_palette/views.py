@@ -261,13 +261,13 @@ def post_edit(request, pk):
                 'all_taste_tags': TasteTag.objects.all(),
                 'all_aroma_tags': AromaTag.objects.all(),
             })
-        # ------------------------
+    
 
         if form.is_valid():
             updated_post = form.save(commit=False)
             action = request.POST.get('action')
             if action == 'save':
-                updated_post.status = 2  
+                updated_post.status = 0  
                 msg = '下書きを保存しました！'
                 redirect_url = 'choco_palette:draft_list'
             else:
@@ -316,7 +316,7 @@ def draft_list(request):
 
 # --- 投稿削除処理 ---
 @login_required
-def post_delete(request): 
+def post_delete(request, pk):
     if request.method == 'POST':
         post_ids = request.POST.getlist('post_ids')
         if post_ids:
