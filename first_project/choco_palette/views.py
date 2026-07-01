@@ -413,7 +413,7 @@ def mypage(request):
 # --- マイページ→プロフィール編集画面---
 @login_required
 def profile_edit(request):
-    profile = request.user.profile
+
     profile, created = Profile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
