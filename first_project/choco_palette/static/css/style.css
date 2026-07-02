@@ -17,6 +17,15 @@ body {
     color: var(--text-color); 
     line-height: 1.6; 
 }
+/* ポートフォリオ */
+#about-app {
+    max-width: 700px;
+    margin: 0 auto 50px auto; 
+    text-align: center;
+    color: #4a2c2a;
+    line-height: 1.8;
+}
+
 
 /* カード全体のデザイン */
 .card { 

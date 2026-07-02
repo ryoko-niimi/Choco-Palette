@@ -31,6 +31,9 @@ from .models import PostPhoto
 # 【追加】画像の一覧取得・並び替え配慮用のインポート
 from django.db.models import Prefetch
 
+# --- ポートフォリオ ---
+def portfolio_view(request):
+    return render(request, 'choco_palette/portfolio.html')
 
 # --- ログイン用の処理 ---
 def login_view(request):

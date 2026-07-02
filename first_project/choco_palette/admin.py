@@ -26,3 +26,4 @@ class ProfileAdmin(admin.ModelAdmin):
 #その他
 admin.site.register(PostPhoto)
 admin.site.register(PasswordReset)
+

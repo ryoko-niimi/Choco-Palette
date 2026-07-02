@@ -5,8 +5,12 @@ from django.contrib.auth import views as auth_views
 app_name = 'choco_palette' 
 
 urlpatterns = [
+     
+    #ポートフォリオ
+    path('portfolio/', views.portfolio_view, name='portfolio'),
+    
     # ホーム画面（一覧画面をホームとする場合はここに定義）
-    path('', views.post_list, name='home'),  # ← ここに name='home' を追加！
+    path('', views.post_list, name='home'),  
 
     # 認証関連
     path('login/', views.login_view, name='login'), 
