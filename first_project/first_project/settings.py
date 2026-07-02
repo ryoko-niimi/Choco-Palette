@@ -11,7 +11,7 @@ load_dotenv(BASE_DIR / '.env')
 # 開発用の設定 '*'
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-63rya_1s$3_+2k(lly=qw1qw5@bmnag5q)p(+7es$&fe3y3b&1')
 DEBUG = True
-ALLOWED_HOSTS = ['ryokoniimi.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ryokoniimi.pythonanywhere.com']
 
 # アプリケーションの登録リスト
 INSTALLED_APPS = [
