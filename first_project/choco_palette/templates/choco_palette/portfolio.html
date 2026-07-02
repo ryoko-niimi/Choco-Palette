@@ -1,4 +1,3 @@
-<!--ポートフォリオ-->
 {% extends "base_portfolio.html" %}
 {% load static %}
 
@@ -6,11 +5,10 @@
 <div class="portfolio-container" style="padding: 30px 20px; display: flex; flex-direction: column; align-items: center;">
     
     <header style="text-align: center; margin-bottom: 30px;">
-    <h1 style="border-bottom: 2px solid #e3d5ca; display: inline-block; padding: 0 20px 5px 20px;">
-        ポートフォリオNo.1
-    </h1>
+        <h1 style="border-bottom: 2px solid #e3d5ca; display: inline-block; padding: 0 20px 5px 20px;">
+            ポートフォリオNo.1
+        </h1>
     </header>
-
 
     <header style="text-align: center; margin-bottom: 40px;">
         <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #4a2c2a;">Choco Palette</h2>
@@ -18,26 +16,24 @@
     </header>
 
     <section id="about-app" style="max-width: 700px; margin: 0 auto 50px auto; text-align: center; color: #4a2c2a; line-height: 1.8;">
-    <h3 style="margin-bottom: 20px; border-bottom: 2px solid #e3d5ca; display: inline-block; padding-bottom: 5px;">アプリ概要</h3>
-    <p style="margin-bottom: 20px;">
-        Choco Paletteは、チョコレートを愛するユーザーが、食べた感想の記録を手軽に残し、<br>
-        好みや味の傾向を整理・分析できるアプリです。<br>
-        味・香り・食感といったテイスティング情報を記録することで、自分だけの好みを可視化でき、<br>
-        次のチョコレート選びをより楽しく、最適にサポートします。
-    </p>
+        <h3 style="margin-bottom: 20px; border-bottom: 2px solid #e3d5ca; display: inline-block; padding-bottom: 5px;">アプリ概要</h3>
+        <p style="margin-bottom: 20px;">
+            Choco Paletteは、チョコレートを愛するユーザーが、食べた感想の記録を手軽に残し、<br>
+            好みや味の傾向を整理・分析できるアプリです。<br>
+            味・香り・食感といったテイスティング情報を記録することで、自分だけの好みを可視化でき、<br>
+            次のチョコレート選びをより楽しく、最適にサポートします。
+        </p>
     </section>
 
-    
-        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin: 30px 0;">
-            <img src="{% static 'images/screenshot1.png' %}" style="width: 200px; border: 1px solid #ddd; border-radius: 8px;" alt="ログイン画面">
-            <img src="{% static 'images/screenshot2.png' %}" style="width: 200px; border: 1px solid #ddd; border-radius: 8px;" alt="新規アカウント登録画面">
-            <img src="{% static 'images/screenshot3.png' %}" style="width: 200px; border: 1px solid #ddd; border-radius: 8px;" alt="検索画面">
-            <img src="{% static 'images/screenshot4.png' %}" style="width: 200px; border: 1px solid #ddd; border-radius: 8px;" alt="テイスティング登録画面">
-        </div>
-        
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin: 30px 0;">
+        <img src="{% static 'images/screenshot1.png' %}" style="width: 200px; max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;" alt="ログイン画面">
+        <img src="{% static 'images/screenshot2.png' %}" style="width: 200px; max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;" alt="新規アカウント登録画面">
+        <img src="{% static 'images/screenshot3.png' %}" style="width: 200px; max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;" alt="検索画面">
+        <img src="{% static 'images/screenshot4.png' %}" style="width: 200px; max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;" alt="テイスティング登録画面">
+    </div>
 
     <section id="about-app" style="max-width: 700px; margin: 0 auto 50px auto; text-align: center; color: #4a2c2a; line-height: 1.8;">
-    <h3 style="margin-bottom: 20px; border-bottom: 2px solid #e3d5ca; display: inline-block; padding-bottom: 5px;">資料一覧</h3>
+        <h3 style="margin-bottom: 20px; border-bottom: 2px solid #e3d5ca; display: inline-block; padding-bottom: 5px;">資料一覧</h3>
 
         <div style="margin-bottom: 20px; text-align: center;">
             <a href="{% static 'documents/kikakusho.pdf' %}" target="_blank">企画書</a> | 
