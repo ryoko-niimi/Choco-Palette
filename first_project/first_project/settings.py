@@ -85,9 +85,9 @@ USE_TZ = True
 
 # 静的ファイル設定
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',]
-
+STATICFILES_DIRS = [ 
+    BASE_DIR / 'static',
+]
 
 
 # メディアファイル設定
