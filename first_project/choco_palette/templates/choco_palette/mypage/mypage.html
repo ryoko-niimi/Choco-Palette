@@ -15,7 +15,7 @@
             <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #ddd; margin: 0 auto;"></div>
         {% endif %}
         <h2>{{ user.profile.nickname|default:user.username }}</h2>
-        <p>{{ user.profile.bio|default:"自己紹介がまだありません。" }}</p>
+        <p style="white-space: pre-wrap; color: #555;">{{ user.profile.bio|default:"自己紹介がまだありません。" }}</p>
         {% if user.profile.link %}
             <p><a href="{{ user.profile.link }}" target="_blank" style="color: #4a2c2a; text-decoration: underline;">{{ user.profile.link }}</a></p>
         {% endif %}

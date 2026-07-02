@@ -21,18 +21,17 @@
                 <a href="{% url 'choco_palette:profile_edit' %}" class="upload-link" style="text-decoration: underline;">プロフィールを編集</a>
             {% endif %}
             
-            <p style="margin-top: 15px; color: #555;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>
+            
+            <p style="margin-top: 15px; color: #555; white-space: pre-wrap;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>
             <p><a href="{{ target_user.profile.website|default:'#' }}">{{ target_user.profile.website }}</a></p>
+            
             {% if target_user.profile.link %}
                 <p><a href="{{ target_user.profile.link }}" target="_blank" style="color: #4a2c2a; text-decoration: underline;">{{ target_user.profile.link }}</a></p>
             {% endif %}
         </div>
-
         <hr>
 
         <h3>投稿記録</h3>
-
-        
 
         <form id="delete-form" method="POST" action="{% url 'choco_palette:user_profile' target_user.pk %}">
             {% csrf_token %}

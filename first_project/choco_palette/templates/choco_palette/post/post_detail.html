@@ -82,11 +82,11 @@
         </div>
 
         <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>
-        <p style="background-color: #fdf6f0; padding: 10px; border-radius: 5px; border: 1px solid #e3d5ca;">{{ post.tasting_comment }}</p>
+        <p style="background-color: #fdf6f0; padding: 10px; border-radius: 5px; border: 1px solid #e3d5ca; white-space: pre-wrap;">{{ post.tasting_comment }}</p>
         
         {% if post.private_memo %}
             <p style="margin: 15px 0 5px 0; font-weight: bold; color: #555;">非公開メモ</p>
-            <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777;">{{ post.private_memo }}</p>
+            <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777; white-space: pre-wrap;">{{ post.private_memo }}</p>
         {% endif %}
     </div>
 
