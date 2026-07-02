@@ -7,10 +7,10 @@ app_name = 'choco_palette'
 urlpatterns = [
      
     #ポートフォリオ
-    path('portfolio/', views.portfolio_view, name='portfolio'),
+    path('', views.portfolio_view, name='home'),
     
-    # ホーム画面（一覧画面をホームとする場合はここに定義）
-    path('', views.post_list, name='home'),  
+    # ホーム画面（一覧画面をホームとする）
+    path('posts/', views.post_list, name='post_list') ,
 
     # 認証関連
     path('login/', views.login_view, name='login'), 
