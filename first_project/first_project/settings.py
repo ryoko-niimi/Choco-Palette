@@ -11,7 +11,7 @@ load_dotenv(BASE_DIR / '.env')
 # 開発用の設定 '*'
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-63rya_1s$3_+2k(lly=qw1qw5@bmnag5q)p(+7es$&fe3y3b&1')
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ryokoniimi.pythonanywhere.com']
 
 # アプリケーションの登録リスト
 INSTALLED_APPS = [
@@ -88,6 +88,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [ 
     BASE_DIR / 'static',
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # メディアファイル設定
@@ -108,5 +109,3 @@ LOGIN_REDIRECT_URL = 'choco_palette:post_list'
 LOGIN_URL = 'choco_palette:login'
 
 
-# settings.py の最後に追加626
-print(f"★保存先チェック: {MEDIA_ROOT}")
