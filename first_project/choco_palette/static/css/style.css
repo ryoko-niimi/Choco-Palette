@@ -322,3 +322,8 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 .mypage-buttons .btn {
     margin: 10px 0;
 }
+
+
+* {
+    outline: 1px solid red !important;
+}
