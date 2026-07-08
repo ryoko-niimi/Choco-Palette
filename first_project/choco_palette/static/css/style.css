@@ -141,7 +141,7 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     
     /* 1行に収めるための設定 */
     display: inline-block;
-    white-space: nowrap;    /* 絶対に改行させない */
+    white-space: nowrap !important;    /* 絶対に改行させない */
     font-size: 0.9rem;      /* 少し小さめにして収まりを良くする */
     
     /* 念のため最大幅を制限 */
