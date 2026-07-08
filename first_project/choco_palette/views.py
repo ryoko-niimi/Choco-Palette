@@ -50,17 +50,18 @@ def login_view(request):
     return render(request, 'choco_palette/auth/login.html', {'form': form})
 
 
-# --- 新規登録用の処理 ---
+# --- 新規アカウント登録用の処理 ---
 def signup_view(request):
     if request.method == 'POST':
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            
+        form = SignupForm(request.POST, request.FILES)
+        
+        if form.is_valid():    
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-    
-            Profile.objects.create(user=user, nickname=user.username)
+            
+            image = request.FILES.get('image')
+            Profile.objects.create(user=user, nickname=user.username,image=image)
             
             return redirect('choco_palette:login')
             

@@ -138,6 +138,9 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     opacity: 1;
     transition: opacity 0.5s ease;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
 }
 
 /* ボタンの種類ごとの色設定 */
