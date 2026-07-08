@@ -32,7 +32,12 @@
                 
                 <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; flex-grow: 1;">
                     <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name|default:"無題" }}</p>
-                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage|default:"-" }}%</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">
+                        {{ post.brand_name }}
+                        {% if post.cacao_percentage %}
+                            / {{ post.cacao_percentage }}%
+                        {% endif %}
+                    </p>
                     <div style="color: #f1c40f; font-size: 0.8em;">
                         {% for i in "12345"|make_list %}
                             {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
@@ -67,14 +72,25 @@
         <div style="margin-top: 40px; text-align: center;">
             <h2 style="font-size: 18px; color: #4a2c2a;">ログインすると、もっと楽しめます</h2>
             <div style="display: flex; justify-content: space-around; margin: 20px 0; font-size: 13px; color: #555;">
-                <div style="text-align: center; width: 30%;"><p>📝テイスティング<br>を記録できる</p></div>
-                <div style="text-align: center; width: 30%;"><p>📁お気に入りを<br>保存できる</p></div>
-                <div style="text-align: center; width: 30%;"><p>📊自分の好みを<br>分析できる</p></div>
+                <div style="text-align: center; width: 30%;">
+                <div style="font-size: 20px; margin-bottom: 5px;">📝</div>
+                <div>テイスティング<br>を記録できる</div>
             </div>
+            <div style="text-align: center; width: 30%;">
+                <div style="font-size: 20px; margin-bottom: 5px;">📁</div>
+                <div>お気に入りを<br>保存できる</div>
+            </div>
+            <div style="text-align: center; width: 30%;">
+                <div style="font-size: 20px; margin-bottom: 5px;">📊</div>
+                <div>自分の好みを<br>分析できる</div>
+            </div>
+        </div>
             <a href="{% url 'choco_palette:login' %}" class="btn btn-primary" style="display:block; text-decoration:none;">ログイン</a>
         </div>
     {% endif %}
 
+
 </div>
+
 {% endblock %}
             

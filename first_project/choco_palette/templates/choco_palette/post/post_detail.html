@@ -51,9 +51,15 @@
     <div style="line-height: 1.8;">
         <h2 style="margin: 5px 0;">{{ post.chocolate_name }}</h2>
         <p style="margin: 0;"><strong>ブランド:</strong> {{ post.brand_name }}</p>
-        <p style="margin: 0;"><strong>カカオ:</strong> {{ post.cacao_percentage }}%</p>
+        <p style="margin: 0;">
+            <strong>カカオ:</strong> 
+            {% if post.cacao_percentage %}
+                {{ post.cacao_percentage }}%
+            {% else %}
+                不明
+            {% endif %}
+        </p>
         <p style="margin: 0;"><strong>日付:</strong> {{ post.created_at|date:"Y/m/d" }}</p>
-
         <p style="margin: 10px 0;">
             <strong>お気に入り度:</strong> 
             <span style="color: #f1c40f;">
@@ -84,9 +90,11 @@
         <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>
         <p style="background-color: #fdf6f0; padding: 10px; border-radius: 5px; border: 1px solid #e3d5ca; white-space: pre-wrap;">{{ post.tasting_comment }}</p>
         
-        {% if post.private_memo %}
-            <p style="margin: 15px 0 5px 0; font-weight: bold; color: #555;">非公開メモ</p>
-            <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777; white-space: pre-wrap;">{{ post.private_memo }}</p>
+        {% if is_owner and post.private_memo %}
+            <div class="private-memo-section">
+                <p style="margin: 15px 0 5px 0; font-weight: bold; color: #555;">非公開メモ</p>
+                <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777; white-space: pre-wrap;">{{ post.private_memo }}</p>
+            </div>
         {% endif %}
     </div>
 
@@ -103,6 +111,7 @@
 <script>
     // 削除モーダル表示
     function openDeleteConfirm(btn) {
+        // ... (既存の削除処理は変更なし)
         const deleteUrl = btn.getAttribute('data-delete-url');
         const confirmHtml = `
             <form action="${deleteUrl}" method="POST" style="margin:0;">
@@ -115,7 +124,23 @@
     }
 
     // お気に入りボタン処理
-    document.getElementById('like-btn').addEventListener('click', function() {
+    document.getElementById('like-btn').addEventListener('click', function(e) {
+        // Djangoのテンプレートタグを使って未ログイン時のみこの処理を実行
+        {% if not user.is_authenticated %}
+            // 【未ログイン時】モーダルで案内
+            e.preventDefault(); 
+            const loginHtml = `
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <a href="{% url 'choco_palette:login' %}" class="btn btn-primary" style="padding:10px 20px; text-decoration:none; color:white; border-radius:8px;">ログインする</a>
+                    <button type="button" class="btn btn-secondary" onclick="closeCommonModal()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">キャンセル</button>
+                </div>
+            `;
+
+            openCommonModal('ログイン後に利用できます', loginHtml);
+            return; 
+        {% endif %}
+
+        // 【ログイン時】お気に入り処理を実行
         const postId = this.getAttribute('data-post-id');
         const heartIcon = document.getElementById('heart-icon');
 
@@ -148,4 +173,5 @@
         setTimeout(() => { parent.remove(); }, 3000);
     }
 </script>
+
 {% endblock %}

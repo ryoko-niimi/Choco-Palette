@@ -9,9 +9,11 @@
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
     <h2>❤️ お気に入り一覧</h2>
     
+    {% if page_obj %}
     <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
         <button type="button" id="toggle-select-btn" class="btn btn-success" style="margin: 0;">選択</button>
     </div>
+    {% endif %}
 
     <form id="delete-form" method="POST" action="{% url 'choco_palette:favorites_list_remove' %}">
         {% csrf_token %}
@@ -31,7 +33,13 @@
 
                 <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; flex-grow: 1;">
                     <p style="margin: 0; font-weight:bold;">{{ post.chocolate_name|default:"無題" }}</p>
-                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">{{ post.brand_name }} / {{ post.cacao_percentage|default:"-" }}%</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em;">
+                        {{ post.brand_name }}
+                        {% if post.cacao_percentage %}
+                            / {{ post.cacao_percentage }}%
+                        {% endif %}
+                    </p>
+
                     <div style="color: #f1c40f; font-size: 0.8em;">
                         {% for i in "12345"|make_list %}
                             {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}

@@ -215,15 +215,20 @@ def post_detail(request, pk):
         pk=pk
     )
     is_liked = False
+    is_owner = False
+    
     if request.user.is_authenticated:
         is_liked = post.likes.filter(id=request.user.id).exists()
-    
+        
+        if post.user == request.user:
+            is_owner = True
     
     back_url = request.GET.get('from', 'home')
     
     return render(request, 'choco_palette/post/post_detail.html', {
         'post': post,
         'is_liked': is_liked,
+        'is_owner': is_owner, 
         'back_url': back_url, 
     })
 
@@ -511,5 +516,5 @@ def favorites_list(request):
 @login_required
 def custom_logout(request):
     logout(request)
-    return redirect('choco_palette:login')
+    return redirect('choco_palette:post_list')
 
