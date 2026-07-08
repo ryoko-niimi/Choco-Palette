@@ -120,34 +120,37 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     text-align: center;
     text-decoration: none;
 }
-/* トースト通知 */
 
+/* トーストの親（位置を制御） */
 .messages {
     position: fixed;
-    bottom: 80px; /* フッター（高さがあるはずなので）より上に配置 */
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1000;
-    
-    /* 修正ポイント */
-    width: auto;           /* 固定幅を解除 */
-    white-space: nowrap;   /* 親要素でも改行させない */
-    padding: 0 10px;       /* 画面端に張り付かないように余白 */
+    z-index: 9999;
+    width: 90vw;        /* 幅を制限 */
+    text-align: center; /* 中身を中央寄せ */
+    pointer-events: none; /* クリックを透過させる */
 }
 
+/* トーストの本体（見た目を制御） */
 .toast-message {
     background-color: #78a890;
     color: white;
-    padding: 12px 24px;   /* 左右のpaddingを確保 */
+    padding: 12px 24px;
     border-radius: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     
-    /* 修正ポイント */
+    /* 1行強制の重要設定 */
     display: inline-block;
-    white-space: nowrap !important; /* 絶対に改行させない */
+    white-space: nowrap !important;
+    max-width: 100%;
     font-size: 0.9rem;
-    max-width: 90vw;      /* 画面幅ギリギリまでならOK */
+    box-sizing: border-box;
 }
+
+
+
 
 /* ボタンの種類ごとの色設定 */
 .btn-primary { background-color: #7ab8cc; color: white; }/* 登録、編集、変更など*/
