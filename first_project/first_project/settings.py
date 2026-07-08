@@ -83,10 +83,11 @@ TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 USE_TZ = True
 
+
 # 静的ファイル設定
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [ 
-    BASE_DIR / 'static',
+    BASE_DIR / 'choco_palette/static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
