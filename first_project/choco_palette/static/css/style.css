@@ -1,6 +1,11 @@
 /* =========================================================
 【全体共通】レイアウト・ベースパーツ
 ========================================================= */
+/* 全ての要素の幅計算を統一 */
+* {
+  box-sizing: border-box;
+}
+
 :root {
     --primary-color: #6f4e37;    /* 濃い茶色 */
     --accent-color: #e3d5ca;    /* 薄い茶色 */
@@ -12,11 +17,15 @@
 
 body { 
     margin: 0; 
+    overflow-x: hidden;
+    width: 100%;
     background-color: var(--bg-color); 
     font-family: "Helvetica Neue", Arial, sans-serif;
     color: var(--text-color); 
     line-height: 1.6; 
 }
+
+
 /* ポートフォリオ */
 #about-app {
     max-width: 700px;
@@ -323,7 +332,3 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     margin: 10px 0;
 }
 
-
-* {
-    outline: 1px solid red !important;
-}
