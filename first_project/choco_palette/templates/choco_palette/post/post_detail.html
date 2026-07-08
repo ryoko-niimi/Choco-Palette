@@ -168,6 +168,9 @@
         const toast = document.createElement('div');
         toast.className = 'toast-message';
         toast.innerText = message;
+        toast.style.whiteSpace = 'nowrap';
+        toast.style.overflow = 'hidden';
+        toast.style.textOverflow = 'ellipsis';
         parent.appendChild(toast);
         document.body.appendChild(parent);
         setTimeout(() => { parent.remove(); }, 3000);

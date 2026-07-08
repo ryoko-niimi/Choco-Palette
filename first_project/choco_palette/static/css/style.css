@@ -128,7 +128,7 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
-    width: 90vw;        /* 幅を制限 */
+    width: 95%;       /* 幅を制限 */
     text-align: center; /* 中身を中央寄せ */
     pointer-events: none; /* クリックを透過させる */
 }
