@@ -5,13 +5,11 @@
     {% if is_search_results %}
         <a href="{% url 'choco_palette:search' %}" style="text-decoration:none; color:#4a2c2a; font-size: 24px;">🔙</a>
     {% else %}
-        {% endif %}
+    {% endif %}
 {% endblock %}
-
 
 {% block content %}
 <style>
-    /* 必須バッジのスタイル */
     .required-badge {
         background-color: #ff4d4d;
         color: white;
@@ -24,7 +22,7 @@
 </style>
 
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
-    
+
     {% if not post %}
     <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px;">
         <a href="{% url 'choco_palette:draft_list' %}" class="btn btn-draft" style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0; background-color: #7db58a; color: white;">
@@ -33,34 +31,32 @@
     </div>
     {% endif %}
 
-    
     <form method="post" enctype="multipart/form-data" id="post-form" novalidate>
         {% csrf_token %}
-        
+
         <div class="form-group" style="margin: 20px 0;">
             <label style="font-weight: bold; display: block; margin-bottom: 10px;">写真をアップロード (最大10枚)</label>
-    
-            <input type="file" id="id_images" name="images" multiple accept="image/*" 
+
+            <input type="file" id="id_images" name="images" multiple accept="image/*"
                 style="width: 0.1px; height: 0.1px; opacity: 0; position: absolute; left:-9999px;">
-           
+
+            <!-- 画像だけを並び替え対象にする -->
             <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px;">
-        
                 {% for photo in existing_photos %}
-                    <div class="image-item existing-image" data-id="{{ photo.id }}" style="position: relative; width: 80px; height: 80px;">
+                    <div class="image-item existing-image" data-id="{{ photo.id }}" style="position: relative; width: 80px; height: 80px; cursor: move;">
                         <img src="{{ photo.image.url }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
                         <button type="button" class="remove-btn" onclick="deleteImage(this, {{ photo.id }})" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; border: none;">×</button>
                     </div>
                 {% endfor %}
-            
-                <label for="id_images" class="photo-upload-label">
-                    <span class="plus-icon">+</span>
-                    <span style="font-size: 10px;">写真を追加</span>
-                </label>
             </div>
-        </div>
-           
 
-        
+            <!-- iPhone対応：写真追加ボタンはSortableの外に出す -->
+            <label for="id_images" class="photo-upload-label" style="margin-top: 10px;">
+                <span class="plus-icon">+</span>
+                <span style="font-size: 10px;">写真を追加</span>
+            </label>
+        </div>
+
         <div class="form-group" style="margin-bottom: 20px;">
             <label style="font-weight: bold; display: block;">{{ form.chocolate_name.label|safe }}</label>
             {{ form.chocolate_name }}
@@ -144,30 +140,31 @@
 
         <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button type="submit" name="action" value="save" class="btn btn-secondary" style="flex: 1;">
-            下書き保存
+                下書き保存
             </button>
-    
-        <button type="submit" name="action" value="publish" id="publish-btn" class="btn btn-primary" style="flex: 1;">
-            投稿する
-        </button>
+
+            <button type="submit" name="action" value="publish" id="publish-btn" class="btn btn-primary" style="flex: 1;">
+                投稿する
+            </button>
+        </div>
+    </form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
-
 <script>
-    // ==========================================
-    // 1. 画像関連の処理
-    // ==========================================
     const MAX_IMAGES = 10;
     const fileInput = document.getElementById('id_images');
     const preview = document.getElementById('image-preview');
-    const fileList = new DataTransfer(); 
+    const fileList = new DataTransfer();
 
     function checkImageLimit() {
         const currentCount = document.querySelectorAll('.image-item').length;
         const uploadLabel = document.querySelector('.photo-upload-label');
-        uploadLabel.style.display = (currentCount >= MAX_IMAGES) ? 'none' : 'flex';
+
+        if (uploadLabel) {
+            uploadLabel.style.display = (currentCount >= MAX_IMAGES) ? 'none' : 'flex';
+        }
     }
 
     fileInput.addEventListener('change', function(e) {
@@ -176,70 +173,78 @@
 
         if (currentCount + newFiles.length > MAX_IMAGES) {
             openCommonModal(
-                '写真は最大10枚までです！', 
+                '写真は最大10枚までです！',
                 '<button class="btn btn-secondary" onclick="closeCommonModal()">閉じる</button>'
             );
-            this.value = ''; 
+            this.value = '';
             return;
         }
 
         for (const file of newFiles) {
             fileList.items.add(file);
-            fileInput.files = fileList.files; 
+            fileInput.files = fileList.files;
 
             const reader = new FileReader();
+
             reader.onload = function(event) {
                 const div = document.createElement('div');
                 div.className = 'image-item';
                 div.style = "position: relative; width: 80px; height: 80px; cursor: move;";
+
                 div.innerHTML = `
                     <img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
                     <button type="button" onclick="removeNewImage(this, '${file.name}')" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
                 `;
-                preview.insertBefore(div, preview.lastElementChild);
+
+                preview.appendChild(div);
                 checkImageLimit();
-            }
+            };
+
             reader.readAsDataURL(file);
         }
     });
 
     function removeNewImage(btn, fileName) {
         btn.parentElement.remove();
+
         for (let i = 0; i < fileList.items.length; i++) {
             if (fileList.items[i].getAsFile().name === fileName) {
                 fileList.items.remove(i);
                 break;
             }
         }
+
         fileInput.files = fileList.files;
         checkImageLimit();
     }
 
-    // ==========================================
-    // 2. 画面読み込み時の設定
-    // ==========================================
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
 
-        // 写真追加ボタンをタップしたらファイル選択を開く
+        // 写真追加ボタン
         const uploadLabel = document.querySelector('.photo-upload-label');
 
         if (uploadLabel) {
             uploadLabel.addEventListener('click', function(e) {
-            e.preventDefault();
-            fileInput.click();
-        });
-    }
-
-
+                e.preventDefault();
+                fileInput.click();
+            });
+        }
 
         // 星評価
         const stars = document.querySelectorAll('.star');
         const rateInput = document.querySelector('input[name="favorite_rate"]');
+
         function updateStars(val) {
-            stars.forEach(s => s.textContent = parseInt(s.getAttribute('data-value')) <= val ? '⭐' : '☆');
+            stars.forEach(s => {
+                s.textContent = parseInt(s.getAttribute('data-value')) <= val ? '⭐' : '☆';
+            });
         }
-        if (rateInput && rateInput.value) updateStars(rateInput.value);
+
+        if (rateInput && rateInput.value) {
+            updateStars(rateInput.value);
+        }
+
         stars.forEach(star => {
             star.addEventListener('click', function() {
                 const val = this.getAttribute('data-value');
@@ -251,54 +256,55 @@
         // タグの色変更
         document.querySelectorAll('.tag-label').forEach(label => {
             const cb = label.querySelector('input[type="checkbox"]');
-            if (cb.checked) label.style.backgroundColor = '#e3d5ca';
+
+            if (cb.checked) {
+                label.style.backgroundColor = '#e3d5ca';
+            }
+
             label.addEventListener('click', function() {
                 cb.checked = !cb.checked;
                 this.style.backgroundColor = cb.checked ? '#e3d5ca' : 'transparent';
             });
         });
 
-        ///* 並び替え（Sortable.js）
-        /*new Sortable(document.getElementById('image-preview'), { 
+        // 並び替え機能を復活
+        // 写真追加ボタンはimage-previewの外に出したので、iPhoneでも邪魔されません
+        new Sortable(preview, {
             animation: 150,
-            filter: '.photo-upload-label',
-            onEnd: function() { }
-        });*/
+            draggable: '.image-item'
+        });
+    });
 
-        
-    });  
-
-    // ==========================================
-    // 3. サーバー通信系（削除・保存）
-    // ==========================================
     function deleteImage(btn, photoId) {
         fetch(`/post/photo/${photoId}/delete/`, {
             method: 'POST',
             headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-        }).then(response => response.json())
-          .then(data => { 
-              if (data.status === 'success') { 
-                  btn.parentElement.remove(); 
-                  checkImageLimit();
-              } 
-          });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.parentElement.remove();
+                checkImageLimit();
+            }
+        });
     }
 
     document.getElementById('post-form').addEventListener('submit', function(e) {
         const photoElements = document.querySelectorAll('.existing-image');
         const photoIds = Array.from(photoElements).map(el => el.dataset.id);
+
         if (photoIds.length > 0) {
             fetch("{% url 'choco_palette:reorder_photos' %}", {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
                 body: JSON.stringify({ photo_ids: photoIds })
             });
         }
     });
 
-    // ==========================================
-    // 4. 投稿ボタンの重複送信防止
-    // ==========================================
     document.getElementById('publish-btn').addEventListener('click', function(event) {
         this.disabled = true;
         this.innerText = '送信中...';
