@@ -40,15 +40,23 @@
         <div class="form-group" style="margin: 20px 0;">
             <label style="font-weight: bold; display: block; margin-bottom: 10px;">写真をアップロード (最大10枚)</label>
     
+            <input type="file" id="id_images" name="images" multiple accept="image/*" 
+                style="width: 0.1px; height: 0.1px; opacity: 0; position: absolute; z-index: -1;">
+           
             <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        
+                {% for photo in existing_photos %}
+                    <div class="image-item existing-image" data-id="{{ photo.id }}" style="position: relative; width: 80px; height: 80px;">
+                        <img src="{{ photo.image.url }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
+                        <button type="button" class="remove-btn" onclick="deleteImage(this, {{ photo.id }})" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; border: none;">×</button>
+                    </div>
+                {% endfor %}
+            
                 <label for="id_images" class="photo-upload-label">
                     <span class="plus-icon">+</span>
-                    <span>写真を追加</span>
+                    <span style="font-size: 10px;">写真を追加</span>
                 </label>
             </div>
-    
-            <input type="file" id="id_images" name="images" multiple accept="image/*" 
-                    style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;">
         </div>
            
 
@@ -213,13 +221,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
 
-        const uploadLabel = document.querySelector('.photo-upload-label');
+        /*const uploadLabel = document.querySelector('.photo-upload-label');
         if (uploadLabel) {
             uploadLabel.addEventListener('touchstart', function(e) {
                 e.preventDefault(); // 余計な挙動を抑止
                 document.getElementById('id_images').click();
             });
-        }
+        }*/
 
 
         // 星評価
