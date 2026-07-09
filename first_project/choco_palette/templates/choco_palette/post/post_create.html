@@ -295,13 +295,15 @@
     // 4. 投稿ボタンの重複送信防止
     // ==========================================
     document.getElementById('publish-btn').addEventListener('click', function(event) {
+        const btn = this;
         
-        this.disabled = true;
-        this.innerText = '送信中...';
-        this.style.opacity = '0.6';
-        this.style.cursor = 'not-allowed';
+        btn.disabled = true;
+        btn.innerText = '送信中...';
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
 
-        
+        document.getElementById('post-form').submit();
+    
     });
     
 </script>
