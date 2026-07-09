@@ -213,6 +213,14 @@
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
 
+        const uploadLabel = document.querySelector('.photo-upload-label');
+        if (uploadLabel) {
+            uploadLabel.addEventListener('touchstart', function(e) {
+                e.preventDefault(); // 余計な挙動を抑止
+                document.getElementById('id_images').click();
+            });
+        }
+
 
         // 星評価
         const stars = document.querySelectorAll('.star');
