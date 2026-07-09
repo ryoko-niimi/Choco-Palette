@@ -48,7 +48,7 @@
             </div>  
             {% endfor %}
                 
-                <label for="id_images" class="photo-upload-label" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80px; height: 80px; border: 2px dashed #ccc; border-radius: 5px; cursor: pointer; background: #f9f9f9; z-index: 10;">
+                <label for="id_images" class="photo-upload-label" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80px; height: 80px; border: 2px dashed #ccc; border-radius: 5px; cursor: pointer; background: #f9f9f9; z-index: 999; position: relative;">
                     <span style="font-size: 20px; pointer-events: none;">+</span>
                     <span style="font-size: 10px; pointer-events: none;">写真を追加</span>
                 </label>
@@ -218,13 +218,13 @@
         checkImageLimit();
 
         // スマホ向けタップ対応（ここでまとめて設定します）
-        const uploadLabel = document.querySelector('.photo-upload-label');
+        /*const uploadLabel = document.querySelector('.photo-upload-label');
         if (uploadLabel) {
             uploadLabel.addEventListener('touchstart', function(e) {
                 e.preventDefault(); // 余計な挙動を抑止
                 document.getElementById('id_images').click();
             });
-        }
+        }*/
 
         // 星評価
         const stars = document.querySelectorAll('.star');
