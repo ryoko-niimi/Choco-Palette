@@ -221,6 +221,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
 
+        // 写真追加ボタンをタップしたらファイル選択を開く
+        const uploadLabel = document.querySelector('.photo-upload-label');
+
+        if (uploadLabel) {
+            uploadLabel.addEventListener('click', function(e) {
+            e.preventDefault();
+            fileInput.click();
+        });
+    }
+
+
 
         // 星評価
         const stars = document.querySelectorAll('.star');
