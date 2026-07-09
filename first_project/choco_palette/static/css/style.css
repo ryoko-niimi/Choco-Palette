@@ -126,9 +126,13 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     cursor: pointer;
     font-weight: bold;
     display: inline-block;
-    margin: 20px auto;
+    margin: 10px auto;
     text-align: center;
     text-decoration: none;
+    width: 280px;            
+    max-width: 90%;
+
+
 }
 
 /* トーストの親（位置を制御） */
