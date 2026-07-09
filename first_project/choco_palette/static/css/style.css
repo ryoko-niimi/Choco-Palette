@@ -131,8 +131,6 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     text-decoration: none;
     width: 280px;            
     max-width: 90%;
-
-
 }
 
 /* トーストの親（位置を制御） */
@@ -294,19 +292,23 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     text-align: center;
 }
 
-/*投稿画像アップロード*/
+
+/* 投稿画像アップロード */
 .photo-upload-label {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     width: 100px;
     height: 100px;
     border: 2px dashed #ccc; /* 破線の四角 */
     text-align: center;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     background-color: #f9f9f9;
+   
+    pointer-events: auto; 
+    position: relative;   
+    z-index: 10;
 }
 
 .photo-upload-label:hover {
@@ -314,12 +316,16 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     background-color: #eee;
 }
 
+
+.photo-upload-label span {
+    pointer-events: none; 
+}
+
 .plus-icon {
     font-size: 24px;
     font-weight: bold;
     color: #888;
 }
-
 
 
 
