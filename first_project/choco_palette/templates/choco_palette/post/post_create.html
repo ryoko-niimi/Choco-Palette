@@ -41,7 +41,7 @@
             <label style="font-weight: bold; display: block; margin-bottom: 10px;">写真をアップロード (最大10枚)</label>
     
             <input type="file" id="id_images" name="images" multiple accept="image/*" 
-                style="width: 0.1px; height: 0.1px; opacity: 0; position: absolute; z-index: -1;">
+                style="width: 0.1px; height: 0.1px; opacity: 0; position: absolute; left:-9999px;">
            
             <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px;">
         
@@ -220,14 +220,6 @@
     // ==========================================
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
-
-        /*const uploadLabel = document.querySelector('.photo-upload-label');
-        if (uploadLabel) {
-            uploadLabel.addEventListener('touchstart', function(e) {
-                e.preventDefault(); // 余計な挙動を抑止
-                document.getElementById('id_images').click();
-            });
-        }*/
 
 
         // 星評価
