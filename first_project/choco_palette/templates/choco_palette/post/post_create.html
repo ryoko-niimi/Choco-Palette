@@ -140,13 +140,12 @@
 
         <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button type="submit" name="action" value="save" class="btn btn-secondary" style="flex: 1;">
-                下書き保存
+            下書き保存
             </button>
-            <button type="submit" name="action" value="publish" class="btn btn-primary" style="flex: 1;">
-                投稿する
-            </button>
-        </div>
-    </form>
+    
+        <button type="submit" name="action" value="publish" id="publish-btn" class="btn btn-primary" style="flex: 1;">
+            投稿する
+        </button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -287,10 +286,24 @@
           .then(data => { 
               if (data.status === 'success') { 
                   btn.parentElement.remove(); 
-                  checkImageLimit(); // 消したらボタンを再表示可能にする
+                  checkImageLimit();
               } 
           });
-    }
+    } 
+
+    // ==========================================
+    // 4. 投稿ボタンの重複送信防止
+    // ==========================================
+    document.getElementById('publish-btn').addEventListener('click', function(event) {
+        
+        this.disabled = true;
+        this.innerText = '送信中...';
+        this.style.opacity = '0.6';
+        this.style.cursor = 'not-allowed';
+
+        
+    });
+    
 </script>
 
 {% endblock %}

@@ -105,7 +105,7 @@ def post_create(request):
             post = form.save(commit=False)
             post.user = None if not request.user.is_authenticated else request.user
             
-            # --- ここが一番大事！ボタンで処理を分ける ---
+            
             action = request.POST.get('action')
             if action == 'save':
                 post.status = 0  
