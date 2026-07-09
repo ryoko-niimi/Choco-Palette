@@ -333,3 +333,15 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     margin: 10px 0;
 }
 
+/* =========================================================
+【スマホ対応】ボタンの改行を防ぐ設定
+========================================================= */
+ /* マイページボタン */
+@media (max-width: 600px) {
+    .mypage-buttons .btn {
+        width: 85% !important;   
+        white-space: nowrap;      
+        padding: 12px 10px;       
+        font-size: 14px;          
+    }
+}

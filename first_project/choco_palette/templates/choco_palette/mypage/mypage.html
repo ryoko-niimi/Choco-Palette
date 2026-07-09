@@ -23,18 +23,18 @@
     </div>
 
     
-    <div class="mypage-buttons" style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="{% url 'choco_palette:profile_edit' %}" class="btn btn-primary" style="width: 50%;">プロフィール編集</a>
-        <a href="{% url 'choco_palette:favorites_list' %}" class="btn btn-primary" style="width: 50%;">❤ お気に入り一覧</a>
-        <a href="{% url 'choco_palette:email_change' %}" class="btn btn-primary" style="width: 50%;">メールアドレス変更</a>
-        <a href="{% url 'choco_palette:password_change' %}" class="btn btn-primary" style="width: 50%;">パスワード変更</a>
-        
-        <button type="button" class="btn btn-danger" style="width: 60%;"
-            data-logout-url="{% url 'choco_palette:logout' %}" 
-            onclick="openLogoutConfirm(this)">
-            ログアウトする</button>
-    </div>
-    </div>
+    <div class="mypage-buttons" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+    <a href="{% url 'choco_palette:profile_edit' %}" class="btn btn-primary">プロフィール編集</a>
+    <a href="{% url 'choco_palette:favorites_list' %}" class="btn btn-primary">❤ お気に入り一覧</a>
+    <a href="{% url 'choco_palette:email_change' %}" class="btn btn-primary">メールアドレス変更</a>
+    <a href="{% url 'choco_palette:password_change' %}" class="btn btn-primary">パスワード変更</a>
+    
+    <button type="button" class="btn btn-danger"
+        data-logout-url="{% url 'choco_palette:logout' %}" 
+        onclick="openLogoutConfirm(this)">
+        ログアウトする
+    </button>
+</div>
 
     
 
