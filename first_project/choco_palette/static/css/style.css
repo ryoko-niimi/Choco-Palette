@@ -327,6 +327,11 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     cursor: pointer;
 }
 
+.modal-message {
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
 
 
 /* 投稿削除モーダル内の form への対策 */
