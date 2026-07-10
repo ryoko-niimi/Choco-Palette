@@ -305,9 +305,18 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 /* モーダルのボタン配置エリア */
 .modal-actions {
     display: flex;
-    gap: 10px;
+    flex-direction: row;        /* 強制的に横並び */
+    justify-content: center;    /* 中央寄せ */
+    align-items: center;        /* 垂直中央寄せ */
+    gap: 10px;                  /* ボタン間の隙間 */
     margin-top: 20px;
     width: 100%;
+}
+
+/* 投稿削除モーダル内の form への対策 */
+.modal-actions form {
+    display: flex;              
+    margin: 0;
 }
 
 
