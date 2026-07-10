@@ -112,7 +112,6 @@ def post_create(request):
             post = form.save(commit=False)
 
             # ログインしていれば投稿者を保存
-            # ログインしていなければNone
             post.user = (
                 None
                 if not request.user.is_authenticated
@@ -137,13 +136,35 @@ def post_create(request):
             # 味タグ・香りタグなどのManyToMany項目を保存
             form.save_m2m()
 
+            # --- 修正版の画像保存ロジック ---
             
-            for index, image in enumerate(files):
-                PostPhoto.objects.create(
-                    post=post,
-                    image=image,
-                    sort_order=index
-                )
+            # 1. 送られてきた並び順JSONを取り出す
+            photo_order_json = request.POST.get('photo_order', '[]')
+            photo_order = json.loads(photo_order_json)
+            
+            # 2. 新規画像を順番に保存
+            # ここではシンプルに、HTML側の「new」の数に合わせてファイルを割り当てます
+            new_files = [f for f in files] 
+            new_file_index = 0
+            
+            for index, item in enumerate(photo_order):
+                if item == 'new':
+                    if new_file_index < len(new_files):
+                        PostPhoto.objects.create(
+                            post=post,
+                            image=new_files[new_file_index],
+                            sort_order=index # ここに正しい順番が入る！
+                        )
+                        new_file_index += 1
+                elif item.startswith('existing:'):
+                    # 編集画面で既存画像を並び替えた場合の処理
+                    photo_id = item.split(':')[1]
+                    try:
+                        photo = PostPhoto.objects.get(id=photo_id, post=post)
+                        photo.sort_order = index
+                        photo.save()
+                    except PostPhoto.DoesNotExist:
+                        pass
 
             # 保存完了メッセージ
             messages.success(request, message)
