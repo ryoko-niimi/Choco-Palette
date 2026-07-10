@@ -84,67 +84,76 @@ def test_design_view(request):
     form = SetPasswordForm(user=None)
     return render(request, 'choco_palette/auth/password_reset_confirm.html', {'form': form})
 
+
 # --- テイスティング投稿の処理 ---
 def post_create(request):
-    back_url = request.META.get('HTTP_REFERER', reverse_lazy('choco_palette:post_list'))
-    
-    if request.method == 'POST':    
+    back_url = request.META.get(
+        'HTTP_REFERER',
+        reverse_lazy('choco_palette:post_list')
+    )
+
+    if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
-        
+
         # 枚数制限チェック
         files = request.FILES.getlist('images')
+
         if len(files) > 10:
             messages.error(request, '写真は最大10枚までです。')
+
             return render(request, 'choco_palette/post/post_create.html', {
-                'form': form, 'back_url': back_url,
+                'form': form,
+                'back_url': back_url,
                 'all_taste_tags': TasteTag.objects.all(),
                 'all_aroma_tags': AromaTag.objects.all(),
             })
 
         if form.is_valid():
             post = form.save(commit=False)
-            post.user = None if not request.user.is_authenticated else request.user
-            
-            
+
+            # ログインしていれば投稿者を保存
+            # ログインしていなければNone
+            post.user = (
+                None
+                if not request.user.is_authenticated
+                else request.user
+            )
+
+            # 下書き保存か、通常投稿かを判定
             action = request.POST.get('action')
+
             if action == 'save':
-                post.status = 0  
+                post.status = 0
                 message = '下書きを保存しました！'
                 redirect_url = 'choco_palette:draft_list'
             else:
-                post.status = 1  
+                post.status = 1
                 message = '投稿完了しました！'
                 redirect_url = 'choco_palette:post_list'
-            # ----------------------------------------
-                
+
+            # 投稿本体を保存
             post.save()
+
+            # 味タグ・香りタグなどのManyToMany項目を保存
             form.save_m2m()
+
             
-            # --- 並び順の更新 ---
-            photo_order_json = request.POST.get('photo_order')
-            if photo_order_json:
-                import json
-                photo_ids = json.loads(photo_order_json)
-                for index, photo_id in enumerate(photo_ids):
-                    
-                    photo = PostPhoto.objects.filter(id=photo_id, post=post).first()
-                    if photo:
-                        photo.sort_order = index
-                        photo.save()
-            
-            # --- 新規画像追加 ---
-            for index, f in enumerate(files):
-                photo = PostPhoto(post=post)
-                # 新規追加画像の並び順は、現在の既存画像数に加算して割り振る
-                current_max_order = PostPhoto.objects.filter(post=post).count()
-                photo.sort_order = current_max_order + index
-                photo.image.save(f.name, f)
-                photo.save()
-            
-        
+            for index, image in enumerate(files):
+                PostPhoto.objects.create(
+                    post=post,
+                    image=image,
+                    sort_order=index
+                )
+
+            # 保存完了メッセージ
+            messages.success(request, message)
+
+            # 下書き一覧または投稿一覧へ移動
+            return redirect(redirect_url)
+
     else:
         form = PostForm()
-    
+
     return render(request, 'choco_palette/post/post_create.html', {
         'form': form,
         'back_url': back_url,
@@ -260,83 +269,263 @@ def like_post(request, pk):
         is_liked = True
     return JsonResponse({'status': 'success', 'is_liked': is_liked})
 
+
+
 # --- 編集処理 ---
 @login_required
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk)
+
+    # 他のユーザーの投稿は編集できないようにする
     if post.user != request.user:
         messages.error(request, '他人の投稿は編集できません。')
         return redirect('choco_palette:post_list')
 
-    back_url = request.META.get('HTTP_REFERER', reverse_lazy('choco_palette:post_list'))
-    
+    back_url = request.META.get(
+        'HTTP_REFERER',
+        reverse_lazy('choco_palette:post_list')
+    )
+
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES, instance=post)
+        form = PostForm(
+            request.POST,
+            request.FILES,
+            instance=post
+        )
+
+        # 今回新しく追加された画像を取得
         files = request.FILES.getlist('images')
-        
+
         # 枚数制限チェック
+        # 既存画像の枚数＋今回追加する画像の枚数が10枚を超えないか確認
         current_count = PostPhoto.objects.filter(post=post).count()
+
         if current_count + len(files) > 10:
-            messages.error(request, f'写真は最大10枚までです。（現在{current_count}枚登録済み）')
-            return render(request, 'choco_palette/post/post_create.html', {
-                'form': form, 'post': post, 'back_url': back_url,
-                'existing_photos': PostPhoto.objects.filter(post=post).order_by('sort_order'),
-                'all_taste_tags': TasteTag.objects.all(),
-                'all_aroma_tags': AromaTag.objects.all(),
-            })
+            messages.error(
+                request,
+                f'写真は最大10枚までです。（現在{current_count}枚登録済み）'
+            )
+
+            return render(
+                request,
+                'choco_palette/post/post_create.html',
+                {
+                    'form': form,
+                    'post': post,
+                    'back_url': back_url,
+                    'existing_photos': PostPhoto.objects.filter(
+                        post=post
+                    ).order_by('sort_order'),
+                    'all_taste_tags': TasteTag.objects.all(),
+                    'all_aroma_tags': AromaTag.objects.all(),
+                }
+            )
 
         if form.is_valid():
             updated_post = form.save(commit=False)
+
+            # 下書き保存か、通常投稿かを判定
             action = request.POST.get('action')
+
             if action == 'save':
-                updated_post.status = 0  
+                updated_post.status = 0
                 msg = '下書きを保存しました！'
                 redirect_url = 'choco_palette:draft_list'
             else:
-                updated_post.status = 1 
+                updated_post.status = 1
                 msg = '投稿しました！'
-                redirect_url = 'choco_palette:post_list' 
+                redirect_url = 'choco_palette:post_list'
 
             updated_post.save()
-            form.save_m2m()  
-            
-            # --- 並び順の更新（修正版） ---
-            photo_order_json = request.POST.get('photo_order')
-            if photo_order_json:
-                import json
-                photo_ids = json.loads(photo_order_json)
-                for index, photo_id in enumerate(photo_ids):
-                    # .update() ではなく .first() + .save() を使用して確実に保存
-                    photo = PostPhoto.objects.filter(id=photo_id, post=updated_post).first()
-                    if photo:
-                        photo.sort_order = index
-                        photo.save()
-            
-            # --- 新規画像追加 ---
-            for index, image in enumerate(files):
-                # 新規追加画像の sort_order は現在登録されている最大数から開始
-                current_max_order = PostPhoto.objects.filter(post=updated_post).count()
-                PostPhoto.objects.create(
-                    post=updated_post, 
-                    image=image, 
-                    sort_order=current_max_order + index
-                )
-            
+
+            # 味タグ・香りタグなどのManyToMany項目を保存
+            form.save_m2m()
+
+            # ----------------------------------------
+            # 画像の並び順を保存
+            # ----------------------------------------
+            #
+            # HTMLから、次のようなデータが送られます。
+            #
+            # ["existing:12", "new", "existing:15"]
+            #
+            # existing:12
+            #     すでに保存されている画像ID 12
+            #
+            # new
+            #     今回新しく追加した画像
+            #
+            # ----------------------------------------
+
+            photo_order_json = request.POST.get('photo_order', '')
+
+            try:
+                if photo_order_json:
+                    photo_order = json.loads(photo_order_json)
+                else:
+                    photo_order = []
+
+                # JSONの内容がリストでなければ、空のリストにする
+                if not isinstance(photo_order, list):
+                    photo_order = []
+
+            except json.JSONDecodeError:
+                # 並び順データを正しく読み取れなかった場合
+                photo_order = []
+
+            # この投稿に現在保存されている画像を取得
+            existing_photos = list(
+                PostPhoto.objects.filter(
+                    post=updated_post
+                ).order_by('sort_order', 'id')
+            )
+
+            # IDから既存画像を探せる辞書を作る
+            #
+            # 例：
+            # {
+            #     "12": 画像オブジェクト,
+            #     "15": 画像オブジェクト
+            # }
+            existing_photo_map = {
+                str(photo.id): photo
+                for photo in existing_photos
+            }
+
+            # 同じ既存画像を2回保存しないための記録
+            used_existing_ids = set()
+
+            # 新規画像を順番に1枚ずつ取り出すための準備
+            new_file_iterator = iter(files)
+
+            # 並び順どおりに処理する画像を入れるリスト
+            ordered_items = []
+
+            # ----------------------------------------
+            # HTMLから送られた順番を読み取る
+            # ----------------------------------------
+            for order_item in photo_order:
+
+                # 保存済み画像の場合
+                if (
+                    isinstance(order_item, str)
+                    and order_item.startswith('existing:')
+                ):
+                    photo_id = order_item.split(':', 1)[1]
+
+                    photo = existing_photo_map.get(photo_id)
+
+                    if (
+                        photo is not None
+                        and photo_id not in used_existing_ids
+                    ):
+                        ordered_items.append({
+                            'type': 'existing',
+                            'photo': photo,
+                        })
+
+                        used_existing_ids.add(photo_id)
+
+                # 新しく追加した画像の場合
+                elif order_item == 'new':
+                    try:
+                        new_file = next(new_file_iterator)
+
+                        ordered_items.append({
+                            'type': 'new',
+                            'file': new_file,
+                        })
+
+                    except StopIteration:
+                        # newの印より実際の画像枚数が少ない場合は何もしない
+                        pass
+
+            # ----------------------------------------
+            # 並び順データに入っていなかった既存画像を末尾へ追加
+            # ----------------------------------------
+            #
+            # JavaScriptの不具合などで一部の画像IDが送られなかった場合でも、
+            # 画像が勝手に消えないようにするための保険です。
+            #
+            for photo in existing_photos:
+                photo_id = str(photo.id)
+
+                if photo_id not in used_existing_ids:
+                    ordered_items.append({
+                        'type': 'existing',
+                        'photo': photo,
+                    })
+
+                    used_existing_ids.add(photo_id)
+
+            # ----------------------------------------
+            # 並び順データに入っていなかった新規画像を末尾へ追加
+            # ----------------------------------------
+            #
+            # 通常はHTML側で全てのnewが送られますが、
+            # 万が一残っていた場合は最後へ追加します。
+            #
+            for remaining_file in new_file_iterator:
+                ordered_items.append({
+                    'type': 'new',
+                    'file': remaining_file,
+                })
+
+            # ----------------------------------------
+            # sort_orderの一時変更
+            # ----------------------------------------
+            #
+            # 既存画像の順番を直接0、1、2へ変更すると、
+            # 同じsort_orderが一時的に重なる場合があります。
+            #
+            # そのため、先に100番台へ一時的に移動します。
+            #
+            for temporary_index, photo in enumerate(existing_photos):
+                photo.sort_order = 100 + temporary_index
+                photo.save(update_fields=['sort_order'])
+
+            # ----------------------------------------
+            # 画面上の順番どおりに保存
+            # ----------------------------------------
+            for sort_index, item in enumerate(ordered_items):
+
+                # 保存済み画像の順番を更新
+                if item['type'] == 'existing':
+                    photo = item['photo']
+                    photo.sort_order = sort_index
+                    photo.save(update_fields=['sort_order'])
+
+                # 新規画像を指定された位置へ保存
+                elif item['type'] == 'new':
+                    PostPhoto.objects.create(
+                        post=updated_post,
+                        image=item['file'],
+                        sort_order=sort_index
+                    )
+
             messages.success(request, msg)
             return redirect(redirect_url)
+
     else:
         form = PostForm(instance=post)
-        
-    existing_photos = PostPhoto.objects.filter(post=post).order_by('sort_order')
-        
-    return render(request, 'choco_palette/post/post_create.html', {
-        'form': form, 
-        'post': post, 
-        'existing_photos': existing_photos,
-        'back_url': back_url,
-        'all_taste_tags': TasteTag.objects.all(), 
-        'all_aroma_tags': AromaTag.objects.all(),
-    })
+
+    # 編集画面を開くときはsort_order順に画像を表示
+    existing_photos = PostPhoto.objects.filter(
+        post=post
+    ).order_by('sort_order')
+
+    return render(
+        request,
+        'choco_palette/post/post_create.html',
+        {
+            'form': form,
+            'post': post,
+            'existing_photos': existing_photos,
+            'back_url': back_url,
+            'all_taste_tags': TasteTag.objects.all(),
+            'all_aroma_tags': AromaTag.objects.all(),
+        }
+    )
 
 # --- 下書き一覧 ---
 @login_required
