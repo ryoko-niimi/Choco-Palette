@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+
 <style>
     /* 必須バッジのスタイル */
     .required-badge {
@@ -42,17 +43,7 @@
 
         {% csrf_token %}
 
-        <!--
-            画像の並び順をDjangoへ送るための非表示項目です。
-
-            登録画面の場合：
-            ["new", "new", "new"]
-
-            編集画面の場合：
-            ["existing:12", "new", "existing:15"]
-
-            のようなJSON文字列をJavaScriptで格納します。
-        -->
+    
         <input type="hidden"
                name="photo_order"
                id="photo_order"
@@ -63,10 +54,7 @@
                 写真をアップロード (最大10枚)
             </label>
 
-            <!--
-                iPhone Safari対応のため、
-                z-index:-1ではなく画面外へ移動して非表示にしています。
-            -->
+           
             <input type="file"
                    id="id_images"
                    name="images"
@@ -78,10 +66,7 @@
                           position: absolute;
                           left: -9999px;">
 
-            <!--
-                Sortable.jsで並び替える画像一覧です。
-                「写真を追加」ボタンはこの外に配置しています。
-            -->
+           
             <div id="image-preview"
                  style="display: flex; flex-wrap: wrap; gap: 10px;">
 
@@ -120,12 +105,7 @@
                 {% endfor %}
             </div>
 
-            <!--
-                iPhone Safariでは、Sortable.jsの中にこのラベルがあると
-                タップがドラッグ操作として扱われることがあります。
-
-                そのため、画像一覧の外に配置しています。
-            -->
+          
             <label for="id_images"
                    class="photo-upload-label"
                    style="margin-top: 10px;">
@@ -321,15 +301,7 @@
     const preview = document.getElementById('image-preview');
     const photoOrderInput = document.getElementById('photo_order');
 
-    /*
-        新しく選択した画像を管理するための箱です。
-
-        画像ごとに一意のキーを作り、
-
-        キー → 実際の画像ファイル
-
-        という形で保存します。
-    */
+    
     const newFileMap = new Map();
 
 
@@ -345,10 +317,7 @@
             return;
         }
 
-        /*
-            画像が10枚以上なら「写真を追加」を非表示にします。
-            10枚未満なら表示します。
-        */
+        
         uploadLabel.style.display =
             currentCount >= MAX_IMAGES ? 'none' : 'flex';
     }
@@ -359,9 +328,7 @@
     // ==========================================
 
     function createFileKey(index) {
-        /*
-            対応しているブラウザではrandomUUIDを使用します。
-        */
+        
         if (
             window.crypto &&
             typeof window.crypto.randomUUID === 'function'
@@ -369,9 +336,7 @@
             return window.crypto.randomUUID();
         }
 
-        /*
-            randomUUIDに対応していないブラウザ用の予備処理です。
-        */
+        
         return (
             Date.now().toString() +
             '-' +
@@ -389,26 +354,16 @@
     function updatePhotoOrderAndFiles() {
         const imageItems = preview.querySelectorAll('.image-item');
 
-        /*
-            Djangoへ送る画像の並び順を入れる配列です。
-        */
+       
         const photoOrder = [];
 
-        /*
-            新しく追加した画像を、
-            画面上の順番に並び直すための箱です。
-        */
+      
         const reorderedFiles = new DataTransfer();
 
         imageItems.forEach(function(item) {
             const photoType = item.dataset.photoType;
 
-            /*
-                すでにDBへ保存されている画像です。
-
-                例：
-                existing:12
-            */
+            
             if (photoType === 'existing') {
                 const photoId = item.dataset.photoId;
 
@@ -417,12 +372,7 @@
                 }
             }
 
-            /*
-                今回新しく選んだ画像です。
-
-                photo_orderには「new」と入れます。
-                実際のファイルは画面上の順番でDataTransferへ入れます。
-            */
+            
             if (photoType === 'new') {
                 const fileKey = item.dataset.fileKey;
                 const file = newFileMap.get(fileKey);
@@ -434,18 +384,10 @@
             }
         });
 
-        /*
-            画像順をJSON文字列にしてhidden inputへ入れます。
-
-            例：
-            ["existing:12","new","existing:15"]
-        */
+        
         photoOrderInput.value = JSON.stringify(photoOrder);
 
-        /*
-            新しく選んだ画像ファイルを、
-            画面上の並び順に変更します。
-        */
+        
         fileInput.files = reorderedFiles.files;
     }
 
@@ -455,27 +397,20 @@
     // ==========================================
 
     fileInput.addEventListener('change', function(event) {
-        /*
-            今回新しく選択した画像だけを取得します。
-        */
+        
         const selectedFiles = Array.from(event.target.files);
 
         const currentCount =
             preview.querySelectorAll('.image-item').length;
 
-        /*
-            既存画像＋新規画像が10枚を超える場合は追加しません。
-        */
+        
         if (currentCount + selectedFiles.length > MAX_IMAGES) {
             openCommonModal(
                 '写真は最大10枚までです！',
                 '<button class="btn btn-secondary" onclick="closeCommonModal()">閉じる</button>'
             );
 
-            /*
-                今回選択された内容をいったん解除します。
-                その後、すでに選択済みの画像を再設定します。
-            */
+           
             this.value = '';
             updatePhotoOrderAndFiles();
 
@@ -483,27 +418,18 @@
         }
 
         selectedFiles.forEach(function(file, index) {
-            /*
-                同じファイル名の画像があっても区別できるように、
-                画像ごとの一意なキーを作ります。
-            */
+            
             const fileKey = createFileKey(index);
 
-            /*
-                実際の画像ファイルをMapへ保存します。
-            */
+           
             newFileMap.set(fileKey, file);
 
-            /*
-                プレビュー用の枠を作ります。
-            */
+            
             const div = document.createElement('div');
 
             div.className = 'image-item new-image';
 
-            /*
-                JavaScriptが新規画像と判断するための情報です。
-            */
+           
             div.dataset.photoType = 'new';
             div.dataset.fileKey = fileKey;
 
@@ -512,9 +438,7 @@
             div.style.height = '80px';
             div.style.cursor = 'move';
 
-            /*
-                画像と削除ボタンを作ります。
-            */
+            
             const image = document.createElement('img');
 
             image.alt = '選択画像のプレビュー';
@@ -539,9 +463,7 @@
             removeButton.style.height = '20px';
             removeButton.style.cursor = 'pointer';
 
-            /*
-                新規画像の削除ボタンを押したときの処理です。
-            */
+            
             removeButton.addEventListener('click', function() {
                 removeNewImage(removeButton, fileKey);
             });
@@ -549,16 +471,10 @@
             div.appendChild(image);
             div.appendChild(removeButton);
 
-            /*
-                FileReaderの読み込み順に左右されないように、
-                先に枠を画面へ追加します。
-            */
+            
             preview.appendChild(div);
 
-            /*
-                画像ファイルを読み込み、
-                プレビューとして表示します。
-            */
+           
             const reader = new FileReader();
 
             reader.onload = function(loadEvent) {
@@ -568,9 +484,7 @@
             reader.readAsDataURL(file);
         });
 
-        /*
-            追加後の画面順を送信データへ反映します。
-        */
+        
         updatePhotoOrderAndFiles();
         checkImageLimit();
     });
@@ -587,14 +501,10 @@
             imageItem.remove();
         }
 
-        /*
-            送信予定のファイル一覧からも削除します。
-        */
+        
         newFileMap.delete(fileKey);
 
-        /*
-            削除後の順番とファイル一覧を作り直します。
-        */
+    
         updatePhotoOrderAndFiles();
         checkImageLimit();
     }
@@ -626,9 +536,7 @@
                     imageItem.remove();
                 }
 
-                /*
-                    削除後の並び順をhidden inputへ反映します。
-                */
+            
                 updatePhotoOrderAndFiles();
                 checkImageLimit();
             }
@@ -642,53 +550,46 @@
     // ==========================================
     // 8. 画面読み込み時の設定
     // ==========================================
-
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
 
-        /*
-            編集画面を開いた時点の既存画像順を、
-            photo_orderへ入れておきます。
-        */
-        updatePhotoOrderAndFiles();
+        // ------------------------------------------
+        // 画像並び替え（Sortable.js）の設定
+        // ------------------------------------------
+       
+        new Sortable(preview, {
+            animation: 150,
+            draggable: '.image-item',
+            onEnd: function() {
+                // 並び替えが終わるたびにデータを同期
+                updatePhotoOrderAndFiles();
+            }
+        });
 
+        // 初期状態で隠しフィールドに正しい順序を書き込む
+        updatePhotoOrderAndFiles();
 
         // ------------------------------------------
         // 写真追加ボタン
         // ------------------------------------------
-
-        const uploadLabel =
-            document.querySelector('.photo-upload-label');
-
+        const uploadLabel = document.querySelector('.photo-upload-label');
         if (uploadLabel) {
             uploadLabel.addEventListener('click', function(event) {
-                /*
-                    label本来の動作とJavaScriptのclickが
-                    二重に実行されるのを防ぎます。
-                */
                 event.preventDefault();
-
                 fileInput.click();
             });
         }
 
-
         // ------------------------------------------
         // 星評価
         // ------------------------------------------
-
         const stars = document.querySelectorAll('.star');
-
-        const rateInput =
-            document.querySelector('input[name="favorite_rate"]');
-
+        const rateInput = document.querySelector('input[name="favorite_rate"]');
+        
         function updateStars(value) {
             stars.forEach(function(star) {
-                const starValue =
-                    parseInt(star.getAttribute('data-value'));
-
-                star.textContent =
-                    starValue <= value ? '⭐' : '☆';
+                const starValue = parseInt(star.getAttribute('data-value'));
+                star.textContent = starValue <= value ? '⭐' : '☆';
             });
         }
 
@@ -698,64 +599,29 @@
 
         stars.forEach(function(star) {
             star.addEventListener('click', function() {
-                const value =
-                    this.getAttribute('data-value');
-
+                const value = this.getAttribute('data-value');
                 if (rateInput) {
                     rateInput.value = value;
                 }
-
                 updateStars(value);
             });
         });
 
-
         // ------------------------------------------
         // タグの色変更
         // ------------------------------------------
-
         document.querySelectorAll('.tag-label').forEach(function(label) {
-            const checkbox =
-                label.querySelector('input[type="checkbox"]');
-
+            const checkbox = label.querySelector('input[type="checkbox"]');
             if (!checkbox) {
                 return;
             }
-
             if (checkbox.checked) {
                 label.style.backgroundColor = '#e3d5ca';
             }
-
             label.addEventListener('click', function() {
                 checkbox.checked = !checkbox.checked;
-
-                this.style.backgroundColor =
-                    checkbox.checked
-                        ? '#e3d5ca'
-                        : 'transparent';
+                this.style.backgroundColor = checkbox.checked ? '#e3d5ca' : 'transparent';
             });
-        });
-
-
-        // ------------------------------------------
-        // 画像並び替え（Sortable.js）
-        // ------------------------------------------
-
-        new Sortable(preview, {
-            animation: 150,
-
-            /*
-                image-itemだけをドラッグ対象にします。
-            */
-            draggable: '.image-item',
-
-            /*
-                並び替えが終わったら、
-                画面上の順番を送信データへ反映します。
-            */
-            onEnd: function() {
-                updatePhotoOrderAndFiles();
-            }
         });
     });
 
@@ -767,37 +633,22 @@
     let isSubmitting = false;
 
     postForm.addEventListener('submit', function(event) {
-        /*
-            二重送信を防止します。
-        */
+       
         if (isSubmitting) {
             event.preventDefault();
             return;
         }
 
-        /*
-            投稿・下書き保存の直前に、
-            最新の画像順をhidden inputへ入れます。
-
-            同時に、新規画像ファイルも画面順に並べ直します。
-        */
+       
         updatePhotoOrderAndFiles();
 
         isSubmitting = true;
 
-        /*
-            実際に押された送信ボタンを取得します。
-        */
+        
         const submitButton = event.submitter;
 
         if (submitButton) {
-            /*
-                ボタンをすぐdisabledにすると、
-                name="action"とvalueが送信されない場合があります。
-
-                そのため、通常の送信処理が始まった直後に
-                ボタンを無効化します。
-            */
+           
             window.setTimeout(function() {
                 submitButton.disabled = true;
                 submitButton.innerText = '送信中...';

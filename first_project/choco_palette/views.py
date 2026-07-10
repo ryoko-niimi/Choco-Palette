@@ -313,8 +313,7 @@ def post_edit(request, pk):
             request.FILES,
             instance=post
         )
-
-        # 今回新しく追加された画像を取得
+    
         files = request.FILES.getlist('images')
 
         # 枚数制限チェック
@@ -336,7 +335,7 @@ def post_edit(request, pk):
                     'back_url': back_url,
                     'existing_photos': PostPhoto.objects.filter(
                         post=post
-                    ).order_by('sort_order'),
+                    ).order_by('sort_order', 'id'),
                     'all_taste_tags': TasteTag.objects.all(),
                     'all_aroma_tags': AromaTag.objects.all(),
                 }
@@ -365,18 +364,6 @@ def post_edit(request, pk):
             # ----------------------------------------
             # 画像の並び順を保存
             # ----------------------------------------
-            #
-            # HTMLから、次のようなデータが送られます。
-            #
-            # ["existing:12", "new", "existing:15"]
-            #
-            # existing:12
-            #     すでに保存されている画像ID 12
-            #
-            # new
-            #     今回新しく追加した画像
-            #
-            # ----------------------------------------
 
             photo_order_json = request.POST.get('photo_order', '')
 
@@ -401,13 +388,6 @@ def post_edit(request, pk):
                 ).order_by('sort_order', 'id')
             )
 
-            # IDから既存画像を探せる辞書を作る
-            #
-            # 例：
-            # {
-            #     "12": 画像オブジェクト,
-            #     "15": 画像オブジェクト
-            # }
             existing_photo_map = {
                 str(photo.id): photo
                 for photo in existing_photos
@@ -464,10 +444,7 @@ def post_edit(request, pk):
             # ----------------------------------------
             # 並び順データに入っていなかった既存画像を末尾へ追加
             # ----------------------------------------
-            #
-            # JavaScriptの不具合などで一部の画像IDが送られなかった場合でも、
-            # 画像が勝手に消えないようにするための保険です。
-            #
+        
             for photo in existing_photos:
                 photo_id = str(photo.id)
 
@@ -482,10 +459,7 @@ def post_edit(request, pk):
             # ----------------------------------------
             # 並び順データに入っていなかった新規画像を末尾へ追加
             # ----------------------------------------
-            #
-            # 通常はHTML側で全てのnewが送られますが、
-            # 万が一残っていた場合は最後へ追加します。
-            #
+            
             for remaining_file in new_file_iterator:
                 ordered_items.append({
                     'type': 'new',
@@ -495,12 +469,7 @@ def post_edit(request, pk):
             # ----------------------------------------
             # sort_orderの一時変更
             # ----------------------------------------
-            #
-            # 既存画像の順番を直接0、1、2へ変更すると、
-            # 同じsort_orderが一時的に重なる場合があります。
-            #
-            # そのため、先に100番台へ一時的に移動します。
-            #
+            
             for temporary_index, photo in enumerate(existing_photos):
                 photo.sort_order = 100 + temporary_index
                 photo.save(update_fields=['sort_order'])
@@ -531,9 +500,10 @@ def post_edit(request, pk):
         form = PostForm(instance=post)
 
     # 編集画面を開くときはsort_order順に画像を表示
+    # NULL値を避けるためにsort_orderが等しい場合はidでソート
     existing_photos = PostPhoto.objects.filter(
         post=post
-    ).order_by('sort_order')
+    ).order_by('sort_order', 'id')
 
     return render(
         request,
@@ -541,7 +511,7 @@ def post_edit(request, pk):
         {
             'form': form,
             'post': post,
-            'existing_photos': existing_photos,
+            'existing_photos': existing_photos, # このリストが確実に順序通りであること
             'back_url': back_url,
             'all_taste_tags': TasteTag.objects.all(),
             'all_aroma_tags': AromaTag.objects.all(),
