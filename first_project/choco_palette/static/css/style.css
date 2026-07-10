@@ -266,6 +266,7 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 .status-private { background-color: #f0f0f0; }
 
 
+
 /* =========================================================
 【モーダル共通】
 ========================================================= */
@@ -295,10 +296,10 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 /* モーダルのボタン配置エリア */
 .modal-actions {
     display: flex !important;
-    flex-direction: row !important;  /* 強制的に横並び */
+    flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 10px !important;            /* ボタン間の隙間 */
+    gap: 10px !important;
     margin-top: 20px;
     width: 100% !important;
 }
@@ -312,20 +313,18 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 
 /* モーダル用ボタンの共通レイアウト */
 .modal-btn {
+    display: flex !important;
     flex: 1 !important; 
     width: 100% !important; 
-    max-width: 100% !important; /* 共通の280px指定を無効化 */
+    max-width: 100% !important; /* ボタンの親幅に収める */
     padding: 12px 5px !important; 
     margin: 0 !important; 
     white-space: nowrap; 
-    font-size: 14px; 
-    text-align: center;
-}
-
-/* モーダル内のボタンの幅をリセット */
-.modal-content .modal-btn {
-    width: auto !important; 
-    min-width: 100px;      
+    font-size: 14px !important; 
+    text-align: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+    cursor: pointer;
 }
 
 
