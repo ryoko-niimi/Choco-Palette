@@ -119,25 +119,28 @@ def post_create(request):
                 
             post.save()
             form.save_m2m()
-            # 1. フォームから送られてきた並び順リストを取得する
+            
+            # --- 並び順の更新 ---
             photo_order_json = request.POST.get('photo_order')
             if photo_order_json:
+                import json
                 photo_ids = json.loads(photo_order_json)
-                # 送られてきた順に更新
                 for index, photo_id in enumerate(photo_ids):
-                    PostPhoto.objects.filter(id=photo_id, post=post).update(sort_order=index)
+                    
+                    photo = PostPhoto.objects.filter(id=photo_id, post=post).first()
+                    if photo:
+                        photo.sort_order = index
+                        photo.save()
             
-            # 2. 新しくアップロードされた画像を追加
+            # --- 新規画像追加 ---
             for index, f in enumerate(files):
                 photo = PostPhoto(post=post)
-                
+                # 新規追加画像の並び順は、現在の既存画像数に加算して割り振る
                 current_max_order = PostPhoto.objects.filter(post=post).count()
                 photo.sort_order = current_max_order + index
                 photo.image.save(f.name, f)
                 photo.save()
             
-            messages.success(request, message)
-            return redirect(redirect_url)
         
     else:
         form = PostForm()
