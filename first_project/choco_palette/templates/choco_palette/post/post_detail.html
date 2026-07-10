@@ -116,12 +116,15 @@
     const csrfToken = '{{ csrf_token }}'; 
     
     const confirmHtml = `
-    <form action="${deleteUrl}" method="POST" style="margin:0; flex:1;">
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-        <button type="submit" class="btn-danger modal-btn">削除する</button>
-    </form>
-    <button type="button" class="btn-secondary modal-btn" onclick="closeCommonModal()">キャンセル</button>
+        <div class="modal-actions">
+        <form action="${deleteUrl}" method="POST" style="margin:0; flex:1;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+            <button type="submit" class="btn-danger modal-btn">削除する</button>
+        </form>
+        <button type="button" class="btn-secondary modal-btn" onclick="closeCommonModal()">キャンセル</button>
+    </div>
 `;
+      
     openCommonModal('投稿を削除しますか？', confirmHtml);
 }
 
