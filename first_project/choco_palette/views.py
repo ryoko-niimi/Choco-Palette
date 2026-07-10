@@ -300,18 +300,27 @@ def post_edit(request, pk):
             updated_post.save()
             form.save_m2m()  
             
-            # --- 並び順の更新 ---
+            # --- 並び順の更新（修正版） ---
             photo_order_json = request.POST.get('photo_order')
             if photo_order_json:
                 import json
                 photo_ids = json.loads(photo_order_json)
                 for index, photo_id in enumerate(photo_ids):
-                    PostPhoto.objects.filter(id=photo_id, post=updated_post).update(sort_order=index)
+                    # .update() ではなく .first() + .save() を使用して確実に保存
+                    photo = PostPhoto.objects.filter(id=photo_id, post=updated_post).first()
+                    if photo:
+                        photo.sort_order = index
+                        photo.save()
             
             # --- 新規画像追加 ---
-            current_max_order = PostPhoto.objects.filter(post=updated_post).count()
             for index, image in enumerate(files):
-                PostPhoto.objects.create(post=updated_post, image=image, sort_order=current_max_order + index)
+                # 新規追加画像の sort_order は現在登録されている最大数から開始
+                current_max_order = PostPhoto.objects.filter(post=updated_post).count()
+                PostPhoto.objects.create(
+                    post=updated_post, 
+                    image=image, 
+                    sort_order=current_max_order + index
+                )
             
             messages.success(request, msg)
             return redirect(redirect_url)
