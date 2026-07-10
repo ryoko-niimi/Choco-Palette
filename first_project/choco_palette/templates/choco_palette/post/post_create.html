@@ -1,3 +1,5 @@
+<!--テイスティング登録・編集画面-->
+<!--テイスティング登録画面・編集画面-->
 {% extends "base.html" %}
 
 {% block header_left %}
@@ -9,6 +11,7 @@
 
 {% block content %}
 <style>
+    /* 必須バッジのスタイル */
     .required-badge {
         background-color: #ff4d4d;
         color: white;
@@ -24,91 +27,217 @@
 
     {% if not post %}
     <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px;">
-        <a href="{% url 'choco_palette:draft_list' %}" class="btn btn-draft" style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0; background-color: #7db58a; color: white;">
+        <a href="{% url 'choco_palette:draft_list' %}"
+           class="btn btn-draft"
+           style="text-decoration: none; display: inline-block; margin-left: auto; margin-right: 0; background-color: #7db58a; color: white;">
             下書き一覧
         </a>
     </div>
     {% endif %}
 
-    <form method="post" enctype="multipart/form-data" id="post-form" novalidate>
+    <form method="post"
+          enctype="multipart/form-data"
+          id="post-form"
+          novalidate>
+
         {% csrf_token %}
 
-        <input type="hidden" name="photo_order" id="photo_order" value="">
+        <!--
+            画像の並び順をDjangoへ送るための非表示項目です。
+
+            登録画面の場合：
+            ["new", "new", "new"]
+
+            編集画面の場合：
+            ["existing:12", "new", "existing:15"]
+
+            のようなJSON文字列をJavaScriptで格納します。
+        -->
+        <input type="hidden"
+               name="photo_order"
+               id="photo_order"
+               value="">
 
         <div class="form-group" style="margin: 20px 0;">
-            <label style="font-weight: bold; display: block; margin-bottom: 10px;">写真をアップロード (最大10枚)</label>
+            <label style="font-weight: bold; display: block; margin-bottom: 10px;">
+                写真をアップロード (最大10枚)
+            </label>
 
-            <input type="file" id="id_images" name="images" multiple accept="image/*"
-                style="width: 0.1px; height: 0.1px; opacity: 0; position: absolute; left:-9999px;">
+            <!--
+                iPhone Safari対応のため、
+                z-index:-1ではなく画面外へ移動して非表示にしています。
+            -->
+            <input type="file"
+                   id="id_images"
+                   name="images"
+                   multiple
+                   accept="image/*"
+                   style="width: 0.1px;
+                          height: 0.1px;
+                          opacity: 0;
+                          position: absolute;
+                          left: -9999px;">
 
-            <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <!--
+                Sortable.jsで並び替える画像一覧です。
+                「写真を追加」ボタンはこの外に配置しています。
+            -->
+            <div id="image-preview"
+                 style="display: flex; flex-wrap: wrap; gap: 10px;">
+
                 {% for photo in existing_photos %}
-                    <div class="image-item existing-image" data-id="{{ photo.id }}" style="position: relative; width: 80px; height: 80px; cursor: move;">
-                        <img src="{{ photo.image.url }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
-                        <button type="button" class="remove-btn" onclick="deleteImage(this, {{ photo.id }})" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; border: none;">×</button>
+                    <div class="image-item existing-image"
+                         data-photo-type="existing"
+                         data-photo-id="{{ photo.id }}"
+                         style="position: relative;
+                                width: 80px;
+                                height: 80px;
+                                cursor: move;">
+
+                        <img src="{{ photo.image.url }}"
+                             alt="登録済み画像"
+                             style="width: 100%;
+                                    height: 100%;
+                                    object-fit: cover;
+                                    border-radius: 5px;">
+
+                        <button type="button"
+                                class="remove-btn"
+                                onclick="deleteImage(this, {{ photo.id }})"
+                                style="position: absolute;
+                                       top: -5px;
+                                       right: -5px;
+                                       background: red;
+                                       color: white;
+                                       border-radius: 50%;
+                                       border: none;
+                                       width: 20px;
+                                       height: 20px;
+                                       cursor: pointer;">
+                            ×
+                        </button>
                     </div>
                 {% endfor %}
             </div>
 
-            <label for="id_images" class="photo-upload-label" style="margin-top: 10px;">
+            <!--
+                iPhone Safariでは、Sortable.jsの中にこのラベルがあると
+                タップがドラッグ操作として扱われることがあります。
+
+                そのため、画像一覧の外に配置しています。
+            -->
+            <label for="id_images"
+                   class="photo-upload-label"
+                   style="margin-top: 10px;">
+
                 <span class="plus-icon">+</span>
                 <span style="font-size: 10px;">写真を追加</span>
             </label>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.chocolate_name.label|safe }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.chocolate_name.label|safe }}
+            </label>
+
             {{ form.chocolate_name }}
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.chocolate_name.errors }}</div>
+
+            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">
+                {{ form.chocolate_name.errors }}
+            </div>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.brand_name.label|safe }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.brand_name.label|safe }}
+            </label>
+
             {{ form.brand_name }}
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.brand_name.errors }}</div>
+
+            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">
+                {{ form.brand_name.errors }}
+            </div>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.status.label|safe }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.status.label|safe }}
+            </label>
+
             <div style="display: flex; gap: 20px;">
                 {% for radio in form.status %}
                     {% if radio.choice_label != "下書き" %}
-                    <label style="display: flex; align-items: center; gap: 5px;">{{ radio.tag }} {{ radio.choice_label }}</label>
+                        <label style="display: flex; align-items: center; gap: 5px;">
+                            {{ radio.tag }}
+                            {{ radio.choice_label }}
+                        </label>
                     {% endif %}
                 {% endfor %}
             </div>
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.status.errors }}</div>
+
+            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">
+                {{ form.status.errors }}
+            </div>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.cacao_percentage.label|safe }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.cacao_percentage.label|safe }}
+            </label>
+
             {{ form.cacao_percentage }}
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.tasting_date.label|safe }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.tasting_date.label|safe }}
+            </label>
+
             {{ form.tasting_date }}
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.tasting_date.errors }}</div>
+
+            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">
+                {{ form.tasting_date.errors }}
+            </div>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.favorite_rate.label }}</label>
-            <div id="star-rating" style="font-size: 24px; cursor: pointer;">
+            <label style="font-weight: bold; display: block;">
+                {{ form.favorite_rate.label }}
+            </label>
+
+            <div id="star-rating"
+                 style="font-size: 24px; cursor: pointer;">
+
                 <span class="star" data-value="1">☆</span>
                 <span class="star" data-value="2">☆</span>
                 <span class="star" data-value="3">☆</span>
                 <span class="star" data-value="4">☆</span>
                 <span class="star" data-value="5">☆</span>
             </div>
+
             {{ form.favorite_rate }}
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">味</label>
+            <label style="font-weight: bold; display: block;">
+                味
+            </label>
+
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for tag in all_taste_tags %}
-                    <label class="tag-label" style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; cursor: pointer; transition: 0.3s;">
-                        <input type="checkbox" name="taste_tags" value="{{ tag.id }}" {% if post and tag in post.taste_tags.all %}checked{% endif %} style="display:none;">
+                    <label class="tag-label"
+                           style="border: 1px solid #d4c4b7;
+                                  padding: 4px 12px;
+                                  border-radius: 15px;
+                                  cursor: pointer;
+                                  transition: 0.3s;">
+
+                        <input type="checkbox"
+                               name="taste_tags"
+                               value="{{ tag.id }}"
+                               {% if post and tag in post.taste_tags.all %}checked{% endif %}
+                               style="display:none;">
+
                         {{ tag.name }}
                     </label>
                 {% endfor %}
@@ -116,11 +245,25 @@
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">香り</label>
+            <label style="font-weight: bold; display: block;">
+                香り
+            </label>
+
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for tag in all_aroma_tags %}
-                    <label class="tag-label" style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; cursor: pointer; transition: 0.3s;">
-                        <input type="checkbox" name="aroma_tags" value="{{ tag.id }}" {% if post and tag in post.aroma_tags.all %}checked{% endif %} style="display:none;">
+                    <label class="tag-label"
+                           style="border: 1px solid #d4c4b7;
+                                  padding: 4px 12px;
+                                  border-radius: 15px;
+                                  cursor: pointer;
+                                  transition: 0.3s;">
+
+                        <input type="checkbox"
+                               name="aroma_tags"
+                               value="{{ tag.id }}"
+                               {% if post and tag in post.aroma_tags.all %}checked{% endif %}
+                               style="display:none;">
+
                         {{ tag.name }}
                     </label>
                 {% endfor %}
@@ -128,21 +271,36 @@
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.tasting_comment.label }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.tasting_comment.label }}
+            </label>
+
             {{ form.tasting_comment }}
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
-            <label style="font-weight: bold; display: block;">{{ form.private_memo.label }}</label>
+            <label style="font-weight: bold; display: block;">
+                {{ form.private_memo.label }}
+            </label>
+
             {{ form.private_memo }}
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button type="submit" name="action" value="save" class="btn btn-secondary" style="flex: 1;">
+            <button type="submit"
+                    name="action"
+                    value="save"
+                    class="btn btn-secondary"
+                    style="flex: 1;">
                 下書き保存
             </button>
 
-            <button type="submit" name="action" value="publish" id="publish-btn" class="btn btn-primary" style="flex: 1;">
+            <button type="submit"
+                    name="action"
+                    value="publish"
+                    id="publish-btn"
+                    class="btn btn-primary"
+                    style="flex: 1;">
                 投稿する
             </button>
         </div>
@@ -152,141 +310,502 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
 <script>
+    // ==========================================
+    // 1. 画像関連の基本設定
+    // ==========================================
+
     const MAX_IMAGES = 10;
+
+    const postForm = document.getElementById('post-form');
     const fileInput = document.getElementById('id_images');
     const preview = document.getElementById('image-preview');
-    const fileList = new DataTransfer();
+    const photoOrderInput = document.getElementById('photo_order');
+
+    /*
+        新しく選択した画像を管理するための箱です。
+
+        画像ごとに一意のキーを作り、
+
+        キー → 実際の画像ファイル
+
+        という形で保存します。
+    */
+    const newFileMap = new Map();
+
+
+    // ==========================================
+    // 2. 画像枚数を確認する処理
+    // ==========================================
 
     function checkImageLimit() {
-        const currentCount = document.querySelectorAll('.image-item').length;
+        const currentCount = preview.querySelectorAll('.image-item').length;
         const uploadLabel = document.querySelector('.photo-upload-label');
 
-        if (uploadLabel) {
-            uploadLabel.style.display = (currentCount >= MAX_IMAGES) ? 'none' : 'flex';
+        if (!uploadLabel) {
+            return;
         }
+
+        /*
+            画像が10枚以上なら「写真を追加」を非表示にします。
+            10枚未満なら表示します。
+        */
+        uploadLabel.style.display =
+            currentCount >= MAX_IMAGES ? 'none' : 'flex';
     }
 
-    fileInput.addEventListener('change', function(e) {
-        const newFiles = Array.from(e.target.files);
-        const currentCount = document.querySelectorAll('.image-item').length;
 
-        if (currentCount + newFiles.length > MAX_IMAGES) {
+    // ==========================================
+    // 3. 新しい画像を区別するためのキーを作る処理
+    // ==========================================
+
+    function createFileKey(index) {
+        /*
+            対応しているブラウザではrandomUUIDを使用します。
+        */
+        if (
+            window.crypto &&
+            typeof window.crypto.randomUUID === 'function'
+        ) {
+            return window.crypto.randomUUID();
+        }
+
+        /*
+            randomUUIDに対応していないブラウザ用の予備処理です。
+        */
+        return (
+            Date.now().toString() +
+            '-' +
+            index.toString() +
+            '-' +
+            Math.random().toString(36).slice(2)
+        );
+    }
+
+
+    // ==========================================
+    // 4. 画面上の順番を送信データへ反映する処理
+    // ==========================================
+
+    function updatePhotoOrderAndFiles() {
+        const imageItems = preview.querySelectorAll('.image-item');
+
+        /*
+            Djangoへ送る画像の並び順を入れる配列です。
+        */
+        const photoOrder = [];
+
+        /*
+            新しく追加した画像を、
+            画面上の順番に並び直すための箱です。
+        */
+        const reorderedFiles = new DataTransfer();
+
+        imageItems.forEach(function(item) {
+            const photoType = item.dataset.photoType;
+
+            /*
+                すでにDBへ保存されている画像です。
+
+                例：
+                existing:12
+            */
+            if (photoType === 'existing') {
+                const photoId = item.dataset.photoId;
+
+                if (photoId) {
+                    photoOrder.push('existing:' + photoId);
+                }
+            }
+
+            /*
+                今回新しく選んだ画像です。
+
+                photo_orderには「new」と入れます。
+                実際のファイルは画面上の順番でDataTransferへ入れます。
+            */
+            if (photoType === 'new') {
+                const fileKey = item.dataset.fileKey;
+                const file = newFileMap.get(fileKey);
+
+                if (file) {
+                    photoOrder.push('new');
+                    reorderedFiles.items.add(file);
+                }
+            }
+        });
+
+        /*
+            画像順をJSON文字列にしてhidden inputへ入れます。
+
+            例：
+            ["existing:12","new","existing:15"]
+        */
+        photoOrderInput.value = JSON.stringify(photoOrder);
+
+        /*
+            新しく選んだ画像ファイルを、
+            画面上の並び順に変更します。
+        */
+        fileInput.files = reorderedFiles.files;
+    }
+
+
+    // ==========================================
+    // 5. 新しい画像を選択したときの処理
+    // ==========================================
+
+    fileInput.addEventListener('change', function(event) {
+        /*
+            今回新しく選択した画像だけを取得します。
+        */
+        const selectedFiles = Array.from(event.target.files);
+
+        const currentCount =
+            preview.querySelectorAll('.image-item').length;
+
+        /*
+            既存画像＋新規画像が10枚を超える場合は追加しません。
+        */
+        if (currentCount + selectedFiles.length > MAX_IMAGES) {
             openCommonModal(
                 '写真は最大10枚までです！',
                 '<button class="btn btn-secondary" onclick="closeCommonModal()">閉じる</button>'
             );
+
+            /*
+                今回選択された内容をいったん解除します。
+                その後、すでに選択済みの画像を再設定します。
+            */
             this.value = '';
+            updatePhotoOrderAndFiles();
+
             return;
         }
 
-        for (const file of newFiles) {
-            fileList.items.add(file);
-            fileInput.files = fileList.files;
+        selectedFiles.forEach(function(file, index) {
+            /*
+                同じファイル名の画像があっても区別できるように、
+                画像ごとの一意なキーを作ります。
+            */
+            const fileKey = createFileKey(index);
 
+            /*
+                実際の画像ファイルをMapへ保存します。
+            */
+            newFileMap.set(fileKey, file);
+
+            /*
+                プレビュー用の枠を作ります。
+            */
+            const div = document.createElement('div');
+
+            div.className = 'image-item new-image';
+
+            /*
+                JavaScriptが新規画像と判断するための情報です。
+            */
+            div.dataset.photoType = 'new';
+            div.dataset.fileKey = fileKey;
+
+            div.style.position = 'relative';
+            div.style.width = '80px';
+            div.style.height = '80px';
+            div.style.cursor = 'move';
+
+            /*
+                画像と削除ボタンを作ります。
+            */
+            const image = document.createElement('img');
+
+            image.alt = '選択画像のプレビュー';
+            image.style.width = '100%';
+            image.style.height = '100%';
+            image.style.objectFit = 'cover';
+            image.style.borderRadius = '5px';
+
+            const removeButton = document.createElement('button');
+
+            removeButton.type = 'button';
+            removeButton.textContent = '×';
+
+            removeButton.style.position = 'absolute';
+            removeButton.style.top = '-5px';
+            removeButton.style.right = '-5px';
+            removeButton.style.background = 'red';
+            removeButton.style.color = 'white';
+            removeButton.style.border = 'none';
+            removeButton.style.borderRadius = '50%';
+            removeButton.style.width = '20px';
+            removeButton.style.height = '20px';
+            removeButton.style.cursor = 'pointer';
+
+            /*
+                新規画像の削除ボタンを押したときの処理です。
+            */
+            removeButton.addEventListener('click', function() {
+                removeNewImage(removeButton, fileKey);
+            });
+
+            div.appendChild(image);
+            div.appendChild(removeButton);
+
+            /*
+                FileReaderの読み込み順に左右されないように、
+                先に枠を画面へ追加します。
+            */
+            preview.appendChild(div);
+
+            /*
+                画像ファイルを読み込み、
+                プレビューとして表示します。
+            */
             const reader = new FileReader();
 
-            reader.onload = function(event) {
-                const div = document.createElement('div');
-                div.className = 'image-item';
-                div.style = "position: relative; width: 80px; height: 80px; cursor: move;";
-
-                div.innerHTML = `
-                    <img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">
-                    <button type="button" onclick="removeNewImage(this, '${file.name}')" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
-                `;
-
-                preview.appendChild(div);
-                checkImageLimit();
+            reader.onload = function(loadEvent) {
+                image.src = loadEvent.target.result;
             };
 
             reader.readAsDataURL(file);
-        }
+        });
+
+        /*
+            追加後の画面順を送信データへ反映します。
+        */
+        updatePhotoOrderAndFiles();
+        checkImageLimit();
     });
 
-    function removeNewImage(btn, fileName) {
-        btn.parentElement.remove();
-        for (let i = 0; i < fileList.items.length; i++) {
-            if (fileList.items[i].getAsFile().name === fileName) {
-                fileList.items.remove(i);
-                break;
-            }
+
+    // ==========================================
+    // 6. 新しく追加した画像を削除する処理
+    // ==========================================
+
+    function removeNewImage(button, fileKey) {
+        const imageItem = button.closest('.image-item');
+
+        if (imageItem) {
+            imageItem.remove();
         }
-        fileInput.files = fileList.files;
+
+        /*
+            送信予定のファイル一覧からも削除します。
+        */
+        newFileMap.delete(fileKey);
+
+        /*
+            削除後の順番とファイル一覧を作り直します。
+        */
+        updatePhotoOrderAndFiles();
         checkImageLimit();
     }
+
+
+    // ==========================================
+    // 7. すでに登録済みの画像を削除する処理
+    // ==========================================
+
+    function deleteImage(button, photoId) {
+        fetch(`/post/photo/${photoId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('画像の削除に失敗しました。');
+            }
+
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.status === 'success') {
+                const imageItem = button.closest('.image-item');
+
+                if (imageItem) {
+                    imageItem.remove();
+                }
+
+                /*
+                    削除後の並び順をhidden inputへ反映します。
+                */
+                updatePhotoOrderAndFiles();
+                checkImageLimit();
+            }
+        })
+        .catch(function(error) {
+            console.error(error);
+        });
+    }
+
+
+    // ==========================================
+    // 8. 画面読み込み時の設定
+    // ==========================================
 
     document.addEventListener('DOMContentLoaded', function() {
         checkImageLimit();
-        const uploadLabel = document.querySelector('.photo-upload-label');
+
+        /*
+            編集画面を開いた時点の既存画像順を、
+            photo_orderへ入れておきます。
+        */
+        updatePhotoOrderAndFiles();
+
+
+        // ------------------------------------------
+        // 写真追加ボタン
+        // ------------------------------------------
+
+        const uploadLabel =
+            document.querySelector('.photo-upload-label');
+
         if (uploadLabel) {
-            uploadLabel.addEventListener('click', function(e) {
-                e.preventDefault();
+            uploadLabel.addEventListener('click', function(event) {
+                /*
+                    label本来の動作とJavaScriptのclickが
+                    二重に実行されるのを防ぎます。
+                */
+                event.preventDefault();
+
                 fileInput.click();
             });
         }
+
+
+        // ------------------------------------------
+        // 星評価
+        // ------------------------------------------
+
         const stars = document.querySelectorAll('.star');
-        const rateInput = document.querySelector('input[name="favorite_rate"]');
-        function updateStars(val) {
-            stars.forEach(s => {
-                s.textContent = parseInt(s.getAttribute('data-value')) <= val ? '⭐' : '☆';
+
+        const rateInput =
+            document.querySelector('input[name="favorite_rate"]');
+
+        function updateStars(value) {
+            stars.forEach(function(star) {
+                const starValue =
+                    parseInt(star.getAttribute('data-value'));
+
+                star.textContent =
+                    starValue <= value ? '⭐' : '☆';
             });
         }
+
         if (rateInput && rateInput.value) {
             updateStars(rateInput.value);
         }
-        stars.forEach(star => {
+
+        stars.forEach(function(star) {
             star.addEventListener('click', function() {
-                const val = this.getAttribute('data-value');
-                rateInput.value = val;
-                updateStars(val);
+                const value =
+                    this.getAttribute('data-value');
+
+                if (rateInput) {
+                    rateInput.value = value;
+                }
+
+                updateStars(value);
             });
         });
-        document.querySelectorAll('.tag-label').forEach(label => {
-            const cb = label.querySelector('input[type="checkbox"]');
-            if (cb.checked) {
+
+
+        // ------------------------------------------
+        // タグの色変更
+        // ------------------------------------------
+
+        document.querySelectorAll('.tag-label').forEach(function(label) {
+            const checkbox =
+                label.querySelector('input[type="checkbox"]');
+
+            if (!checkbox) {
+                return;
+            }
+
+            if (checkbox.checked) {
                 label.style.backgroundColor = '#e3d5ca';
             }
+
             label.addEventListener('click', function() {
-                cb.checked = !cb.checked;
-                this.style.backgroundColor = cb.checked ? '#e3d5ca' : 'transparent';
+                checkbox.checked = !checkbox.checked;
+
+                this.style.backgroundColor =
+                    checkbox.checked
+                        ? '#e3d5ca'
+                        : 'transparent';
             });
         });
+
+
+        // ------------------------------------------
+        // 画像並び替え（Sortable.js）
+        // ------------------------------------------
+
         new Sortable(preview, {
             animation: 150,
-            draggable: '.image-item'
-        });
-    });
 
-    function deleteImage(btn, photoId) {
-        fetch(`/post/photo/${photoId}/delete/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                btn.parentElement.remove();
-                checkImageLimit();
+            /*
+                image-itemだけをドラッグ対象にします。
+            */
+            draggable: '.image-item',
+
+            /*
+                並び替えが終わったら、
+                画面上の順番を送信データへ反映します。
+            */
+            onEnd: function() {
+                updatePhotoOrderAndFiles();
             }
         });
-    }
-
-    // フォーム送信時：並び順を隠しフィールドへ格納
-    document.getElementById('post-form').addEventListener('submit', function(e) {
-        const photoElements = document.querySelectorAll('.image-item');
-        const photoIds = Array.from(photoElements)
-            .map(el => el.dataset.id)
-            .filter(id => id !== undefined); 
-        document.getElementById('photo_order').value = JSON.stringify(photoIds);
     });
 
-    // 投稿ボタン制御
-    document.getElementById('publish-btn').addEventListener('click', function(event) {
-        this.disabled = true;
-        this.innerText = '送信中...';
-        this.style.opacity = '0.6';
-        this.style.cursor = 'not-allowed';
-        document.getElementById('post-form').submit();
+
+    // ==========================================
+    // 9. フォーム送信時の処理
+    // ==========================================
+
+    let isSubmitting = false;
+
+    postForm.addEventListener('submit', function(event) {
+        /*
+            二重送信を防止します。
+        */
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        /*
+            投稿・下書き保存の直前に、
+            最新の画像順をhidden inputへ入れます。
+
+            同時に、新規画像ファイルも画面順に並べ直します。
+        */
+        updatePhotoOrderAndFiles();
+
+        isSubmitting = true;
+
+        /*
+            実際に押された送信ボタンを取得します。
+        */
+        const submitButton = event.submitter;
+
+        if (submitButton) {
+            /*
+                ボタンをすぐdisabledにすると、
+                name="action"とvalueが送信されない場合があります。
+
+                そのため、通常の送信処理が始まった直後に
+                ボタンを無効化します。
+            */
+            window.setTimeout(function() {
+                submitButton.disabled = true;
+                submitButton.innerText = '送信中...';
+                submitButton.style.opacity = '0.6';
+                submitButton.style.cursor = 'not-allowed';
+            }, 0);
+        }
     });
 </script>
+
 {% endblock %}
