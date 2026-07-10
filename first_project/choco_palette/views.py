@@ -119,10 +119,21 @@ def post_create(request):
                 
             post.save()
             form.save_m2m()
+            # 1. フォームから送られてきた並び順リストを取得する
+            photo_order_json = request.POST.get('photo_order')
+            if photo_order_json:
+                photo_ids = json.loads(photo_order_json)
+                # 送られてきた順に更新
+                for index, photo_id in enumerate(photo_ids):
+                    PostPhoto.objects.filter(id=photo_id, post=post).update(sort_order=index)
             
+            # 2. 新しくアップロードされた画像を追加
             for index, f in enumerate(files):
-                photo = PostPhoto(post=post, sort_order=index)
-                photo.image.save(f.name, f) 
+                photo = PostPhoto(post=post)
+                
+                current_max_order = PostPhoto.objects.filter(post=post).count()
+                photo.sort_order = current_max_order + index
+                photo.image.save(f.name, f)
                 photo.save()
             
             messages.success(request, message)
@@ -255,22 +266,21 @@ def post_edit(request, pk):
         return redirect('choco_palette:post_list')
 
     back_url = request.META.get('HTTP_REFERER', reverse_lazy('choco_palette:post_list'))
-   
+    
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
-        
-        # --- 枚数制限チェック ---
         files = request.FILES.getlist('images')
+        
+        # 枚数制限チェック
         current_count = PostPhoto.objects.filter(post=post).count()
         if current_count + len(files) > 10:
             messages.error(request, f'写真は最大10枚までです。（現在{current_count}枚登録済み）')
-            # 編集画面へ戻す
             return render(request, 'choco_palette/post/post_create.html', {
                 'form': form, 'post': post, 'back_url': back_url,
+                'existing_photos': PostPhoto.objects.filter(post=post).order_by('sort_order'),
                 'all_taste_tags': TasteTag.objects.all(),
                 'all_aroma_tags': AromaTag.objects.all(),
             })
-    
 
         if form.is_valid():
             updated_post = form.save(commit=False)
@@ -287,6 +297,15 @@ def post_edit(request, pk):
             updated_post.save()
             form.save_m2m()  
             
+            # --- 並び順の更新 ---
+            photo_order_json = request.POST.get('photo_order')
+            if photo_order_json:
+                import json
+                photo_ids = json.loads(photo_order_json)
+                for index, photo_id in enumerate(photo_ids):
+                    PostPhoto.objects.filter(id=photo_id, post=updated_post).update(sort_order=index)
+            
+            # --- 新規画像追加 ---
             current_max_order = PostPhoto.objects.filter(post=updated_post).count()
             for index, image in enumerate(files):
                 PostPhoto.objects.create(post=updated_post, image=image, sort_order=current_max_order + index)
@@ -306,7 +325,6 @@ def post_edit(request, pk):
         'all_taste_tags': TasteTag.objects.all(), 
         'all_aroma_tags': AromaTag.objects.all(),
     })
-
 
 # --- 下書き一覧 ---
 @login_required
