@@ -322,6 +322,12 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     text-align: center;
 }
 
+/* モーダル内のボタンの幅をリセット */
+.modal-content .modal-btn {
+    width: auto !important; 
+    min-width: 100px;      
+}
+
 
 
 /* 投稿削除モーダル内の form への対策 */
