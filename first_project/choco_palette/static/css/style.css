@@ -292,6 +292,30 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     text-align: center;
 }
 
+/* モーダル用ボタンの共通レイアウト */
+.modal-btn {
+    flex: 1;
+    padding: 12px 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+
+/* モーダルのボタン配置エリア */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    width: 100%;
+}
+
 
 /* 投稿画像アップロード */
 .photo-upload-label {
