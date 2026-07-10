@@ -269,7 +269,7 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 /* =========================================================
 【モーダル共通】
 ========================================================= */
-/* 背景*/
+/* 背景 */
 #common-modal {
     display: none;
     position: fixed;
@@ -292,26 +292,37 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     text-align: center;
 }
 
-/* モーダル用ボタンの共通レイアウト */
-.modal-btn {
-    flex: 1; 
-    width: 100%; 
-    padding: 12px 5px; 
-    margin: 0 !important; 
-    white-space: nowrap; 
-    font-size: 14px; 
-}
-
 /* モーダルのボタン配置エリア */
 .modal-actions {
     display: flex !important;
     flex-direction: row !important;  /* 強制的に横並び */
-    justify-content: center;    /* 中央寄せ */
-    align-items: center;        /* 垂直中央寄せ */
-    gap: 10px;                  /* ボタン間の隙間 */
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;            /* ボタン間の隙間 */
     margin-top: 20px;
-    width: 100%;
+    width: 100% !important;
 }
+
+/* フォームをFlex要素として扱うための定義 */
+.modal-actions form {
+    display: flex !important;
+    flex: 1 !important;
+    margin: 0 !important;
+}
+
+/* モーダル用ボタンの共通レイアウト */
+.modal-btn {
+    flex: 1 !important; 
+    width: 100% !important; 
+    max-width: 100% !important; /* 共通の280px指定を無効化 */
+    padding: 12px 5px !important; 
+    margin: 0 !important; 
+    white-space: nowrap; 
+    font-size: 14px; 
+    text-align: center;
+}
+
+
 
 /* 投稿削除モーダル内の form への対策 */
 .modal-actions form {
