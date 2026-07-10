@@ -111,17 +111,19 @@
 <script>
     // 削除モーダル表示
     function openDeleteConfirm(btn) {
-        // ... (既存の削除処理は変更なし)
-        const deleteUrl = btn.getAttribute('data-delete-url');
-        const confirmHtml = `
-            <form action="${deleteUrl}" method="POST" style="margin:0;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">削除する</button>
-            </form>
-            <button type="button" class="btn btn-secondary" onclick="closeCommonModal()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">キャンセル</button>
-        `;
-        openCommonModal('投稿を削除しますか？', confirmHtml);
-    }
+    const deleteUrl = btn.getAttribute('data-delete-url');
+    
+    const csrfToken = '{{ csrf_token }}'; 
+    
+    const confirmHtml = `
+        <form action="${deleteUrl}" method="POST" style="margin:0;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+            <button type="submit" class="btn btn-danger" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">削除する</button>
+        </form>
+        <button type="button" class="btn btn-secondary" onclick="closeCommonModal()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">キャンセル</button>
+    `;
+    openCommonModal('投稿を削除しますか？', confirmHtml);
+}
 
     // お気に入りボタン処理
     document.getElementById('like-btn').addEventListener('click', function(e) {

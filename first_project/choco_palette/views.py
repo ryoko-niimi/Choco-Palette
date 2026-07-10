@@ -537,11 +537,19 @@ def draft_list(request):
 @login_required
 def post_delete(request, pk):
     if request.method == 'POST':
-        post_ids = request.POST.getlist('post_ids')
-        if post_ids:
-            Post.objects.filter(pk__in=post_ids, user=request.user).delete()
-    return redirect(request.META.get('HTTP_REFERER', 'choco_palette:post_list'))
+        
+        post = get_object_or_404(Post, pk=pk, user=request.user)
+        post.delete()
+        
+        
+        messages.success(request, '削除しました！')
+        
+        
+        return redirect('choco_palette:post_list')
     
+    
+    return redirect('choco_palette:post_detail', pk=pk)
+
 # --- 投稿画像削除処理 ---
 @login_required
 @require_POST  
