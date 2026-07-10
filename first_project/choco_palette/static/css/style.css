@@ -304,8 +304,8 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 
 /* モーダルのボタン配置エリア */
 .modal-actions {
-    display: flex;
-    flex-direction: row;        /* 強制的に横並び */
+    display: flex !important;
+    flex-direction: row !important;  /* 強制的に横並び */
     justify-content: center;    /* 中央寄せ */
     align-items: center;        /* 垂直中央寄せ */
     gap: 10px;                  /* ボタン間の隙間 */
