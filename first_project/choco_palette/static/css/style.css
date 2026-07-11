@@ -199,8 +199,8 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 .btn-primary { background-color: #7ab8cc; color: white; }/* 登録、編集、変更など*/
 .btn-danger { background-color: #e74c3c; color: white; }/* 削除、ログアウト */
 .btn-secondary { background-color: #95a5a6; color: white; }/* 戻る、キャンセル */
-.btn-draft {background-color: #7db58a;color: white;}/* 下書き */
-
+.btn-draft {background-color: #7db58a;color: white; width: 180px;max-width: 50%;}/* 下書き */
+.btn-select {width: 180px;max-width: 50%;}
 
 
 

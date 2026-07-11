@@ -26,13 +26,12 @@
 
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
 
-    {% if not post %}
-    <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px;">
+
+     {% if not post %}
+     <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
         <a href="{% url 'choco_palette:draft_list' %}"
-           class="btn-sm-custom"
-           style="text-decoration: none; background-color: #7db58a; color: white;">
-            下書き一覧
-        </a>
+            class="btn btn-draft"
+            style="margin:0; text-decoration:none;">下書き一覧</a>
     </div>
     {% endif %}
 
