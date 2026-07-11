@@ -14,7 +14,7 @@
     
     {% if page_obj %}
     <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <button type="button" id="toggle-select-btn" class="btn btn-success" style="margin: 0;">選択</button>
+        <button type="button" id="toggle-select-btn" class="btn-success btn-sm-custom" style="margin: 0;">選択</button>
     </div>
     {% endif %}
 
@@ -53,18 +53,19 @@
             <p style="text-align: center; color: #999; margin-top: 20px;">下書きはありません</p>
             {% endfor %}
         </div>
+
         {% if page_obj.has_other_pages %}
         <div class="pagination" style="text-align: center; margin: 20px 0;">
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">前へ</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">前へ</a>
             {% endif %}
             
-            <span style="margin: 0 10px; font-weight: bold;">
+            <span style="margin: 0 10px; font-weight: bold; vertical-align: middle;">
                 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
             </span>
             
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">次へ</a>
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">次へ</a>
             {% endif %}
         </div>
         {% endif %}
@@ -85,7 +86,6 @@
         } else {
             const checked = document.querySelectorAll('.select-checkbox:checked');
             if (checked.length > 0) {
-                // 共通モーダルを呼び出す
                 const confirmHtml = `
                     <div class="modal-actions">
                         <button type="button" class="btn btn-danger modal-btn" onclick="document.getElementById('delete-form').submit();">削除</button>
