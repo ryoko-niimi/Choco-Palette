@@ -142,23 +142,26 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     margin: 10px 5px !important;   /* 左右に少し隙間をあける */
 }
 
-/* 小さめのボタン設定 */
+
+/* 小さめのボタンの共通設定 */
 .btn-sm-custom {
-    padding: 8px 16px !important; /* 12px/24px から 8px/16px に減らしてコンパクトに */
-    font-size: 14px !important;    /* 少しだけ小さくして繊細に */
-    width: auto !important;
-    margin: 4px !important;        /* 余白を少し抑える */
-    display: inline-flex;          
-    justify-content: center;
-    align-items: center;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    font-weight: bold;
     border-radius: var(--btn-radius);
     border: none;
     cursor: pointer;
-    font-weight: bold;
     text-decoration: none;
-    line-height: 1.2;              /* 行の高さを揃える */
+    
+    /* ボタンの中身（文字）を中央揃えにするための設定 */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* 余計な幅やマージンをリセット */
+    width: auto !important;
+    margin: 0 !important; 
 }
-
 
 
 /* トーストの親（位置を制御） */
