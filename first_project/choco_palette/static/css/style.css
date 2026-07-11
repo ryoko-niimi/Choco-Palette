@@ -142,12 +142,12 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     margin: 10px 5px !important;   /* 左右に少し隙間をあける */
 }
 
-/* 下書き一覧　選択　右上ボタンの設定 */
+/* 小さめのボタン設定 */
 .btn-sm-custom {
-    padding: 12px 24px !important; 
-    font-size: 15px !important;    
-    width: auto !important;        
-    margin: 5px !important;        
+    padding: 8px 16px !important; /* 12px/24px から 8px/16px に減らしてコンパクトに */
+    font-size: 14px !important;    /* 少しだけ小さくして繊細に */
+    width: auto !important;
+    margin: 4px !important;        /* 余白を少し抑える */
     display: inline-flex;          
     justify-content: center;
     align-items: center;
@@ -156,6 +156,7 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+    line-height: 1.2;              /* 行の高さを揃える */
 }
 
 
