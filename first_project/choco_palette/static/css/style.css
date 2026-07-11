@@ -135,10 +135,13 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 
 /* ページネーション用ボタンの調整 */
 .pagination .btn-secondary {
-    padding: 5px 15px; /* 上下を狭く、左右は少し残す */
-    font-size: 0.85em;  /* 少し文字を小さく */
-    line-height: 1.2;
+    padding: 10px 15px !important; 
+    font-size: 0.85em !important;  
+    line-height: 1.2 !important;
+    width: auto !important;        /* 幅を自動にして小さくする */
+    margin: 10px 5px !important;   /* 左右に少し隙間をあける */
 }
+
 
 /* トーストの親（位置を制御） */
 .messages {
