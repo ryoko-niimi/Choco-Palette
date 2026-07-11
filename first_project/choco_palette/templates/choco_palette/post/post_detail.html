@@ -132,17 +132,17 @@
     document.getElementById('like-btn').addEventListener('click', function(e) {
         // Djangoのテンプレートタグを使って未ログイン時のみこの処理を実行
         {% if not user.is_authenticated %}
-            // 【未ログイン時】モーダルで案内
-            e.preventDefault(); 
-            const loginHtml = `
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                    <a href="{% url 'choco_palette:login' %}" class="btn btn-primary" style="padding:10px 20px; text-decoration:none; color:white; border-radius:8px;">ログインする</a>
-                    <button type="button" class="btn btn-secondary" onclick="closeCommonModal()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">キャンセル</button>
-                </div>
-            `;
+    // 【未ログイン時】モーダルで案内
+        e.preventDefault(); 
+        const loginHtml = `
+            <div class="modal-actions">
+                <a href="{% url 'choco_palette:login' %}" class="btn btn-primary modal-btn" style="text-decoration:none; color:white;">ログインする</a>
+                <button type="button" class="btn btn-secondary modal-btn" onclick="closeCommonModal()">キャンセル</button>
+            </div>
+        `;
 
-            openCommonModal('ログイン後に利用できます', loginHtml);
-            return; 
+        openCommonModal('ログイン後に利用できます', loginHtml);
+        return; 
         {% endif %}
 
         // 【ログイン時】お気に入り処理を実行
