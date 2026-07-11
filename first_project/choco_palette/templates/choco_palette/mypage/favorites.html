@@ -74,20 +74,9 @@
     </form>
 </div>
 
-<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
-    <div style="width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 15px; text-align: center;">
-        <p style="margin-bottom: 20px; font-weight: bold;">お気に入りから解除しますか？</p>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button type="button" class="btn btn-danger" id="confirm-delete">解除</button>
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('delete-modal').style.display='none';">キャンセル</button>
-        </div>
-    </div>
-</div>
-
 <script>
     const toggleBtn = document.getElementById('toggle-select-btn');
     const checkboxes = document.querySelectorAll('.select-checkbox');
-    const deleteModal = document.getElementById('delete-modal');
 
     toggleBtn.addEventListener('click', () => {
         const isSelecting = checkboxes[0]?.style.display === 'block';
@@ -99,17 +88,20 @@
         } else {
             const checked = document.querySelectorAll('.select-checkbox:checked');
             if (checked.length > 0) {
-                deleteModal.style.display = 'flex';
+                // 共通モーダルを呼び出す
+                const confirmHtml = `
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-danger modal-btn" onclick="document.getElementById('delete-form').submit();">解除</button>
+                        <button type="button" class="btn btn-secondary modal-btn" onclick="closeCommonModal()">キャンセル</button>
+                    </div>
+                `;
+                openCommonModal('お気に入りから解除しますか？', confirmHtml);
             } else {
                 checkboxes.forEach(cb => cb.style.display = 'none');
                 toggleBtn.textContent = '選択';
                 toggleBtn.classList.replace('btn-danger', 'btn-success');
             }
         }
-    });
-
-    document.getElementById('confirm-delete').addEventListener('click', () => {
-        document.getElementById('delete-form').submit();
     });
 </script>
 {% endblock %}

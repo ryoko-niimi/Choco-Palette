@@ -19,34 +19,31 @@
         {% if user.profile.link %}
             <p><a href="{{ user.profile.link }}" target="_blank" style="color: #4a2c2a; text-decoration: underline;">{{ user.profile.link }}</a></p>
         {% endif %}
-        
     </div>
 
-    
     <div class="mypage-buttons" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-    <a href="{% url 'choco_palette:profile_edit' %}" class="btn btn-primary">プロフィール編集</a>
-    <a href="{% url 'choco_palette:favorites_list' %}" class="btn btn-primary">❤ お気に入り一覧</a>
-    <a href="{% url 'choco_palette:email_change' %}" class="btn btn-primary">メールアドレス変更</a>
-    <a href="{% url 'choco_palette:password_change' %}" class="btn btn-primary">パスワード変更</a>
-    
-    <button type="button" class="btn btn-danger"
-        data-logout-url="{% url 'choco_palette:logout' %}" 
-        onclick="openLogoutConfirm(this)">
-        ログアウトする
-    </button>
+        <a href="{% url 'choco_palette:profile_edit' %}" class="btn btn-primary">プロフィール編集</a>
+        <a href="{% url 'choco_palette:favorites_list' %}" class="btn btn-primary">❤ お気に入り一覧</a>
+        <a href="{% url 'choco_palette:email_change' %}" class="btn btn-primary">メールアドレス変更</a>
+        <a href="{% url 'choco_palette:password_change' %}" class="btn btn-primary">パスワード変更</a>
+        
+        <button type="button" class="btn btn-danger"
+            data-logout-url="{% url 'choco_palette:logout' %}" 
+            onclick="openLogoutConfirm(this)">
+            ログアウトする
+        </button>
+    </div>
 </div>
-
 
 <script>
     function openLogoutConfirm(btn) {
-        
         const logoutUrl = btn.getAttribute('data-logout-url');
         
         const confirmHtml = `
             <div class="modal-actions">
-                <a href="${logoutUrl}" class="btn btn-danger" style="text-decoration:none; color:white; padding:12px 24px; border-radius:8px;">ログアウト</a>
-                <button type="button" class="btn btn-secondary" onclick="closeCommonModal()">キャンセル</button>
-                </div>
+                <a href="${logoutUrl}" class="btn btn-danger modal-btn" style="text-decoration:none;">ログアウト</a>
+                <button type="button" class="btn btn-secondary modal-btn" onclick="closeCommonModal()">キャンセル</button>
+            </div>
         `;
         openCommonModal('ログアウトしますか？', confirmHtml);
     }
