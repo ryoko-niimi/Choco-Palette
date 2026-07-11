@@ -35,7 +35,7 @@
         <form id="delete-form" method="POST" action="{% url 'choco_palette:user_profile' target_user.pk %}">
             {% csrf_token %}
 
-            {% if page_obj %}
+            {% if request.user == target_user and page_obj %}
             <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
                 <button type="button" id="toggle-select-btn" class="btn btn-success btn-select" style="margin: 0;">選択</button>
             </div>
