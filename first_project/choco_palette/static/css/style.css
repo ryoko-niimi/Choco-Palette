@@ -133,6 +133,13 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     max-width: 90%;
 }
 
+/* ページネーション用ボタンの調整 */
+.pagination .btn-secondary {
+    padding: 5px 15px; /* 上下を狭く、左右は少し残す */
+    font-size: 0.85em;  /* 少し文字を小さく */
+    line-height: 1.2;
+}
+
 /* トーストの親（位置を制御） */
 .messages {
     position: fixed;
