@@ -36,7 +36,6 @@
     </button>
 </div>
 
-    
 
 <script>
     function openLogoutConfirm(btn) {
@@ -44,10 +43,11 @@
         const logoutUrl = btn.getAttribute('data-logout-url');
         
         const confirmHtml = `
-            <a href="${logoutUrl}" class="btn btn-danger" style="text-decoration:none; color:white; padding:12px 24px; border-radius:8px;">ログアウト</a>
-            <button type="button" class="btn btn-secondary" onclick="closeCommonModal()">キャンセル</button>
+            <div class="modal-actions">
+                <a href="${logoutUrl}" class="btn btn-danger" style="text-decoration:none; color:white; padding:12px 24px; border-radius:8px;">ログアウト</a>
+                <button type="button" class="btn btn-secondary" onclick="closeCommonModal()">キャンセル</button>
+                </div>
         `;
-        
         openCommonModal('ログアウトしますか？', confirmHtml);
     }
 </script>
