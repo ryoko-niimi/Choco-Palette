@@ -107,9 +107,13 @@ DEFAULT_FROM_EMAIL = os.getenv('EMAIL_USER')
 SERVER_EMAIL = os.getenv('EMAIL_USER')
 
 
+
 #ログイン後の遷移先
 LOGIN_REDIRECT_URL = 'choco_palette:post_list'
 #未ログイン時に促す遷移先はログイン画面
 LOGIN_URL = 'choco_palette:login'
 
-
+# --- 設定読み込み確認用コード ---
+import os
+print(f"DEBUG_CHECK: EMAIL_USER is {os.getenv('EMAIL_USER')}")
+# ------------------------------
