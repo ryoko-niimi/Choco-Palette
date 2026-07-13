@@ -193,7 +193,7 @@ class ProfileForm(forms.ModelForm):
         self.fields['link'].widget.attrs.update({'style': 'height: 40px;'})
         self.fields['link'].widget.attrs.update({
             'style': 'height: 40px;',
-            'placeholder': 'SNSやブログのURLを入力してください'
+            'placeholder': 'SNSなどのURLを入力してください'
         })
         
 
