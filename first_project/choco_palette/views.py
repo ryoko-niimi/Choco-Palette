@@ -353,7 +353,8 @@ def post_edit(request, pk):
                 msg = '下書きを保存しました！'
                 redirect_url = 'choco_palette:draft_list'
             else:
-                updated_post.status = 1
+                
+                updated_post.status = form.cleaned_data.get('status', 1)
                 msg = '投稿しました！'
                 redirect_url = 'choco_palette:post_list'
 
