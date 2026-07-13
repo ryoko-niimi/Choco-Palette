@@ -122,11 +122,12 @@ def post_create(request):
             action = request.POST.get('action')
 
             if action == 'save':
-                post.status = 0
+                post.status = 0 # 下書き
                 message = '下書きを保存しました！'
                 redirect_url = 'choco_palette:draft_list'
             else:
-                post.status = 1
+                # フォームで選択されたstatusをそのまま使う
+                post.status = form.cleaned_data.get('status', 1) 
                 message = '投稿完了しました！'
                 redirect_url = 'choco_palette:post_list'
 
