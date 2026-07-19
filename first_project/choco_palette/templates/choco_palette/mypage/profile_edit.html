@@ -9,7 +9,7 @@
 {% block content %}
 <div class="card">
     
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" id="profile-form" enctype="multipart/form-data">
         {% csrf_token %}
         
     <div style="text-align: center; margin-bottom: 20px;">
@@ -41,7 +41,7 @@
             {{ form.link }}
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width:100%;">編集する</button>
+        <button type="submit" class="btn btn-primary" style="width:100%;">登録内容を変更する</button>
     </form>
 </div>
 
@@ -59,7 +59,29 @@
                 reader.readAsDataURL(this.files[0]);
             }
         });
+        
+    const profileForm = document.getElementById('profile-form');
+        let isSubmitting = false;
+
+        profileForm.addEventListener('submit', function(event) {
+            if (isSubmitting) {
+                event.preventDefault(); 
+                return;
+            }
+
+            isSubmitting = true; 
+
+            const submitButton = event.submitter; 
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerText = '送信中...';
+                submitButton.style.opacity = '0.6';
+                submitButton.style.cursor = 'not-allowed';
+            }
+        });
     });
+
+
 </script>
 
 {% endblock %}

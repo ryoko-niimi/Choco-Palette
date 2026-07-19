@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <form method="post">
+    <form method="post" id="email-form">
         {% csrf_token %}
         <div class="email-input-group" style="text-align: left; margin-bottom: 20px;">
             <label style="font-weight: bold; margin-bottom: 10px; display: block;">{{ form.email.label }}</label>
@@ -26,4 +26,28 @@
         <button type="submit" class="btn btn-primary" style="width:100%;">変更する</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailForm = document.getElementById('email-form');
+        let isSubmitting = false;
+
+        emailForm.addEventListener('submit', function(event) {
+            if (isSubmitting) {
+                event.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+
+            const submitButton = event.submitter;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerText = '送信中...';
+                submitButton.style.opacity = '0.6';
+                submitButton.style.cursor = 'not-allowed';
+            }
+        });
+    });
+</script>
 {% endblock %}
