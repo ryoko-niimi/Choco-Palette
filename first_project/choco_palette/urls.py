@@ -16,13 +16,11 @@ urlpatterns = [
     path('login/', views.login_view, name='login'), 
     path('signup/', views.signup_view, name='signup'),
     
-    
     # パスワードの再設定画面
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(
              template_name='choco_palette/auth/password_reset.html',
              email_template_name='choco_palette/auth/password_reset_email.html', 
-             subject='【Choco Palette】パスワード再設定のご案内', 
              success_url='/password_reset/done/'
          ), 
          name='password_reset'),
