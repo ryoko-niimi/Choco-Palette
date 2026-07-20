@@ -194,7 +194,6 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 
 
 
-
 /* ボタンの種類ごとの色設定 */
 .btn-primary { background-color: #7ab8cc; color: white; }/* 登録、編集、変更など*/
 .btn-danger { background-color: #e74c3c; color: white; }/* 削除、ログアウト */
@@ -212,8 +211,9 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     overflow-wrap: break-word;
     width: 100%;
     box-sizing: border-box;
+    }
 
-    
+
 
 
 /* =========================================================

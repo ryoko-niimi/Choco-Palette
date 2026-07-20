@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
         
@@ -131,6 +132,16 @@ class PostForm(forms.ModelForm):
         self.fields['brand_name'].error_messages['required'] = 'ブランド名を入力してください'
         self.fields['status'].error_messages['required'] = '公開・非公開を選択してください'
         self.fields['tasting_date'].error_messages['required'] = 'テイスティング日を選択してください'
+        
+        # 7. 日付を取得して未来の日付は選択できなくする
+        today_str = timezone.localdate().strftime('%Y-%m-%d')
+        self.fields['tasting_date'].widget.attrs['max'] = today_str
+        
+    def clean_tasting_date(self):
+        tasting_date = self.cleaned_data.get('tasting_date')
+        if tasting_date and tasting_date > timezone.localdate():
+            raise forms.ValidationError('未来の日付は選択できません。')
+        return tasting_date
 
        
 

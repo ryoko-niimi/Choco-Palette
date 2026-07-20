@@ -20,15 +20,14 @@
 
         <div style="text-align: center; margin-bottom: 20px;">
             <img id="profile-preview" class="profile-icon" src="{% static 'images/default-avatar.png' %}">
-    
         </div>
             
-            <div class="upload-link" style="text-decoration: underline;">
-                <label for="id_image" style="cursor: pointer;">
-                    <div style="margin-top: 20px;">画像をアップロード</div>
-                </label>
-                <input type="file" name="image" id="id_image" style="display: none;">
-            </div>
+        <div class="upload-link" style="text-decoration: underline;">
+            <label for="id_image" style="cursor: pointer;">
+                <div style="margin-top: 20px;">画像をアップロード</div>
+            </label>
+            <input type="file" name="image" id="id_image" style="display: none;">
+        </div>
 
         <div class="form-group">
             <label>{{ form.username.label }}</label>
@@ -99,7 +98,6 @@
                 submitButton.style.cursor = 'not-allowed';
             }
         });
-
     });
 </script>
 {% endblock %}

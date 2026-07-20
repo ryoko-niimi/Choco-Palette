@@ -30,7 +30,11 @@
                     {% if first_photo %}
                         <img src="{{ first_photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px; flex-shrink: 0;">
                     {% else %}
-                        <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0;"></div>
+                    
+                        <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #888; text-align: center;">
+                            <span style="font-size: 20px; line-height: 1;">📷</span>
+                            <span style="margin-top: 5px;">No Image</span>
+                        </div>
                     {% endif %}
                 {% endwith %}
                 

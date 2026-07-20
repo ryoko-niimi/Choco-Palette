@@ -26,12 +26,19 @@
 
     {% with sorted_photos=post.photos.all|dictsort:"sort_order" %}
     <div style="width: 100%; max-width: 400px; margin: 0 auto 10px;">
-        <div id="main-image-container" style="height: 300px; overflow: hidden; background: #eee; border-radius: 8px;">
+        <div id="main-image-container" style="height: 300px; overflow: hidden; background: #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
             {% if sorted_photos %}
                 <img id="main-display" src="{{ sorted_photos.0.image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+                <!-- ▼ 画像がない場合に表示する「画像なし」の文字やアイコン -->
+                <div style="color: #888; font-size: 16px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 5px;">📷</div>
+                    <span>No Image</span>
+                </div>
             {% endif %}
         </div>
         
+        {% if sorted_photos %}
         <div style="display: flex; gap: 5px; margin-top: 10px; overflow-x: auto;">
             {% for photo in sorted_photos %}
                 <img src="{{ photo.image.url }}" 
@@ -39,6 +46,7 @@
                      style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ccc;">
             {% endfor %}
         </div>
+        {% endif %}
     </div>
     {% endwith %}
     

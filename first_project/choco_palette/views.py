@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.core.paginator import Paginator
-# --- Django標準ライブラリ ---
 from django.views.decorators.http import require_POST
 # --- 認証関連 ---
 from django.contrib.auth import authenticate, login, logout 
@@ -13,6 +12,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.contrib.auth.models import User 
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import login, authenticate
+from django.conf import settings
 from .forms import MyPasswordChangeForm
 
 # --- 投稿 ---
@@ -61,9 +62,15 @@ def signup_view(request):
             user.save()
             
             image = request.FILES.get('image')
-            Profile.objects.create(user=user, nickname=user.username,image=image)
+            Profile.objects.create(user=user, nickname=user.username, image=image)
             
-            return redirect('choco_palette:login')
+            backend_path = settings.AUTHENTICATION_BACKENDS[0]
+            login(request, user, backend=backend_path)
+            
+            messages.success(request, 'アカウント登録が完了しました！')
+            
+            # ホーム画面へ遷移させる
+            return redirect('choco_palette:post_list')
             
     else:
         form = SignupForm()
@@ -501,8 +508,7 @@ def post_edit(request, pk):
     else:
         form = PostForm(instance=post)
 
-    # 編集画面を開くときはsort_order順に画像を表示
-    # NULL値を避けるためにsort_orderが等しい場合はidでソート
+    
     existing_photos = PostPhoto.objects.filter(
         post=post
     ).order_by('sort_order', 'id')

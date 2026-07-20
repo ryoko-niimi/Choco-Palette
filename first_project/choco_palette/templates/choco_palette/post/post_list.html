@@ -27,7 +27,10 @@
                 {% if post.photos.all %}
                     <img src="{{ post.photos.all.0.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
                 {% else %}
-                    <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px;"></div>
+                    <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #888; text-align: center;">
+                        <span style="font-size: 20px; line-height: 1;">📷</span>
+                        <span style="margin-top: 5px;">No Image</span>
+                    </div>
                 {% endif %}
                 
                 
