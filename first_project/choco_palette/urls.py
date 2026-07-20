@@ -20,6 +20,7 @@ urlpatterns = [
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(
              template_name='choco_palette/auth/password_reset.html',
+             subject_template_name='choco_palette/auth/password_reset_subject.txt',
              email_template_name='choco_palette/auth/password_reset_email.html', 
              success_url='/password_reset/done/'
          ), 
