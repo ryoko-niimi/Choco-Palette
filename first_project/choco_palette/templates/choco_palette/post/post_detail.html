@@ -51,14 +51,7 @@
     <div style="line-height: 1.8;">
         <h2 style="margin: 5px 0;">{{ post.chocolate_name }}</h2>
         <p style="margin: 0;"><strong>ブランド:</strong> {{ post.brand_name }}</p>
-        <p style="margin: 0;">
-            <strong>カカオ:</strong> 
-            {% if post.cacao_percentage %}
-                {{ post.cacao_percentage }}%
-            {% else %}
-                不明
-            {% endif %}
-        </p>
+        <p style="margin: 0;">{% if post.cacao_percentage %}<strong>カカオ:</strong> {{ post.cacao_percentage }}%{% endif %}</p>
         <p style="margin: 0;"><strong>日付:</strong> {{ post.created_at|date:"Y/m/d" }}</p>
         <p style="margin: 10px 0;">
             <strong>お気に入り度:</strong> 
@@ -69,6 +62,8 @@
             </span>
         </p>
 
+        
+    {% if post.taste_tags.exists %}
         <p style="margin: 10px 0 5px 0;"><strong>味</strong></p>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             {% for tag in post.taste_tags.all %}
@@ -77,23 +72,31 @@
                 </span>
             {% endfor %}
         </div>
+    {% endif %}
 
+
+    {% if post.aroma_tags.exists %}
         <p style="margin: 15px 0 5px 0;"><strong>香り</strong></p>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-            {% for tag in post.aroma_tags.all %}
-                <span style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; color: #5a4a3f; background-color: #fdfaf8;">
-                    {{ tag.name }}
-                </span>
-            {% endfor %}
-        </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                {% for tag in post.aroma_tags.all %}
+                    <span style="border: 1px solid #d4c4b7; padding: 4px 12px; border-radius: 15px; color: #5a4a3f; background-color: #fdfaf8;">
+                        {{ tag.name }}
+                    </span>
+                {% endfor %}
+            </div>
+    {% endif %}
 
-        <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>
-        <p style="background-color: #fdf6f0; padding: 10px; border-radius: 5px; border: 1px solid #e3d5ca; white-space: pre-wrap;">{{ post.tasting_comment }}</p>
         
-        {% if is_owner and post.private_memo %}
+    {% if post.tasting_comment %}
+        <p style="margin: 15px 0 5px 0; font-weight: bold;">テイスティングコメント</p>
+        <p style="background-color: #fdf6f0;padding: 10px;border-radius: 5px;border: 1px solid #e3d5ca;white-space: pre-wrap;overflow-wrap: break-word;">{{ post.tasting_comment }}</p>
+    {% endif %}
+
+    {% if is_owner and post.private_memo %}
             <div class="private-memo-section">
                 <p style="margin: 15px 0 5px 0; font-weight: bold; color: #555;">非公開メモ</p>
-                <p style="padding: 10px; border-radius: 5px; border: 1px dashed #ccc; color: #777; white-space: pre-wrap;">{{ post.private_memo }}</p>
+                <p style="padding: 10px;border-radius: 5px;border: 1px dashed #ccc;color: #777;white-space: pre-wrap;overflow-wrap: break-word;">{{ post.private_memo }}</p>
+                 
             </div>
         {% endif %}
     </div>

@@ -7,7 +7,7 @@
 <div class="card">
     <h2 style="margin-bottom: 25px;">新規アカウント登録</h2>
     
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" id="signup-form" enctype="multipart/form-data">
         {% csrf_token %}
         
         {% if form.non_field_errors %}
@@ -55,7 +55,7 @@
             <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.password_confirm.errors }}</div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin: 20px 0;">登録</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin: 20px 0;">登録する</button>
 
         <div style="margin-top: 20px;">
             <a href="{% url 'choco_palette:login' %}" class="upload-link" style="text-decoration: underline;">
@@ -79,6 +79,27 @@
                 reader.readAsDataURL(this.files[0]);
             }
         });
+
+        const signupForm = document.getElementById('signup-form');
+        let isSubmitting = false;
+
+        signupForm.addEventListener('submit', function(event) {
+            if (isSubmitting) {
+                event.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+
+            const submitButton = event.submitter;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerText = '送信中...';
+                submitButton.style.opacity = '0.6';
+                submitButton.style.cursor = 'not-allowed';
+            }
+        });
+
     });
 </script>
 {% endblock %}

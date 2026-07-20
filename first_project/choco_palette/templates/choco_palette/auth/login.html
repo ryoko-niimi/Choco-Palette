@@ -8,7 +8,7 @@
         <p style="color: red; font-size: 14px;">メールアドレスまたはパスワードが正しくありません。</p>
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" id="login-form">
         {% csrf_token %}
         
         <div class="form-group">
@@ -34,4 +34,28 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('login-form');
+        let isSubmitting = false;
+
+        loginForm.addEventListener('submit', function(event) {
+            if (isSubmitting) {
+                event.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+
+            const submitButton = event.submitter;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerText = '送信中...';
+                submitButton.style.opacity = '0.6';
+                submitButton.style.cursor = 'not-allowed';
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -138,11 +138,13 @@
             </div>
         </div>
 
+       
         <div class="form-group" style="margin-bottom: 20px;">
             <label style="font-weight: bold; display: block;">
                 {{ form.status.label|safe }}
             </label>
-
+              
+        
             <div style="display: flex; gap: 20px;">
                 {% for radio in form.status %}
                     {% if radio.choice_label != "下書き" %}

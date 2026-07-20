@@ -203,6 +203,18 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
 .btn-select {width: 180px;max-width: 50%;}
 
 
+/* 白いカード内長文折り返し */
+.form-group input, 
+.form-group textarea,
+#id_link {
+    word-break: break-all;
+    white-space: normal;
+    overflow-wrap: break-word;
+    width: 100%;
+    box-sizing: border-box;
+
+    
+
 
 /* =========================================================
 【ヘッダー・フッター】
