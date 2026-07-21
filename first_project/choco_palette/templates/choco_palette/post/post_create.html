@@ -1,5 +1,4 @@
 <!--テイスティング登録・編集画面-->
-
 {% extends "base.html" %}
 
 {% block header_left %}
@@ -104,7 +103,7 @@
                 {% endfor %}
             </div>
 
-          
+         
             <label for="id_images"
                    class="photo-upload-label"
                    style="margin-top: 10px;">
@@ -287,6 +286,7 @@
         </div>
     </form>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
@@ -658,6 +658,26 @@
             }, 0);
         }
     });
+
+    
+    // ==========================================
+    // 10. カレンダー未来の日付は選択不可
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", function() {
+        const tastingDateInput = document.querySelector('input[name="tasting_date"]');
+        if (tastingDateInput) {
+            // 今日の日付を YYYY-MM-DD 形式で取得
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayString = `${yyyy}-${mm}-${dd}`;
+            
+            // max属性に今日の値をセット
+            tastingDateInput.setAttribute('max', todayString);
+        }
+    });
+
 </script>
 
 {% endblock %}
