@@ -9,7 +9,8 @@
 
 {% block content %}
 <div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
-    <form method="GET" action="{% url 'choco_palette:post_list' %}">
+    <!-- 登録画面と同じように id="search-form" を付与 -->
+    <form method="GET" action="{% url 'choco_palette:post_list' %}" id="search-form">
         
         <div class="form-group">
             <label>キーワード</label>
@@ -37,14 +38,6 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label>テイスティング日</label>
-            <div style="display: flex; gap: 5px; align-items: center;">
-                <input type="date" name="start_date" value="{{ request.GET.start_date|default:'' }}"  class="form-control">
-                <span>～</span>
-                <input type="date" name="end_date" value="{{ request.GET.end_date|default:'' }}" class="form-control">
-            </div>
-        </div>
 
         <div class="form-group">
             <label>テイスティング日</label>
@@ -54,7 +47,7 @@
                        name="start_date"
                        id="start-date"
                        value="{{ request.GET.start_date|default:'' }}"
-                    class="form-control">
+                       class="form-control">
 
                 <span>～</span>
 
@@ -121,14 +114,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const endDateInput = document.getElementById('end-date');
     const errorMessage = document.getElementById('search-date-error');
 
-    
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const todayString = `${yyyy}-${mm}-${dd}`;
 
-    
     if (startDateInput) {
         startDateInput.max = todayString;
     }
@@ -163,9 +154,35 @@ document.addEventListener('DOMContentLoaded', function () {
             checkDate(this);
         });
     }
+
+    // --- 新規登録画面を参考にした二重送信防止・ボタン制御 ---
+    const searchForm = document.getElementById('search-form');
+    let isSubmitting = false;
+
+    if (searchForm) {
+        searchForm.addEventListener('submit', function (event) {
+            // 未来日エラーが残っている場合は検索をストップ
+            if ((startDateInput && !checkDate(startDateInput)) || (endDateInput && !checkDate(endDateInput))) {
+                event.preventDefault();
+                return;
+            }
+
+            if (isSubmitting) {
+                event.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+
+            const submitButton = event.submitter;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerText = '検索中...';
+                submitButton.style.opacity = '0.6';
+                submitButton.style.cursor = 'not-allowed';
+            }
+        });
+    }
 });
 </script>
-
-
-
 {% endblock %}
