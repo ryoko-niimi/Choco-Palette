@@ -175,8 +175,12 @@
 
             {{ form.tasting_date }}
 
+            <div id="tasting-date-js-error"
+                style="color: red; font-size: 0.8rem; margin-top: 5px;">
+            </div>
+
             <div style="color: red; font-size: 0.8rem; margin-top: 5px;">
-                {{ form.tasting_date.errors }}
+            {{ form.tasting_date.errors }}
             </div>
         </div>
 
@@ -662,22 +666,46 @@
     
     // ==========================================
     // 10. カレンダー未来の日付は選択不可
-    // ==========================================
-    document.addEventListener("DOMContentLoaded", function() {
-        const tastingDateInput = document.querySelector('input[name="tasting_date"]');
-        if (tastingDateInput) {
-            // 今日の日付を YYYY-MM-DD 形式で取得
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const todayString = `${yyyy}-${mm}-${dd}`;
-            
-            // max属性に今日の値をセット
-            tastingDateInput.setAttribute('max', todayString);
+   // ==========================================
+    document.addEventListener("DOMContentLoaded", function () {
+        const tastingDateInput =
+            document.querySelector('input[name="tasting_date"]');
+
+        const errorMessage =
+            document.getElementById('tasting-date-js-error');
+
+        if (!tastingDateInput) {
+        return;
+        }
+
+    // 今日の日付を YYYY-MM-DD 形式で作成
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayString = `${yyyy}-${mm}-${dd}`;
+
+    // ブラウザに「今日まで」と伝える
+        tastingDateInput.max = todayString;
+
+    // 日付が選択された直後に確認
+        tastingDateInput.addEventListener('change', function () {
+            if (this.value && this.value > todayString) {
+                this.value = '';
+
+            if (errorMessage) {
+                errorMessage.textContent =
+                    '未来の日付は選択できません。';
+            }
+
+            this.focus();
+        } else {
+            if (errorMessage) {
+                errorMessage.textContent = '';
+            }
         }
     });
-
+});
 </script>
 
 {% endblock %}
