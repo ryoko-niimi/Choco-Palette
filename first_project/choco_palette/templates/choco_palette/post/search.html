@@ -40,9 +40,33 @@
         <div class="form-group">
             <label>テイスティング日</label>
             <div style="display: flex; gap: 5px; align-items: center;">
-                <input type="date" name="start_date" value="{{ request.GET.start_date|default:'' }}" max="2026-07-20" class="form-control">
+                <input type="date" name="start_date" value="{{ request.GET.start_date|default:'' }}"  class="form-control">
                 <span>～</span>
-                <input type="date" name="end_date" value="{{ request.GET.end_date|default:'' }}" max="2026-07-20" class="form-control">
+                <input type="date" name="end_date" value="{{ request.GET.end_date|default:'' }}" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>テイスティング日</label>
+
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <input type="date"
+                       name="start_date"
+                       id="start-date"
+                       value="{{ request.GET.start_date|default:'' }}"
+                    class="form-control">
+
+                <span>～</span>
+
+                <input type="date"
+                       name="end_date"
+                       id="end-date"
+                       value="{{ request.GET.end_date|default:'' }}"
+                       class="form-control">
+            </div>
+
+            <div id="search-date-error"
+                style="color: red; font-size: 0.8rem; margin-top: 5px;">
             </div>
         </div>
 
@@ -89,5 +113,59 @@
         <button type="submit" class="btn btn-primary" style="width: 100%;">検索</button>
     </form>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    const errorMessage = document.getElementById('search-date-error');
+
+    
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayString = `${yyyy}-${mm}-${dd}`;
+
+    
+    if (startDateInput) {
+        startDateInput.max = todayString;
+    }
+
+    if (endDateInput) {
+        endDateInput.max = todayString;
+    }
+
+    function checkDate(input) {
+        if (input.value && input.value > todayString) {
+            input.value = '';
+
+            errorMessage.textContent =
+                '・未来の日付は選択できません。';
+
+            input.focus();
+            return false;
+        }
+
+        errorMessage.textContent = '';
+        return true;
+    }
+
+    if (startDateInput) {
+        startDateInput.addEventListener('change', function () {
+            checkDate(this);
+        });
+    }
+
+    if (endDateInput) {
+        endDateInput.addEventListener('change', function () {
+            checkDate(this);
+        });
+    }
+});
+</script>
+
+
 
 {% endblock %}
