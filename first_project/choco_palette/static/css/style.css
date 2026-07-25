@@ -233,32 +233,44 @@ input[type="date"] {
 .btn-select {width: 180px;max-width: 50%;}
 
 
-/* 白いカード内長文折り返し */
-.card {
-    word-break: break-all;
-    overflow-wrap: anywhere;
-    min-width: 0; /* Flexbox等で内側の要素がはみ出るのを防ぐ */
-    box-sizing: border-box;
-}
-
-.card p,
-.card a,
-.card span,
-.card input,
-.card textarea,
-.form-group input, 
-.form-group textarea,
-#id_link {
-    display: block; 
-    width: 100%;
+/* カード内の文章を折り返す */
+.card p {
     max-width: 100%;
-    min-width: 0; /* フレックスコンテナ内での突き抜け防止に必須 */
-    word-break: break-all;
+    min-width: 0;
     overflow-wrap: anywhere;
+    word-break: break-word;
     white-space: normal;
     box-sizing: border-box;
 }
 
+/* 通常の入力欄だけ、カード内に収める */
+.form-group input:not([type="checkbox"]):not([type="radio"]),
+.card textarea,
+.form-group textarea,
+#id_link {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* チェックボックス＋文字を横並びにする */
+.tag-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    width: auto;
+}
+
+/* チェックボックスの大きさを通常に戻す */
+.tag-label input[type="checkbox"] {
+    display: inline-block;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    flex-shrink: 0;
+}
 
 /* プロフィール画面の長いURLをカード内で確実に折り返す親要素 */
 .profile-link-wrap {
