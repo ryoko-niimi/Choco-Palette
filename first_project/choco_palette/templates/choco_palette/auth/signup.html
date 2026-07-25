@@ -6,58 +6,79 @@
 {% block content %}
 <div class="card">
     <h2 style="margin-bottom: 25px;">新規アカウント登録</h2>
-    
+
     <form method="POST" id="signup-form" enctype="multipart/form-data">
         {% csrf_token %}
-        
+
         {% if form.non_field_errors %}
-            <div style="color: red; font-size: 0.9em; margin-bottom: 15px; text-align: left;">
-                {% for error in form.non_field_errors %}
-                    {{ error }}<br>
-                {% endfor %}
-            </div> 
+            <div class="non-field-errors">
+                {{ form.non_field_errors }}
+            </div>
         {% endif %}
 
         <div style="text-align: center; margin-bottom: 20px;">
-            <img id="profile-preview" class="profile-icon" src="{% static 'images/default-avatar.png' %}">
+            <img id="profile-preview"
+                 class="profile-icon"
+                 src="{% static 'images/default-avatar.png' %}">
         </div>
-            
+
         <div class="upload-link" style="text-decoration: underline;">
             <label for="id_image" style="cursor: pointer;">
                 <div style="margin-top: 20px;">画像をアップロード</div>
             </label>
-            <input type="file" name="image" id="id_image" style="display: none;">
+
+            <input type="file"
+                   name="image"
+                   id="id_image"
+                   style="display: none;">
         </div>
 
         <div class="form-group">
             <label>{{ form.username.label }}</label>
+
             {{ form.username }}
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.username.errors }}</div>
+
+            {{ form.username.errors }}
         </div>
 
         <div class="form-group">
             <label>{{ form.email.label }}</label>
+
             {{ form.email }}
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.email.errors }}</div>
+
+            {{ form.email.errors }}
         </div>
 
         <div class="form-group">
             <label>{{ form.password.label }}</label>
+
             {{ form.password }}
-            <small class="password-hint">※半角英数字を含む8文字以上</small>
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.password.errors }}</div>
+
+            <small class="password-hint">
+                ※半角英数字を含む8文字以上
+            </small>
+
+            {{ form.password.errors }}
         </div>
 
         <div class="form-group">
             <label>{{ form.password_confirm.label }}</label>
+
             {{ form.password_confirm }}
-            <div style="color: red; font-size: 0.8rem; margin-top: 5px;">{{ form.password_confirm.errors }}</div>
+
+            {{ form.password_confirm.errors }}
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin: 20px 0;">登録する</button>
+        <button type="submit"
+                class="btn btn-primary"
+                style="width: 100%; margin: 20px 0;">
+            登録する
+        </button>
 
         <div style="margin-top: 20px;">
-            <a href="{% url 'choco_palette:login' %}" class="upload-link" style="text-decoration: underline;">
+            <a href="{% url 'choco_palette:login' %}"
+               class="upload-link"
+               style="text-decoration: underline;">
                 ログイン画面へ戻る
             </a>
         </div>
@@ -65,39 +86,46 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const imageInput = document.getElementById('id_image');
-        const profilePreview = document.getElementById('profile-preview');
+document.addEventListener('DOMContentLoaded', function() {
 
-        imageInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    profilePreview.src = e.target.result;
-                };
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
+    const imageInput = document.getElementById('id_image');
+    const profilePreview = document.getElementById('profile-preview');
 
-        const signupForm = document.getElementById('signup-form');
-        let isSubmitting = false;
+    imageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
 
-        signupForm.addEventListener('submit', function(event) {
-            if (isSubmitting) {
-                event.preventDefault();
-                return;
-            }
+            reader.onload = function(e) {
+                profilePreview.src = e.target.result;
+            };
 
-            isSubmitting = true;
-
-            const submitButton = event.submitter;
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.innerText = '送信中...';
-                submitButton.style.opacity = '0.6';
-                submitButton.style.cursor = 'not-allowed';
-            }
-        });
+            reader.readAsDataURL(this.files[0]);
+        }
     });
+
+    const signupForm = document.getElementById('signup-form');
+
+    let isSubmitting = false;
+
+    signupForm.addEventListener('submit', function(event) {
+
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        isSubmitting = true;
+
+        const submitButton = event.submitter;
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerText = '送信中...';
+            submitButton.style.opacity = '0.6';
+            submitButton.style.cursor = 'not-allowed';
+        }
+    });
+
+});
 </script>
 {% endblock %}

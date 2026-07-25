@@ -81,6 +81,7 @@ body {
     border-color: #c9b9ae;
 }
 
+
 /* 入力枠 */
 .form-control, 
 input[type="text"],
@@ -295,6 +296,32 @@ input[type="date"] {
     word-break: break-all;    /* 強制的に改行させる */
     box-sizing: border-box;
 }
+
+
+/* Djangoフォームのエラーメッセージ */
+.errorlist {
+    width: 100%;
+    max-width: 100%;
+    margin: 5px 0 0;
+    padding: 0;
+    list-style: none;
+    color: #e74c3c;
+    font-size: 0.8rem;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    box-sizing: border-box;
+}
+
+.errorlist li {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 
 /* =========================================================
 【ヘッダー・フッター】
