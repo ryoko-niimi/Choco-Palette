@@ -88,9 +88,22 @@ input[type="password"],
 input[type="email"],
 input[type="number"],
 input[type="date"],
-textarea,
 select,
 .custom-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 50px;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: var(--btn-radius);
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+/* テキストエリアは高さを固定しない */
+textarea {
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -104,7 +117,7 @@ select,
 
 /* スマホの日付入力欄対策 */
 input[type="date"] {
-    display: block;
+    min-height: 50px;
 }
 
 
