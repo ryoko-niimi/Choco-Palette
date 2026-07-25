@@ -1,3 +1,4 @@
+import re
 from django import forms
 from .models import Profile, Post, TasteTag, AromaTag
 from django.contrib.auth.models import User
@@ -44,6 +45,7 @@ class SignupForm(forms.ModelForm):
         return email
     
     # パスワードのルールチェック（半角英数字含む８文字以上）
+    # パスワードのルールチェック（半角英数字含む８文字以上）
     def clean_password(self):
         password = self.cleaned_data.get('password')
         
@@ -51,11 +53,16 @@ class SignupForm(forms.ModelForm):
         if password and len(password) < 8:
             raise forms.ValidationError("8文字以上で入力してください。")
             
-        # 2. Django標準のパスワードバリデーション（英数字チェック等）
+        # 英字と数字の両方が含まれているかチェック
+        if password:
+            if not re.search(r'[A-Za-z]', password) or not re.search(r'[0-9]', password):
+                raise forms.ValidationError("半角英数字を組み合わせてください。")
+
+        # 2. Django標準のパスワードバリデーション
         try:
             validate_password(password)
         except ValidationError as e:
-            raise forms.ValidationError("英数字を組み合わせてください。")
+            raise ValidationError("英数字を組み合わせてください。")
             
         return password
     
@@ -244,6 +251,11 @@ class MyPasswordChangeForm(PasswordChangeForm):
         if password and len(password) < 8:
             raise ValidationError("8文字以上で入力してください。")
             
+        # ★追加: 英字と数字の両方が含まれているかチェック
+        if password:
+            if not re.search(r'[A-Za-z]', password) or not re.search(r'[0-9]', password):
+                raise ValidationError("半角英数字を組み合わせてください。")
+            
         # 2. Django標準のバリデーションチェック
         try:
             validate_password(password)
@@ -251,4 +263,3 @@ class MyPasswordChangeForm(PasswordChangeForm):
             raise ValidationError("英数字を組み合わせてください。")
             
         return password
-    
