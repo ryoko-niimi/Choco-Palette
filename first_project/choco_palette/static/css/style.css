@@ -254,7 +254,26 @@ input[type="date"] {
     box-sizing: border-box;
 }
 
+/* プロフィール画面の長いURLをカード内で折り返す */
+.profile-link-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 15px 0;
+    overflow: hidden;
+}
 
+.profile-link {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    color: #4a2c2a;
+    text-decoration: underline;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+}
 
 
 /* =========================================================

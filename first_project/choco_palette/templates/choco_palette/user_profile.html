@@ -2,131 +2,311 @@
 {% extends "base.html" %}
 
 {% block header_left %}
-<a href="{% url 'choco_palette:post_list' %}" id="back-button" style="text-decoration:none; color:#4a2c2a;">🔙</a>
+<a href="{% url 'choco_palette:post_list' %}"
+   id="back-button"
+   style="text-decoration:none; color:#4a2c2a;">
+    🔙
+</a>
 {% endblock %}
 
 {% block content %}
-<div class="card" style="width: 100%; max-width: 500px; margin: 20px auto; padding: 20px;">
-    <div class="profile-container" style="max-width: 600px; margin: 0 auto; padding: 10px;">
-        <div class="user-info" style="text-align: center; margin-bottom: 30px;">
+<div class="card"
+     style="width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;">
+
+    <div class="profile-container"
+         style="max-width: 600px;
+                margin: 0 auto;
+                padding: 10px;">
+
+        <div class="user-info"
+             style="text-align: center;
+                    margin-bottom: 30px;">
+
             {% if target_user.profile.image %}
-                <img src="{{ target_user.profile.image.url }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                <img src="{{ target_user.profile.image.url }}"
+                     alt="プロフィール画像"
+                     style="width: 100px;
+                            height: 100px;
+                            border-radius: 50%;
+                            object-fit: cover;">
             {% else %}
-                <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #ddd; margin: 0 auto;"></div>
+                <div style="width: 100px;
+                            height: 100px;
+                            border-radius: 50%;
+                            background-color: #ddd;
+                            margin: 0 auto;">
+                </div>
             {% endif %}
-            
-            <h2>{{ target_user.profile.nickname|default:target_user.username }}</h2>
-            
+
+            <h2>
+                {{ target_user.profile.nickname|default:target_user.username }}
+            </h2>
+
             {% if request.user == target_user %}
-                <a href="{% url 'choco_palette:profile_edit' %}" class="upload-link" style="text-decoration: underline;">プロフィールを編集</a>
+                <a href="{% url 'choco_palette:profile_edit' %}"
+                   class="upload-link"
+                   style="text-decoration: underline;">
+                    プロフィールを編集
+                </a>
             {% endif %}
-            
-            <p style="margin-top: 15px; color: #555; white-space: pre-wrap;">{{ target_user.profile.bio|default:"自己紹介がまだありません。" }}</p>
+
+            <p style="margin-top: 15px;
+                      color: #555;
+                      white-space: pre-wrap;
+                      overflow-wrap: anywhere;
+                      word-break: break-word;">
+                {{ target_user.profile.bio|default:"自己紹介がまだありません。" }}
+            </p>
+
             {% if target_user.profile.website and target_user.profile.website != '#' %}
-                <p style="word-break: break-all; overflow-wrap: anywhere; overflow: hidden;"><a href="{{ target_user.profile.website }}" style="display: inline-block; max-width: 100%; word-break: break-all; overflow-wrap: anywhere;">{{ target_user.profile.website }}</a></p>
+                <p class="profile-link-wrap">
+                    <a href="{{ target_user.profile.website }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="profile-link">
+                        {{ target_user.profile.website }}
+                    </a>
+                </p>
             {% endif %}
-            
+
             {% if target_user.profile.link %}
-                <p style="word-break: break-all; overflow-wrap: anywhere; overflow: hidden;"><a href="{{ target_user.profile.link }}" target="_blank" style="display: inline-block; max-width: 100%; word-break: break-all; overflow-wrap: anywhere; color: #4a2c2a; text-decoration: underline;">{{ target_user.profile.link }}</a></p>
+                <p class="profile-link-wrap">
+                    <a href="{{ target_user.profile.link }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="profile-link">
+                        {{ target_user.profile.link }}
+                    </a>
+                </p>
             {% endif %}
         </div>
+
         <hr>
 
         <h3>投稿記録</h3>
 
-        <form id="delete-form" method="POST" action="{% url 'choco_palette:user_profile' target_user.pk %}">
+        <form id="delete-form"
+              method="POST"
+              action="{% url 'choco_palette:user_profile' target_user.pk %}">
+
             {% csrf_token %}
 
             {% if request.user == target_user and page_obj %}
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-                <button type="button" id="toggle-select-btn" class="btn btn-success btn-select" style="margin: 0;">選択</button>
-            </div>
+                <div style="display: flex;
+                            justify-content: flex-end;
+                            margin-bottom: 20px;">
+
+                    <button type="button"
+                            id="toggle-select-btn"
+                            class="btn btn-success btn-select"
+                            style="margin: 0;">
+                        選択
+                    </button>
+                </div>
             {% endif %}
 
             {% for post in page_obj %}
-                <div class="post-card {% if post.status == 2 %}status-private{% endif %}" style="display: flex; align-items: center; margin-bottom: 10px;">
-                    
-                    <input type="checkbox" name="post_ids" value="{{ post.pk }}" class="select-checkbox" style="display: none; transform: scale(1.5); margin-right: 15px;">
+                <div class="post-card {% if post.status == 2 %}status-private{% endif %}"
+                     style="display: flex;
+                            align-items: center;
+                            margin-bottom: 10px;">
+
+                    <input type="checkbox"
+                           name="post_ids"
+                           value="{{ post.pk }}"
+                           class="select-checkbox"
+                           style="display: none;
+                                  transform: scale(1.5);
+                                  margin-right: 15px;">
 
                     {% with first_photo=post.photos.all|dictsort:"sort_order"|first %}
                         {% if first_photo %}
-                            <img src="{{ first_photo.image.url }}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 4px; flex-shrink: 0;">
+                            <img src="{{ first_photo.image.url }}"
+                                 alt="投稿画像"
+                                 style="width: 80px;
+                                        height: 80px;
+                                        object-fit: cover;
+                                        margin-right: 15px;
+                                        border-radius: 4px;
+                                        flex-shrink: 0;">
                         {% else %}
-                    
-                        <div style="width: 80px; height: 80px; background-color: #eee; margin-right: 15px; border-radius: 4px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #888; text-align: center;">
-                            <span style="font-size: 18px; line-height: 1;">📷</span>
-                            <span style="margin-top: 2px;">画像なし</span>
-                        </div>
+                            <div style="width: 80px;
+                                        height: 80px;
+                                        background-color: #eee;
+                                        margin-right: 15px;
+                                        border-radius: 4px;
+                                        flex-shrink: 0;
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-size: 10px;
+                                        color: #888;
+                                        text-align: center;">
+
+                                <span style="font-size: 18px;
+                                             line-height: 1;">
+                                    📷
+                                </span>
+
+                                <span style="margin-top: 2px;">
+                                    画像なし
+                                </span>
+                            </div>
                         {% endif %}
                     {% endwith %}
-                    
-                    <div style="flex-grow: 1;">
-                        <a href="{% url 'choco_palette:post_detail' post.pk %}" style="text-decoration:none; color:inherit; font-weight:bold;">
+
+                    <div style="flex-grow: 1;
+                                min-width: 0;">
+
+                        <a href="{% url 'choco_palette:post_detail' post.pk %}"
+                           style="text-decoration: none;
+                                  color: inherit;
+                                  font-weight: bold;
+                                  overflow-wrap: anywhere;
+                                  word-break: break-word;">
                             {{ post.chocolate_name }}
                         </a>
-                     
-                        <p style="margin: 5px 0; font-size: 0.9em;">
+
+                        <p style="margin: 5px 0;
+                                  font-size: 0.9em;
+                                  overflow-wrap: anywhere;
+                                  word-break: break-word;">
+
                             {{ post.brand_name }}
+
                             {% if post.cacao_percentage %}
                                 / {{ post.cacao_percentage }}%
                             {% endif %}
                         </p>
-                        <div style="color: #f1c40f; font-size: 0.8em;">
+
+                        <div style="color: #f1c40f;
+                                    font-size: 0.8em;">
+
                             {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= post.favorite_rate %}★{% else %}☆{% endif %}
+                                {% if forloop.counter <= post.favorite_rate %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div>
 
                     {% if post.status == 2 %}
-                        <span style="font-size: 1.2em; margin-left: 10px;">🔒</span>
+                        <span style="font-size: 1.2em;
+                                     margin-left: 10px;">
+                            🔒
+                        </span>
                     {% endif %}
                 </div>
+
             {% empty %}
-                <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">まだ投稿はありません。</p>
+                <p style="text-align: center;
+                          color: #7f8c8d;
+                          margin-top: 20px;">
+                    まだ投稿はありません。
+                </p>
             {% endfor %}
         </form>
 
         {% if page_obj.has_other_pages %}
-        <div class="pagination" style="text-align: center; margin: 20px 0;">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">前へ</a>
-            {% endif %}
-            <span style="margin: 0 10px; font-weight: bold; vertical-align: middle;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">次へ</a>
-            {% endif %}
-        </div>
+            <div class="pagination"
+                 style="text-align: center;
+                        margin: 20px 0;">
+
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}"
+                       class="btn btn-secondary btn-sm">
+                        前へ
+                    </a>
+                {% endif %}
+
+                <span style="margin: 0 10px;
+                             font-weight: bold;
+                             vertical-align: middle;">
+                    {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}"
+                       class="btn btn-secondary btn-sm">
+                        次へ
+                    </a>
+                {% endif %}
+            </div>
         {% endif %}
     </div>
 </div>
 
 <script>
-    const toggleBtn = document.getElementById('toggle-select-btn');
-    const checkboxes = document.querySelectorAll('.select-checkbox');
+    const toggleBtn =
+        document.getElementById('toggle-select-btn');
+
+    const checkboxes =
+        document.querySelectorAll('.select-checkbox');
 
     if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const isSelecting = checkboxes[0]?.style.display === 'block';
-            
+        toggleBtn.addEventListener('click', function() {
+            const isSelecting =
+                checkboxes[0]?.style.display === 'block';
+
             if (!isSelecting) {
-                checkboxes.forEach(cb => cb.style.display = 'block');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.style.display = 'block';
+                });
+
                 toggleBtn.textContent = '削除を実行';
-                toggleBtn.classList.replace('btn-success', 'btn-danger');
+
+                toggleBtn.classList.replace(
+                    'btn-success',
+                    'btn-danger'
+                );
+
             } else {
-                const checked = document.querySelectorAll('.select-checkbox:checked');
+                const checked =
+                    document.querySelectorAll(
+                        '.select-checkbox:checked'
+                    );
+
                 if (checked.length > 0) {
                     const confirmHtml = `
                         <div class="modal-actions">
-                            <button type="button" class="btn btn-danger modal-btn" onclick="document.getElementById('delete-form').submit();">削除</button>
-                            <button type="button" class="btn btn-secondary modal-btn" onclick="closeCommonModal()">キャンセル</button>
+                            <button
+                                type="button"
+                                class="btn btn-danger modal-btn"
+                                onclick="document.getElementById('delete-form').submit();">
+                                削除
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary modal-btn"
+                                onclick="closeCommonModal()">
+                                キャンセル
+                            </button>
                         </div>
                     `;
-                    openCommonModal('選択した投稿を削除しますか？', confirmHtml);
+
+                    openCommonModal(
+                        '選択した投稿を削除しますか？',
+                        confirmHtml
+                    );
+
                 } else {
-                    checkboxes.forEach(cb => cb.style.display = 'none');
+                    checkboxes.forEach(function(checkbox) {
+                        checkbox.style.display = 'none';
+                    });
+
                     toggleBtn.textContent = '選択';
-                    toggleBtn.classList.replace('btn-danger', 'btn-success');
+
+                    toggleBtn.classList.replace(
+                        'btn-danger',
+                        'btn-success'
+                    );
                 }
             }
         });
