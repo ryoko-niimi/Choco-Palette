@@ -259,7 +259,8 @@ input[type="date"] {
     box-sizing: border-box;
 }
 
-/* プロフィール画面の長いURLをカード内で折り返す */
+
+/* プロフィール画面の長いURLをカード内で確実に折り返す親要素 */
 .profile-link-wrap {
     width: 100%;
     max-width: 100%;
@@ -269,6 +270,7 @@ input[type="date"] {
     box-sizing: border-box;
 }
 
+/* リンク自体の強制折り返し設定 */
 .profile-link {
     display: block;
     width: 100%;
@@ -277,11 +279,10 @@ input[type="date"] {
     color: #4a2c2a;
     text-decoration: underline;
     white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-all;
+    overflow-wrap: anywhere;  /* どこででも折り返す */
+    word-break: break-all;    /* 強制的に改行させる */
     box-sizing: border-box;
 }
-
 
 /* =========================================================
 【ヘッダー・フッター】
