@@ -233,8 +233,12 @@ input[type="date"] {
 .btn-select {width: 180px;max-width: 50%;}
 
 
-/* 白いカード内長文折り返し */
-.form-group input, 
+/* 白いカード内長文折り返し（テキスト・数値・日付・メールなどの入力欄のみに限定） */
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="password"],
+.form-group input[type="email"],
 .form-group textarea,
 #id_link {
     word-break: break-all;
@@ -242,8 +246,7 @@ input[type="date"] {
     overflow-wrap: break-word;
     width: 100%;
     box-sizing: border-box;
-    }
-
+}
 
 
 
