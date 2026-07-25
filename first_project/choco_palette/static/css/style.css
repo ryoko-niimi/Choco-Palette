@@ -83,9 +83,17 @@ body {
 
 /* 入力枠 */
 .form-control, 
-input[type="text"], input[type="password"], input[type="email"],
-input[type="number"], input[type="date"], textarea, select, .custom-input {
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+textarea,
+select,
+.custom-input {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding: 12px;
     margin-top: 5px;
     border: 1px solid #ccc;
@@ -94,11 +102,9 @@ input[type="number"], input[type="date"], textarea, select, .custom-input {
     font-size: 16px;
 }
 
-/* スマホの日付入力欄が横にはみ出す対策 */
+/* スマホの日付入力欄対策 */
 input[type="date"] {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
+    display: block;
 }
 
 
