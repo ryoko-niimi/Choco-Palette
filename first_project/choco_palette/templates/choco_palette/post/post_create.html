@@ -174,8 +174,11 @@
                 {{ form.tasting_date.label|safe }}
             </label>
 
-            
-            <input type="date" name="{{ form.tasting_date.name }}" value="{{ form.tasting_date.value|default_if_none:'' }}" class="form-control" max="">
+        
+            <input type="date"
+                   name="tasting_date"
+                   value="{{ form.tasting_date.value|date:'Y-m-d'|default_if_none:'' }}"
+                   class="form-control">
 
             <div id="tasting-date-js-error"
                 style="color: red; font-size: 0.8rem; margin-top: 5px;">
