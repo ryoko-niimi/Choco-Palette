@@ -234,18 +234,26 @@ input[type="date"] {
 
 
 /* 白いカード内長文折り返し */
+.card {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
 
-.card,
-.card *,
+.card p,
+.card a,
+.card span,
 .form-group input, 
 .form-group textarea,
-#id_link,
-a {
-    overflow-wrap: anywhere; 
+#id_link {
+    display: block; 
+    width: 100%;
+    max-width: 100%;
     word-break: break-all;
+    overflow-wrap: anywhere;
     white-space: normal;
     box-sizing: border-box;
 }
+
 
 
 
