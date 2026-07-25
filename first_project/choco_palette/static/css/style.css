@@ -117,7 +117,9 @@ textarea {
 
 /* スマホの日付入力欄対策 */
 input[type="date"] {
+    width: 100%;
     min-height: 50px;
+    box-sizing: border-box;
 }
 
 
