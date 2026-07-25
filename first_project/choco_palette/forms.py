@@ -234,32 +234,50 @@ class EmailChangeForm(forms.ModelForm):
         
 #マイページ→パスワード変更画面
 class MyPasswordChangeForm(PasswordChangeForm):
+
+    # Django標準のエラーメッセージを上書き
+    error_messages = {
+        **PasswordChangeForm.error_messages,
+        'password_incorrect': '現在のパスワードが違います。',
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.fields['old_password'].label = "現在のパスワード"
         self.fields['new_password1'].label = "新しいパスワード"
         self.fields['new_password2'].label = "新しいパスワード（確認用）"
-        
+
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'custom-input'})
-            
-    # パスワードのルールチェック（半角英数字含む８文字以上）
+
+    # パスワードのルールチェック
     def clean_new_password1(self):
         password = self.cleaned_data.get('new_password1')
-        
-        # 1. 8文字以上かチェック
-        if password and len(password) < 8:
-            raise ValidationError("8文字以上で入力してください。")
-            
-        # ★追加: 英字と数字の両方が含まれているかチェック
-        if password:
-            if not re.search(r'[A-Za-z]', password) or not re.search(r'[0-9]', password):
-                raise ValidationError("半角英数字を組み合わせてください。")
-            
-        # 2. Django標準のバリデーションチェック
+
+        if not password:
+            return password
+
+        if len(password) < 8:
+            raise forms.ValidationError(
+                "8文字以上で入力してください。"
+            )
+
+        if not re.search(r'[A-Za-z]', password):
+            raise forms.ValidationError(
+                "半角英字と数字を組み合わせてください。"
+            )
+
+        if not re.search(r'[0-9]', password):
+            raise forms.ValidationError(
+                "半角英字と数字を組み合わせてください。"
+            )
+
         try:
-            validate_password(password)
-        except ValidationError as e:
-            raise ValidationError("英数字を組み合わせてください。")
-            
+            validate_password(password, self.user)
+        except ValidationError:
+            raise forms.ValidationError(
+                "使用できないパスワードです。"
+            )
+
         return password
