@@ -60,7 +60,7 @@
         <h2 style="margin: 5px 0;">{{ post.chocolate_name }}</h2>
         <p style="margin: 0;"><strong>ブランド:</strong> {{ post.brand_name }}</p>
         <p style="margin: 0;">{% if post.cacao_percentage %}<strong>カカオ:</strong> {{ post.cacao_percentage }}%{% endif %}</p>
-        <p style="margin: 0;"><strong>日付:</strong> {{ post.created_at|date:"Y/m/d" }}</p>
+        <p style="margin: 0;"><strong>テイスティング日:</strong> {{ post.tasting_date|date:"Y/m/d" }}</p>
         <p style="margin: 10px 0;">
             <strong>お気に入り度:</strong> 
             <span style="color: #f1c40f;">
