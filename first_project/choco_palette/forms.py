@@ -49,13 +49,13 @@ class SignupForm(forms.ModelForm):
         
         # 1. 8文字以上かチェック
         if password and len(password) < 8:
-            raise forms.ValidationError("パスワードは8文字以上で入力してください。")
+            raise forms.ValidationError("8文字以上で入力してください。")
             
         # 2. Django標準のパスワードバリデーション（英数字チェック等）
         try:
             validate_password(password)
         except ValidationError as e:
-            raise forms.ValidationError("パスワードには英数字を組み合わせてください。")
+            raise forms.ValidationError("英数字を組み合わせてください。")
             
         return password
     
@@ -67,7 +67,7 @@ class SignupForm(forms.ModelForm):
         password_confirm = cleaned_data.get("password_confirm")
 
         if password and password_confirm and password != password_confirm:
-            raise forms.ValidationError("パスワードと再入力パスワードが一致していません。")
+            raise forms.ValidationError("パスワードが一致していません。")
         
         return cleaned_data
 
@@ -242,13 +242,13 @@ class MyPasswordChangeForm(PasswordChangeForm):
         
         # 1. 8文字以上かチェック
         if password and len(password) < 8:
-            raise ValidationError("パスワードは8文字以上で入力してください。")
+            raise ValidationError("8文字以上で入力してください。")
             
         # 2. Django標準のバリデーションチェック
         try:
             validate_password(password)
         except ValidationError as e:
-            raise ValidationError("パスワードには英数字を組み合わせてください。")
+            raise ValidationError("英数字を組み合わせてください。")
             
         return password
     
