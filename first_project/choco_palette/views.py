@@ -32,6 +32,85 @@ from .models import PostPhoto
 # 【追加】画像の一覧取得・並び替え配慮用のインポート
 from django.db.models import Prefetch
 
+# --- 注！一時的なテストパスワード再設定メール---
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
+@login_required
+def test_email_send(request):
+    # 自分以外が実行できないように制限
+    if request.user.username != 'ryokoniimi':
+        return render(
+            request,
+            'choco_palette/auth/test_email.html',
+            {
+                'error_message': 'このページは利用できません。'
+            },
+            status=403
+        )
+
+    context = {}
+
+    if request.method == 'POST':
+        recipient = request.POST.get('email', '').strip()
+
+        if not recipient:
+            context['error_message'] = (
+                '受信先メールアドレスを入力してください。'
+            )
+            return render(
+                request,
+                'choco_palette/auth/test_email.html',
+                context
+            )
+
+        try:
+            result = send_mail(
+                subject='Choco Palette Webメール送信テスト',
+                message=(
+                    'PythonAnywhereのWebアプリから'
+                    '送信したテストメールです。'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[recipient],
+                fail_silently=False,
+            )
+
+            logger.info(
+                'Web email test succeeded. recipient=%s result=%s',
+                recipient,
+                result
+            )
+
+            context['success_message'] = (
+                f'送信処理に成功しました。送信件数：{result}'
+            )
+
+        except Exception:
+            logger.exception(
+                'Web email test failed. recipient=%s',
+                recipient
+            )
+
+            context['error_message'] = (
+                'メール送信処理に失敗しました。'
+                'PythonAnywhereのエラーログを確認してください。'
+            )
+
+    return render(
+        request,
+        'choco_palette/auth/test_email.html',
+        context
+    )
+
+
 # --- ポートフォリオ ---
 def portfolio_view(request):
     return render(request, 'choco_palette/portfolio.html')
