@@ -2,7 +2,7 @@ import re
 from django import forms
 from .models import Profile, Post, TasteTag, AromaTag
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import (AuthenticationForm,PasswordChangeForm,SetPasswordForm,)
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -44,7 +44,7 @@ class SignupForm(forms.ModelForm):
             
         return email
     
-    # パスワードのルールチェック（半角英数字含む８文字以上）
+   
     # パスワードのルールチェック（半角英数字含む８文字以上）
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -281,3 +281,48 @@ class MyPasswordChangeForm(PasswordChangeForm):
             )
 
         return password
+    
+# 再設定メール経由のパスワード設定画面
+class MySetPasswordForm(SetPasswordForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['new_password1'].label = "新しいパスワード"
+        self.fields['new_password2'].label = "新しいパスワード（確認用）"
+
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'custom-input'})
+
+    # 半角英字と数字を含む8文字以上かチェック
+    def clean_new_password1(self):
+        password = self.cleaned_data.get('new_password1')
+
+        if not password:
+            return password
+
+        if len(password) < 8:
+            raise forms.ValidationError(
+                "8文字以上で入力してください。"
+            )
+
+        if not re.search(r'[A-Za-z]', password):
+            raise forms.ValidationError(
+                "半角英字と数字を組み合わせてください。"
+            )
+
+        if not re.search(r'[0-9]', password):
+            raise forms.ValidationError(
+                "半角英字と数字を組み合わせてください。"
+            )
+
+        try:
+            validate_password(password, self.user)
+        except ValidationError:
+            raise forms.ValidationError(
+                "使用できないパスワードです。"
+            )
+
+        return password
+    
+    

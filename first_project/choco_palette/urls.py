@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views 
+from .forms import MySetPasswordForm
 from django.contrib.auth import views as auth_views
 
 app_name = 'choco_palette' 
@@ -32,12 +33,11 @@ urlpatterns = [
          name='password_reset_done'),
     
     # 新パスワードの設定画面
-    path('reset/<uidb64>/<token>/', 
-         auth_views.PasswordResetConfirmView.as_view(
-             template_name='choco_palette/auth/password_reset_confirm.html',
-             success_url='/reset/done/'  
-         ), 
-         name='password_reset_confirm'),
+    path('reset/<uidb64>/<token>/',
+          auth_views.PasswordResetConfirmView.as_view(template_name='choco_palette/auth/password_reset_confirm.html',
+          form_class=MySetPasswordForm,
+          success_url='/reset/done/'),
+          name='password_reset_confirm'),
     
     # 新パスワード変更完了画面
     path('reset/done/', 
