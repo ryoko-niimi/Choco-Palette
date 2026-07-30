@@ -97,8 +97,7 @@ urlpatterns = [
    #ログアウト処理
    path('logout/', views.custom_logout, name='logout'),
    
-   # 一時的なWebメール送信テスト
-   path('test-email-send/',views.test_email_send,name='test_email_send'),
+  
    
    
     
